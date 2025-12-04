@@ -1,0 +1,100 @@
+@import '../../../../../styles/variables';
+
+.categories-settings {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-description {
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .loading,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+    color: var(--text-color-secondary);
+  }
+
+  .table-container {
+    ::ng-deep .category-tree-table {
+      .p-treetable-header {
+        background: var(--surface-50);
+        border-bottom: 2px solid var(--surface-border);
+        
+        th {
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.875rem;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .p-treetable-tbody {
+        tr {
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: var(--surface-hover);
+          }
+
+          td {
+            vertical-align: middle;
+
+            &:first-child {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            }
+            
+            .node-name {
+              font-weight: 500;
+              display: inline-block;
+              line-height: 2.5rem; // Mateix line-height que l'input
+            }
+
+            .edit-input {
+              flex: 1;
+              max-width: 400px;
+              margin: 0;
+              height: 2.5rem;
+            }
+
+            .action-buttons {
+              display: flex;
+              gap: 0.25rem;
+              align-items: center;
+
+              ::ng-deep .p-button {
+                width: 2rem;
+                height: 2rem;
+              }
+            }
+          }
+        }
+      }
+
+      // Nested rows styling
+      tr[ng-reflect-level="1"] td:first-child {
+        padding-left: 3rem;
+      }
+
+      tr[ng-reflect-level="2"] td:first-child {
+        padding-left: 5rem;
+      }
+    }
+  }
+}

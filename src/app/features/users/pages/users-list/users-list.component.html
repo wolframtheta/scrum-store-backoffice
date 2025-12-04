@@ -1,0 +1,138 @@
+<div class="users-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="header">
+    <div>
+      <h1>{{ 'users.title' | translate }}</h1>
+      <p class="subtitle">{{ 'users.subtitle' | translate: { groupName: currentGroup()?.name } }}</p>
+    </div>
+    <div class="header-actions">
+      @if (isManager()) {
+        <p-button
+          icon="pi pi-link"
+          [label]="'users.inviteViaLink' | translate"
+          severity="success"
+          [outlined]="true"
+          (click)="openInviteModal()"
+        />
+        <p-button
+          icon="pi pi-user-plus"
+          [label]="'users.addMember' | translate"
+          severity="primary"
+          (click)="openAddMemberModal()"
+        />
+      }
+    </div>
+  </div>
+
+  <!-- Modal per afegir membre -->
+  <app-add-member-modal
+    [visible]="showAddMemberModal()"
+    (visibleChange)="showAddMemberModal.set($event)"
+    (confirm)="onMemberAdded($event)"
+  />
+
+  <!-- Modal per generar invitació -->
+  <app-invite-member-modal
+    [visible]="showInviteModal()"
+    [groupId]="currentGroupId() || ''"
+    [groupName]="currentGroup()?.name || ''"
+    (visibleChange)="showInviteModal.set($event)"
+  />
+
+  <!-- Taula de membres -->
+  <p-table
+    [value]="members()"
+    [paginator]="true"
+    [rows]="10"
+    [loading]="settingsService.isLoading()"
+    styleClass="p-datatable-sm"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{{ 'common.showingRecords' | translate }}">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'users.table.email' | translate }}</th>
+        <th>{{ 'users.table.name' | translate }}</th>
+        <th>{{ 'users.table.roles' | translate }}</th>
+        <th>{{ 'users.table.joinedAt' | translate }}</th>
+        @if (isManager()) {
+          <th class="actions-column">{{ 'common.actions' | translate }}</th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-member>
+      <tr>
+        <td>{{ member.userEmail }}</td>
+        <td>{{ member.name && member.surname ? (member.name + ' ' + member.surname) : '-' }}</td>
+        <td>
+          <div class="role-tags">
+            @if (member.isManager) {
+              <p-tag
+                severity="danger"
+                value="{{ 'users.roles.manager' | translate }}"
+                icon="pi pi-shield"
+              />
+            }
+            @if (member.isClient) {
+              <p-tag
+                severity="success"
+                value="{{ 'users.roles.client' | translate }}"
+                icon="pi pi-user"
+              />
+            }
+          </div>
+        </td>
+        <td>{{ member.joinedAt | date: 'dd/MM/yyyy' }}</td>
+        @if (isManager()) {
+          <td>
+            <div class="action-buttons">
+              <p-button
+                [icon]="member.isManager ? 'pi pi-shield' : 'pi pi-shield'"
+                [text]="true"
+                [rounded]="true"
+                [severity]="member.isManager ? 'danger' : 'secondary'"
+                size="small"
+                (click)="toggleManager(member)"
+                [pTooltip]="member.isManager ? ('users.actions.removeManager' | translate) : ('users.actions.makeManager' | translate)"
+              />
+              <p-button
+                [icon]="member.isClient ? 'pi pi-user' : 'pi pi-user-plus'"
+                [text]="true"
+                [rounded]="true"
+                [severity]="member.isClient ? 'success' : 'secondary'"
+                size="small"
+                (click)="toggleClient(member)"
+                [pTooltip]="member.isClient ? ('users.actions.removeClient' | translate) : ('users.actions.makeClient' | translate)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                size="small"
+                (click)="confirmRemoveMember(member)"
+                [pTooltip]="'users.actions.remove' | translate"
+              />
+            </div>
+          </td>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="isManager() ? 5 : 4" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-users" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+            <p>{{ 'users.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+

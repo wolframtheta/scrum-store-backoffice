@@ -1,0 +1,169 @@
+<div class="notices-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="header">
+    <h1>{{ 'notices.title' | translate }}</h1>
+    <p class="subtitle">{{ 'notices.subtitle' | translate }}</p>
+  </div>
+
+  <!-- Formulari per crear nou avís (només gestors) -->
+  @if (groupService.isManager()) {
+    <p-card class="create-notice-card">
+      <div class="create-notice-form">
+        <textarea
+          pInputTextarea
+          [(ngModel)]="newNoticeContent"
+          [placeholder]="'notices.form.placeholder' | translate"
+          [rows]="4"
+          [autoResize]="true"
+          class="w-full"
+        ></textarea>
+
+        @if (selectedFile()) {
+          <div class="selected-file">
+            <i class="pi pi-image"></i>
+            <span>{{ selectedFile()!.name }}</span>
+            <p-button
+              icon="pi pi-times"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              size="small"
+              (click)="removeSelectedFile()"
+            />
+          </div>
+        }
+
+        <div class="form-actions">
+          <input
+            type="file"
+            #fileInput
+            accept="image/*"
+            (change)="onFileSelect($event)"
+            style="display: none"
+          />
+          <p-button
+            icon="pi pi-image"
+            [text]="true"
+            [label]="'notices.form.addImage' | translate"
+            (click)="fileInput.click()"
+          />
+          <p-button
+            icon="pi pi-send"
+            [label]="'notices.form.publish' | translate"
+            [disabled]="!newNoticeContent().trim()"
+            [loading]="noticesService.isLoading()"
+            (click)="createNotice()"
+          />
+        </div>
+      </div>
+    </p-card>
+  }
+
+  <!-- Llista d'avisos -->
+  <div class="notices-list">
+    @if (noticesService.isLoading() && noticesService.notices().length === 0) {
+      <div class="loading">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+        <p>{{ 'notices.loading' | translate }}</p>
+      </div>
+    } @else if (noticesService.notices().length === 0) {
+      <p-card>
+        <div class="empty-state">
+          <i class="pi pi-inbox" style="font-size: 3rem"></i>
+          <p>{{ 'notices.empty' | translate }}</p>
+        </div>
+      </p-card>
+    } @else {
+      @for (notice of noticesService.notices(); track notice.id) {
+        <p-card class="notice-card">
+          <div class="notice-header">
+            <div class="author-info">
+              @if (notice.author.profileImageUrl) {
+                <p-avatar
+                  [image]="notice.author.profileImageUrl"
+                  shape="circle"
+                  size="large"
+                />
+              } @else {
+                <p-avatar
+                  [label]="getAuthorInitials(notice)"
+                  shape="circle"
+                  size="large"
+                  styleClass="author-avatar"
+                />
+              }
+              <div class="author-details">
+                <strong>{{ getAuthorFullName(notice) }}</strong>
+                <small>{{ formatDate(notice.createdAt) }}</small>
+              </div>
+            </div>
+
+            <div class="notice-actions">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                size="small"
+                (click)="startEdit(notice)"
+                pTooltip="Editar"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                size="small"
+                (click)="deleteNotice(notice)"
+                pTooltip="Eliminar"
+              />
+            </div>
+          </div>
+
+          <div class="notice-content">
+            @if (editingNoticeId() === notice.id) {
+              <div class="edit-form">
+                <textarea
+                  pInputTextarea
+                  [(ngModel)]="editingContent"
+                  [rows]="4"
+                  [autoResize]="true"
+                  class="w-full"
+                ></textarea>
+                <div class="edit-actions">
+                  <p-button
+                    [label]="'notices.actions.cancel' | translate"
+                    [text]="true"
+                    severity="secondary"
+                    (click)="cancelEdit()"
+                  />
+                  <p-button
+                    [label]="'notices.actions.save' | translate"
+                    (click)="saveEdit(notice.id)"
+                    [disabled]="!editingContent().trim()"
+                  />
+                </div>
+              </div>
+            } @else {
+              <p class="content-text">{{ notice.content }}</p>
+              
+              @if (notice.imageUrl) {
+                <div class="notice-image">
+                  <p-image
+                    [src]="notice.imageUrl"
+                    alt="Notice image"
+                    [preview]="true"
+                    width="100%"
+                  />
+                </div>
+              }
+            }
+          </div>
+        </p-card>
+      }
+    }
+  </div>
+</div>
+

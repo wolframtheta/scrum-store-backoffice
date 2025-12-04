@@ -1,0 +1,52 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px' }"
+  (onHide)="onHide()"
+>
+  <ng-template pTemplate="header">
+    <h3>{{ title }}</h3>
+  </ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    @if (contextInfo) {
+      <p class="context-info">{{ contextInfo }}</p>
+    }
+
+    <div class="field">
+      <label [for]="'name-' + data().type">
+        {{ label }} <span class="required">*</span>
+      </label>
+      <input
+        pInputText
+        [id]="'name-' + data().type"
+        formControlName="name"
+        [class.ng-invalid]="isFieldInvalid('name')"
+        [class.ng-dirty]="isFieldInvalid('name')"
+        [placeholder]="'settings.categories.enterName' | translate"
+        autofocus
+      />
+      @if (isFieldInvalid('name')) {
+        <small class="p-error">{{ getFieldError('name') | translate }}</small>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+    />
+    <p-button
+      [label]="'common.save' | translate"
+      (onClick)="onSave()"
+      [loading]="isSaving()"
+    />
+  </ng-template>
+</p-dialog>
+

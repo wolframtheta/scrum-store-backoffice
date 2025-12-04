@@ -1,0 +1,161 @@
+@import '../../../../styles/variables';
+
+.groups-list-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  
+  .page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  .page-subtitle {
+    color: $dark-gray;
+    margin: 0;
+  }
+}
+
+.filters-section {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+
+  .search-input {
+    flex: 1;
+    max-width: 400px;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .status-dropdown {
+    min-width: 200px;
+  }
+}
+
+// Table styles
+::ng-deep .admin-table {
+  background: $white;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+
+  .p-datatable-header {
+    background: $white;
+    border: none;
+    padding: $spacing-lg;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: $light-gray;
+    color: $text-dark;
+    font-weight: 600;
+    padding: $spacing-md $spacing-lg;
+    border: none;
+  }
+
+  .p-datatable-tbody > tr {
+    transition: background-color $transition-speed $transition-ease;
+
+    &:hover {
+      background: $light-gray;
+    }
+
+    > td {
+      padding: $spacing-md $spacing-lg;
+      border-bottom: 1px solid $medium-gray;
+    }
+  }
+
+  .text-center {
+    text-align: center;
+  }
+}
+
+.group-name-cell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .group-avatar,
+  .group-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .group-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary-color;
+    color: $white;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .group-name {
+    font-weight: 500;
+    color: $text-dark;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: $spacing-xs;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: $spacing-xxl !important;
+
+  i {
+    font-size: 3rem;
+    color: $dark-gray;
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    color: $dark-gray;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .groups-list-container {
+    padding: $spacing-lg;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  .filters-section {
+    flex-direction: column;
+
+    .search-input {
+      max-width: none;
+    }
+
+    .status-dropdown {
+      width: 100%;
+    }
+  }
+}
+
+

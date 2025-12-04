@@ -1,0 +1,170 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="producer-dialog"
+  (onHide)="onHide()"
+  [style]="{ width: '600px' }"
+>
+  <ng-template pTemplate="header">
+    <h2 class="dialog-title">
+      {{ (isEditMode() ? 'producers.edit' : 'producers.create') | translate }}
+    </h2>
+  </ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <!-- Nom -->
+      <div class="form-field">
+        <label for="name">{{ 'producers.form.name' | translate }} *</label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          [class.ng-invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <small class="error-message">
+            {{ 'validation.required' | translate }}
+          </small>
+        }
+      </div>
+
+      <!-- Proveïdor -->
+      <div class="form-field">
+        <label for="supplier">{{ 'producers.form.supplier' | translate }}</label>
+        <div class="input-with-button">
+          <p-autoComplete
+            id="supplier"
+            formControlName="supplier"
+            [suggestions]="filteredSuppliers()"
+            (completeMethod)="filterSuppliers($event)"
+            optionLabel="name"
+            dataKey="id"
+            [forceSelection]="false"
+            [dropdown]="true"
+            [style]="{ width: '100%' }"
+          >
+          </p-autoComplete>
+          <p-button
+            icon="pi pi-plus"
+            [rounded]="true"
+            severity="success"
+            [text]="true"
+            (onClick)="openSupplierDialog()"
+            [pTooltip]="'producers.form.createSupplier' | translate"
+            tooltipPosition="top"
+          />
+        </div>
+        <small class="field-hint">{{ 'producers.form.supplierHint' | translate }}</small>
+      </div>
+
+      <!-- Email i Telèfon -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="email">{{ 'producers.form.email' | translate }}</label>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            [class.ng-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          />
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <small class="error-message">
+              {{ 'validation.email' | translate }}
+            </small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="phone">{{ 'producers.form.phone' | translate }}</label>
+          <p-inputMask
+            id="phone"
+            formControlName="phone"
+            mask="999 999 999"
+            [placeholder]="'666 777 888'"
+            [style]="{ width: '100%' }"
+          />
+          <small class="field-hint">9 dígitos</small>
+        </div>
+      </div>
+
+      <!-- Ciutat -->
+      <div class="form-field">
+        <label for="city">{{ 'producers.form.city' | translate }}</label>
+        <input
+          id="city"
+          type="text"
+          pInputText
+          formControlName="city"
+        />
+      </div>
+
+      <!-- Adreça -->
+      <div class="form-field">
+        <label for="address">{{ 'producers.form.address' | translate }}</label>
+        <textarea
+          id="address"
+          pInputTextarea
+          formControlName="address"
+          [rows]="2"
+        ></textarea>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-field">
+        <label for="notes">{{ 'producers.form.notes' | translate }}</label>
+        <textarea
+          id="notes"
+          pInputTextarea
+          formControlName="notes"
+          [rows]="3"
+        ></textarea>
+      </div>
+
+      <!-- Actiu -->
+      @if (isEditMode()) {
+        <div class="form-field checkbox-field">
+          <p-checkbox
+            formControlName="isActive"
+            [binary]="true"
+            inputId="isActive"
+          />
+          <label for="isActive">{{ 'producers.form.isActive' | translate }}</label>
+        </div>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onHide()"
+      />
+      <p-button
+        [label]="'common.save' | translate"
+        icon="pi pi-check"
+        (onClick)="onSubmit()"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Supplier Quick Create Dialog -->
+<app-supplier-form
+  [visible]="showSupplierDialog()"
+  [supplier]="null"
+  (visibleChange)="closeSupplierDialog()"
+  (save)="onSupplierCreated($event)"
+/>
+
+

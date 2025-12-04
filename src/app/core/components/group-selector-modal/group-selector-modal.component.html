@@ -1,0 +1,87 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="false"
+  [dismissableMask]="false"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="group-selector-dialog"
+  [style]="{ width: '600px', maxWidth: '90vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <i class="pi pi-users"></i>
+      <h2>{{ 'groupSelector.title' | translate }}</h2>
+    </div>
+  </ng-template>
+
+  <div class="dialog-content">
+    <p class="description">{{ 'groupSelector.description' | translate }}</p>
+
+    <div class="groups-list">
+      @for (group of groups(); track group.id) {
+        <div
+          class="group-card"
+          [class.selected]="isGroupSelected(group.id)"
+          [class.manager]="group.role.isManager"
+          [class.default]="group.role.isDefault"
+          (click)="selectGroup(group)"
+        >
+          <div class="group-info">
+            <div class="group-header">
+              <h3>{{ group.name }}</h3>
+              @if (group.role.isDefault) {
+                <span class="badge default-badge">
+                  <i class="pi pi-star-fill"></i>
+                  {{ 'groupSelector.default' | translate }}
+                </span>
+              }
+            </div>
+
+            @if (group.description) {
+              <p class="group-description">{{ group.description }}</p>
+            }
+
+            <div class="group-meta">
+              @if (group.city) {
+                <span class="meta-item">
+                  <i class="pi pi-map-marker"></i>
+                  {{ group.city }}
+                </span>
+              }
+
+              <span class="meta-item role" [class.manager-role]="group.role.isManager">
+                <i class="pi" [class.pi-crown]="group.role.isManager" [class.pi-user]="!group.role.isManager"></i>
+                {{ group.role.isManager ? ('groupSelector.manager' | translate) : ('groupSelector.client' | translate) }}
+              </span>
+            </div>
+          </div>
+
+          @if (isGroupSelected(group.id)) {
+            <div class="selected-indicator">
+              <i class="pi pi-check-circle"></i>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <p>{{ 'groupSelector.noGroups' | translate }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        [label]="'groupSelector.continue' | translate"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="continueToHome()"
+        [disabled]="!selectedGroupId()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+

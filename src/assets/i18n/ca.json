@@ -1,0 +1,660 @@
+{
+  "common": {
+    "save": "Desar",
+    "cancel": "Cancel·lar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Cercar",
+    "filter": "Filtrar",
+    "loading": "Carregant...",
+    "noData": "No hi ha dades",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "back": "Tornar",
+    "close": "Tancar",
+    "select": "Seleccionar",
+    "selectAll": "Seleccionar tot",
+    "clear": "Netejar",
+    "refresh": "Actualitzar",
+    "view": "Veure",
+    "actions": "Accions",
+    "total": "Total",
+    "paid": "Pagat",
+    "pending": "Pendent",
+    "date": "Data",
+    "status": "Estat",
+    "showing": "Mostrant",
+    "to": "a",
+    "of": "de",
+    "records": "registres",
+    "success": "Èxit",
+    "error": "Error",
+    "warning": "Advertència",
+    "info": "Informació",
+    "confirmDelete": "Confirmar eliminació",
+    "showingRecords": "Mostrant {first} a {last} de {totalRecords} registres",
+    "errors": {
+      "required": "Aquest camp és obligatori",
+      "invalidEmail": "El format de l'email no és vàlid"
+    }
+  },
+  "auth": {
+    "login": "Iniciar sessió",
+    "logout": "Tancar sessió",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "rememberMe": "Recorda'm",
+    "forgotPassword": "Has oblidat la contrasenya?",
+    "loginButton": "Entrar",
+    "loginError": "Credencials incorrectes",
+    "accessDenied": "No tens permisos per accedir al gestor. Només els gestors i administradors poden accedir.",
+    "welcome": "Benvingut a Scrum Store",
+    "managerAccess": "Accés per a gestors de grups de consum",
+    "emailRequired": "El correu electrònic és obligatori",
+    "emailInvalid": "Introdueix un correu vàlid",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "passwordMinLength": "Mínim 6 caràcters"
+  },
+  "register": {
+    "title": "Crear Compte",
+    "subtitle": "Uneix-te al Scrum Store",
+    "validatingInvitation": "Validant invitació...",
+    "invitedTo": "Has estat convidat a unir-te al grup: {{groupName}}",
+    "alreadyHaveAccount": "Ja tens compte?",
+    "goToLogin": "Inicia sessió",
+    "form": {
+      "name": "Nom",
+      "surname": "Cognoms",
+      "email": "Correu electrònic",
+      "password": "Contrasenya",
+      "confirmPassword": "Confirmar contrasenya",
+      "submit": "Registrar-me"
+    },
+    "errors": {
+      "generic": "Error en registrar l'usuari",
+      "invalidToken": "La invitació no és vàlida o ha caducat",
+      "passwordMinLength": "La contrasenya ha de tenir mínim 6 caràcters",
+      "passwordMismatch": "Les contrasenyes no coincideixen"
+    }
+  },
+  "groupSelector": {
+    "title": "Selecciona el teu grup de consum",
+    "description": "Tria el grup de consum amb el qual vols treballar. Pots canviar-lo més tard des del menú d'usuari.",
+    "default": "Per defecte",
+    "manager": "Gestor",
+    "client": "Client",
+    "noGroups": "No pertanys a cap grup de consum",
+    "continue": "Continuar"
+  },
+  "nav": {
+    "dashboard": "Panell",
+    "catalog": "Catàleg",
+    "showcase": "Aparador",
+    "sales": "Vendes",
+    "users": "Usuaris",
+    "myGroup": "El meu grup",
+    "profile": "Perfil",
+    "settings": "Configuració",
+    "notices": "Avisos"
+  },
+  "header": {
+    "home": "Inici",
+    "profile": "Perfil",
+    "logout": "Tancar sessió",
+    "userMenu": "Menú d'usuari"
+  },
+  "profile": {
+    "title": "El meu perfil",
+    "subtitle": "Gestiona la teva informació personal",
+    "personalInfo": "Informació personal",
+    "comingSoon": "Aviat podràs actualitzar el teu perfil amb més opcions"
+  },
+  "home": {
+    "welcome": "Benvingut, {{name}}!",
+    "quickMetrics": {
+      "salesMonth": "Vendes del Mes",
+      "pendingPayment": "Pendent",
+      "articles": "Articles",
+      "members": "Membres"
+    },
+    "modules": {
+      "catalog": {
+        "title": "Catàleg",
+        "description": "Gestió completa d'articles",
+        "metric": "{{count}} articles"
+      },
+      "showcase": {
+        "title": "Aparador",
+        "description": "Articles visibles per als clients",
+        "metric": "{{count}} a l'aparador"
+      },
+      "producers": {
+        "title": "Productors",
+        "description": "Gestiona els teus productors"
+      },
+      "suppliers": {
+        "title": "Proveïdors",
+        "description": "Gestiona empreses facturadores"
+      },
+      "sales": {
+        "title": "Vendes",
+        "description": "Gestiona comandes i pagaments",
+        "metric": "{{count}} pendents"
+      },
+      "users": {
+        "title": "Usuaris",
+        "description": "Gestiona membres del grup",
+        "metric": "{{count}} membres"
+      },
+      "notices": {
+        "title": "Avisos",
+        "description": "Publica avisos per al grup"
+      },
+      "settings": {
+        "title": "Configuració",
+        "description": "Perfil i ajustos del grup",
+        "metric": "Gestionar grup"
+      },
+      "adminGroups": {
+        "title": "Grups de Consum",
+        "description": "Gestió global de grups"
+      },
+      "adminUsers": {
+        "title": "Usuaris Globals",
+        "description": "Gestió d'usuaris de l'aplicació"
+      }
+    }
+  },
+  "sales": {
+    "title": "Gestió de Vendes",
+    "tabs": {
+      "unpaid": "No Pagades",
+      "partial": "Pagament Parcial",
+      "paid": "Pagades"
+    },
+    "table": {
+      "date": "Data",
+      "user": "Usuari",
+      "items": "Articles",
+      "total": "Total",
+      "paid": "Pagat",
+      "remaining": "Pendent",
+      "status": "Estat"
+    },
+    "status": {
+      "paid": "Pagat",
+      "partial": "Parcial",
+      "unpaid": "No Pagat"
+    },
+    "actions": {
+      "registerPayment": "Registrar Pagament"
+    },
+    "noUnpaidSales": "No hi ha vendes pendents de pagament",
+    "noPartialSales": "No hi ha vendes amb pagament parcial",
+    "noPaidSales": "No hi ha vendes pagades",
+    "payment": {
+      "title": "Registrar Pagament",
+      "user": "Usuari",
+      "date": "Data de compra",
+      "total": "Total venda",
+      "alreadyPaid": "Ja pagat",
+      "remaining": "Pendent de pagament",
+      "items": "Articles de la venda",
+      "article": "Article",
+      "quantity": "Quantitat",
+      "pricePerUnit": "Preu/unitat",
+      "itemTotal": "Total",
+      "itemPaid": "Pagat",
+      "itemRemaining": "Pendent",
+      "payAmount": "A pagar ara",
+      "payFullItem": "Pagar tot",
+      "payAll": "Pagar tot pendent",
+      "totalThisPayment": "Total d'aquest pagament",
+      "remainingAfter": "Pendent després del pagament"
+    }
+  },
+  "catalog": {
+    "title": "Catàleg",
+    "subtitle": "Gestió completa d'articles",
+    "empty": "No hi ha articles al catàleg",
+    "addArticle": "Afegir Article",
+    "editArticle": "Editar Article",
+    "deleteArticle": "Eliminar Article",
+    "name": "Nom",
+    "price": "Preu",
+    "stock": "Estoc",
+    "category": "Categoria",
+    "inShowcase": "A l'Aparador",
+    "priceHistory": "Historial de Preus",
+    "filters": {
+      "searchPlaceholder": "Cercar per nom, descripció o productor...",
+      "showcase": "Aparador",
+      "category": "Categoria",
+      "all": "Tots",
+      "inShowcase": "A l'aparador",
+      "notInShowcase": "Fora de l'aparador"
+    },
+    "table": {
+      "name": "Nom",
+      "description": "Descripció",
+      "producer": "Productor",
+      "city": "Ciutat",
+      "price": "Preu",
+      "unit": "Unitat",
+      "maxQuantity": "Quantitat Màx.",
+      "seasonal": "Temporada",
+      "seasonalYes": "De temporada",
+      "seasonalNo": "No",
+      "showcase": "Aparador"
+    },
+    "status": {
+      "inShowcase": "A l'aparador",
+      "notInShowcase": "Fora"
+    },
+    "actions": {
+      "create": "Nou Article",
+      "addToShowcase": "Afegir a l'aparador",
+      "removeFromShowcase": "Treure de l'aparador"
+    },
+    "form": {
+      "titleCreate": "Crear Nou Article",
+      "titleEdit": "Editar Article",
+      "name": "Nom",
+      "category": "Categoria",
+      "product": "Producte",
+      "variety": "Varietat",
+      "description": "Descripció",
+      "unitMeasure": "Unitat de Mesura",
+      "pricePerUnit": "Preu per Unitat",
+      "producer": "Productor",
+      "city": "Ciutat",
+      "isSeasonal": "Producte de temporada",
+      "errors": {
+        "required": "Aquest camp és obligatori",
+        "maxLength": "Has superat el màxim de caràcters",
+        "min": "El valor ha de ser superior a 0"
+      }
+    }
+  },
+  "users": {
+    "title": "Gestió de Membres",
+    "subtitle": "Gestiona els membres del grup: {{groupName}}",
+    "empty": "Encara no hi ha membres en aquest grup",
+    "addMember": "Afegir Membre",
+    "inviteViaLink": "Convidar per Enllaç",
+    "addMemberTitle": "Afegir Nou Membre",
+    "memberAdded": "Membre afegit correctament",
+    "memberRemoved": "Membre eliminat correctament",
+    "roleUpdated": "Rol actualitzat correctament",
+    "confirmRemove": "Estàs segur que vols eliminar a {{email}} del grup?",
+    "table": {
+      "email": "Email",
+      "name": "Nom",
+      "roles": "Rols",
+      "joinedAt": "Data d'alta"
+    },
+    "roles": {
+      "client": "Client",
+      "manager": "Gestor",
+      "admin": "Administrador"
+    },
+    "actions": {
+      "makeManager": "Fer gestor",
+      "removeManager": "Treure gestor",
+      "makeClient": "Fer client",
+      "removeClient": "Treure client",
+      "remove": "Eliminar membre"
+    },
+    "form": {
+      "email": "Email de l'usuari",
+      "isClient": "És client (pot comprar)",
+      "isClientHelp": "Els clients poden veure l'aparador i fer comandes",
+      "isManager": "És gestor (pot administrar)",
+      "isManagerHelp": "Els gestors poden gestionar articles, membres i configuració"
+    },
+    "invitation": {
+      "title": "Convidar Nou Membre",
+      "description": "Genera un enllaç d'invitació per compartir amb nous membres. L'enllaç no caduca i es pot usar múltiples vegades.",
+      "generate": "Generar Enllaç d'Invitació",
+      "success": "Enllaç generat!",
+      "successDesc": "Comparteix aquest enllaç amb les persones que vulguis convidar",
+      "link": "Enllaç d'invitació",
+      "copy": "Copiar enllaç",
+      "copied": "Enllaç copiat al porta-retalls",
+      "shareVia": "Compartir via",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "generated": "Invitació generada correctament",
+      "infoTitle": "Enllaç permanent",
+      "infoDesc": "Aquest enllaç no caduca i pot ser utilitzat per múltiples persones. Pots compartir-lo tantes vegades com vulguis.",
+      "errors": {
+        "generate": "Error en generar la invitació"
+      }
+    },
+    "errors": {
+      "loadMembers": "Error en carregar els membres",
+      "addMember": "Error en afegir el membre",
+      "updateRole": "Error en actualitzar el rol",
+      "removeMember": "Error en eliminar el membre"
+    }
+  },
+  "errors": {
+    "generic": "Ha ocorregut un error",
+    "networkError": "Error de connexió",
+    "unauthorized": "No autoritzat",
+    "notFound": "No trobat",
+    "serverError": "Error del servidor"
+  },
+  "messages": {
+    "savedSuccessfully": "Desat correctament",
+    "deletedSuccessfully": "Eliminat correctament",
+    "updatedSuccessfully": "Actualitzat correctament",
+    "confirmDelete": "Estàs segur que vols eliminar aquest element?"
+  },
+  "notices": {
+    "title": "Avisos del Grup",
+    "subtitle": "Gestiona els avisos i comunicacions del grup",
+    "empty": "Encara no hi ha cap avís",
+    "loading": "Carregant avisos...",
+    "form": {
+      "placeholder": "Escriu un avís per al grup...",
+      "addImage": "Afegir imatge",
+      "publish": "Publicar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "save": "Desar",
+      "cancel": "Cancel·lar"
+    }
+  },
+  "showcase": {
+    "title": "Aparador",
+    "subtitle": "Articles visibles per als clients",
+    "empty": "No hi ha articles a l'aparador",
+    "table": {
+      "category": "Categoria",
+      "product": "Producte",
+      "variety": "Varietat",
+      "description": "Descripció",
+      "producer": "Productor",
+      "supplier": "Proveïdor",
+      "city": "Població",
+      "price": "Preu",
+      "unit": "Unitat",
+      "maxQuantity": "Quantitat Màx."
+    },
+    "actions": {
+      "remove": "Treure de l'aparador"
+    }
+  },
+  "producers": {
+    "title": "Gestió de Productors",
+    "subtitle": "Administra els productors del teu grup de consum",
+    "create": "Nou Productor",
+    "edit": "Editar Productor",
+    "active": "Actiu",
+    "inactive": "Inactiu",
+    "showInactive": "Mostrar inactius",
+    "hideInactive": "Ocultar inactius",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "noProducers": "No hi ha productors registrats",
+    "noContact": "Sense contacte",
+    "table": {
+      "name": "Nom",
+      "supplier": "Proveïdor",
+      "contact": "Contacte",
+      "location": "Ubicació",
+      "status": "Estat"
+    },
+    "form": {
+      "name": "Nom del productor",
+      "supplier": "Proveïdor / Empresa",
+      "supplierHint": "Empresa o cooperativa que factura",
+      "createSupplier": "Crear nou proveïdor",
+      "email": "Email",
+      "phone": "Telèfon",
+      "city": "Ciutat",
+      "address": "Adreça",
+      "notes": "Notes internes",
+      "isActive": "Productor actiu"
+    }
+  },
+  "suppliers": {
+    "title": "Gestió de Proveïdors",
+    "subtitle": "Administra els proveïdors i empreses que facturen",
+    "create": "Nou Proveïdor",
+    "edit": "Editar Proveïdor",
+    "active": "Actiu",
+    "inactive": "Inactiu",
+    "showInactive": "Mostrar inactius",
+    "hideInactive": "Ocultar inactius",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "noSuppliers": "No hi ha proveïdors registrats",
+    "noContact": "Sense contacte",
+    "table": {
+      "name": "Nom",
+      "taxId": "CIF/NIF",
+      "contact": "Contacte",
+      "location": "Ubicació",
+      "status": "Estat"
+    },
+    "form": {
+      "name": "Nom del proveïdor",
+      "taxId": "CIF / NIF",
+      "taxIdHint": "Identificador fiscal de l'empresa",
+      "email": "Email",
+      "phone": "Telèfon",
+      "city": "Ciutat",
+      "address": "Adreça",
+      "postalCode": "Codi Postal",
+      "bankAccount": "IBAN",
+      "bankAccountHint": "Compte bancari per a pagaments",
+      "notes": "Notes internes",
+      "isActive": "Proveïdor actiu"
+    }
+  },
+  "admin": {
+    "groups": {
+      "title": "Gestió de Grups de Consum",
+      "subtitle": "Administra tots els grups de consum de la plataforma",
+      "filters": {
+        "searchPlaceholder": "Cercar per nom...",
+        "status": "Estat",
+        "all": "Tots",
+        "active": "Actius",
+        "inactive": "Inactius"
+      },
+      "table": {
+        "name": "Nom",
+        "email": "Email",
+        "city": "Ciutat",
+        "created": "Creat",
+        "status": "Estat",
+        "empty": "No s'han trobat grups"
+      },
+      "status": {
+        "active": "Actiu",
+        "inactive": "Inactiu"
+      },
+      "actions": {
+        "create": "Crear Grup",
+        "activate": "Activar",
+        "deactivate": "Desactivar"
+      },
+      "create": {
+        "title": "Crear Grup de Consum",
+        "fields": {
+          "name": "Nom del grup",
+          "email": "Email del grup",
+          "managerEmail": "Email del gestor",
+          "city": "Ciutat",
+          "address": "Adreça",
+          "description": "Descripció"
+        },
+        "placeholders": {
+          "name": "Grup de Consum Barcelona",
+          "email": "grup@exemple.com",
+          "managerEmail": "gestor@exemple.com",
+          "city": "Barcelona",
+          "address": "Carrer Major 123",
+          "description": "Descripció del grup..."
+        },
+        "help": {
+          "managerEmail": "Email de l'usuari que serà el gestor d'aquest grup"
+        }
+      },
+      "success": {
+        "created": "Grup creat correctament",
+        "updated": "Grup actualitzat correctament",
+        "deleted": "Grup eliminat correctament"
+      },
+      "errors": {
+        "loadFailed": "Error en carregar els grups",
+        "createFailed": "Error en crear el grup",
+        "statusUpdateFailed": "Error en actualitzar l'estat",
+        "deleteFailed": "Error en eliminar el grup"
+      }
+    },
+    "users": {
+      "title": "Gestió d'Usuaris",
+      "subtitle": "Administra tots els usuaris de la plataforma",
+      "detail": {
+        "title": "Detall d'Usuari",
+        "tabs": {
+          "general": "Informació General",
+          "groups": "Grups",
+          "activity": "Activitat"
+        },
+        "phone": "Telèfon",
+        "lastLogin": "Últim accés",
+        "createdAt": "Data de creació",
+        "updatedAt": "Última actualització",
+        "groupName": "Nom del grup",
+        "roles": "Rols",
+        "joinedAt": "Data d'alta",
+        "noGroups": "Aquest usuari no pertany a cap grup",
+        "activity": {
+          "lastLogin": "Últim accés",
+          "totalLogins": "Total d'accésos",
+          "totalPurchases": "Comandes totals",
+          "totalSales": "Vendes totals"
+        },
+        "rolesManagement": "Gestió de Rols",
+        "rolesDescription": "Selecciona els rols que tindrà aquest usuari. Els rols determinen els permisos i accés a diferents funcionalitats del sistema.",
+        "confirmRoleChange": "Estàs segur que vols canviar els rols d'aquest usuari?",
+        "rolesUpdated": "Rols actualitzats correctament"
+      },
+      "filters": {
+        "searchPlaceholder": "Cercar per nom o email...",
+        "role": "Rol",
+        "status": "Estat",
+        "all": "Tots",
+        "active": "Actius",
+        "inactive": "Inactius",
+        "allRoles": "Tots els rols"
+      },
+      "table": {
+        "name": "Nom",
+        "email": "Email",
+        "roles": "Rols",
+        "lastLogin": "Últim accés",
+        "status": "Estat",
+        "empty": "No s'han trobat usuaris",
+        "neverLoggedIn": "Mai ha accedit"
+      },
+      "roles": {
+        "superAdmin": "Super Admin",
+        "admin": "Administrador",
+        "client": "Client"
+      },
+      "status": {
+        "active": "Actiu",
+        "inactive": "Inactiu"
+      },
+      "actions": {
+        "resetPassword": "Restablir contrasenya",
+        "activate": "Activar",
+        "deactivate": "Desactivar"
+      },
+      "success": {
+        "created": "Usuari creat correctament",
+        "updated": "Usuari actualitzat correctament",
+        "deleted": "Usuari eliminat correctament"
+      },
+      "errors": {
+        "loadFailed": "Error en carregar els usuaris",
+        "createFailed": "Error en crear l'usuari",
+        "statusUpdateFailed": "Error en actualitzar l'estat",
+        "resetPasswordFailed": "Error en restablir la contrasenya",
+        "deleteFailed": "Error en eliminar l'usuari",
+        "updateRolesFailed": "Error en actualitzar els rols"
+      }
+    }
+  },
+  "validation": {
+    "required": "Aquest camp és obligatori",
+    "invalidEmail": "El format de l'email no és vàlid",
+    "invalidIban": "IBAN no vàlid (Format: ES + 22 dígits)",
+    "invalidPostalCode": "Codi postal no vàlid (5 dígits)",
+    "minLength": "Mínim de caràcters no assolit",
+    "maxLength": "S'ha superat la longitud màxima"
+  },
+  "settings": {
+    "title": "Configuració",
+    "menu": {
+      "general": "General",
+      "categories": "Categories i Productes"
+    },
+    "general": {
+      "title": "Configuració General",
+      "description": "Gestiona la informació bàsica del teu grup de consum",
+      "groupName": "Nom del grup",
+      "city": "Ciutat",
+      "address": "Adreça",
+      "phone": "Telèfon",
+      "email": "Correu electrònic",
+      "defaultLanguage": "Idioma per defecte",
+      "saveSuccess": "Configuració desada correctament",
+      "saveError": "Error en desar la configuració"
+    },
+    "categories": {
+      "title": "Categories, Productes i Varietats",
+      "description": "Gestiona l'arbre jeràrquic de categories per als teus articles",
+      "name": "Nom",
+      "level": "Nivell",
+      "category": "Categoria",
+      "product": "Producte",
+      "variety": "Varietat",
+      "emptyState": "No hi ha categories creades encara",
+      "addCategory": "Afegir Categoria",
+      "addFirstCategory": "Crear Primera Categoria",
+      "addProduct": "Afegir Producte",
+      "addVariety": "Afegir Varietat",
+      "editCategory": "Editar Categoria",
+      "editProduct": "Editar Producte",
+      "editVariety": "Editar Varietat",
+      "categoryName": "Nom de la categoria",
+      "productName": "Nom del producte",
+      "varietyName": "Nom de la varietat",
+      "enterName": "Introdueix el nom",
+      "inCategory": "A la categoria: {{name}}",
+      "inProduct": "Producte: {{product}} (Categoria: {{category}})",
+      "emptyName": "El nom no pot estar buit",
+      "deleteConfirm": "Estàs segur que vols eliminar '{{name}}'? Aquesta acció no es pot desfer.",
+      "categoryCreated": "Categoria creada correctament",
+      "productCreated": "Producte creat correctament",
+      "varietyCreated": "Varietat creada correctament",
+      "createError": "Error en crear l'element",
+      "loadError": "Error en carregar les categories",
+      "updateSuccess": "Element actualitzat correctament",
+      "updateError": "Error en actualitzar l'element",
+      "deleteSuccess": "Element eliminat correctament",
+      "deleteError": "Error en eliminar l'element"
+    }
+  }
+}

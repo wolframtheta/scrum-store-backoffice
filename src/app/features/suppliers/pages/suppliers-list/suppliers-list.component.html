@@ -1,0 +1,165 @@
+<div class="suppliers-container">
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Header -->
+  <div class="suppliers-header">
+    <div class="header-content">
+      <h1 class="suppliers-title">{{ 'suppliers.title' | translate }}</h1>
+      <p class="suppliers-subtitle">{{ 'suppliers.subtitle' | translate }}</p>
+    </div>
+    <p-button
+      [label]="'suppliers.create' | translate"
+      icon="pi pi-plus"
+      (onClick)="openCreateDialog()"
+    />
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <p-inputGroup class="search-input">
+      <p-inputGroupAddon>
+        <i class="pi pi-search"></i>
+      </p-inputGroupAddon>
+      <input
+        type="text"
+        pInputText
+        [placeholder]="'common.search' | translate"
+        (input)="onSearch($event)"
+      />
+      <p-button
+        icon="pi pi-search"
+        [label]="'common.search' | translate"
+        (onClick)="onSearchClick()"
+      />
+    </p-inputGroup>
+    
+    <p-button
+      [label]="showInactive() ? ('suppliers.hideInactive' | translate) : ('suppliers.showInactive' | translate)"
+      [icon]="showInactive() ? 'pi pi-eye-slash' : 'pi pi-eye'"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="toggleShowInactive()"
+    />
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <p-table
+      [value]="filteredSuppliers()"
+      [loading]="isLoading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'suppliers.table.name' | translate }}</th>
+          <th>{{ 'suppliers.table.taxId' | translate }}</th>
+          <th>{{ 'suppliers.table.contact' | translate }}</th>
+          <th>{{ 'suppliers.table.location' | translate }}</th>
+          <th>{{ 'suppliers.table.status' | translate }}</th>
+          <th class="actions-column">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-supplier>
+        <tr>
+          <td>
+            <strong>{{ supplier.name }}</strong>
+          </td>
+          <td>
+            @if (supplier.taxId) {
+              <span>{{ supplier.taxId }}</span>
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          </td>
+          <td>
+            <div class="contact-info">
+              @if (supplier.email) {
+                <div class="contact-item">
+                  <i class="pi pi-envelope"></i>
+                  <span>{{ supplier.email }}</span>
+                </div>
+              }
+              @if (supplier.phone) {
+                <div class="contact-item">
+                  <i class="pi pi-phone"></i>
+                  <span>{{ supplier.phone }}</span>
+                </div>
+              }
+              @if (!supplier.email && !supplier.phone) {
+                <span class="text-muted">{{ 'suppliers.noContact' | translate }}</span>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="location-info">
+              @if (supplier.city) {
+                <i class="pi pi-map-marker"></i>
+                <span>{{ supplier.city }}</span>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </div>
+          </td>
+          <td>
+            <p-tag
+              [value]="supplier.isActive ? ('suppliers.active' | translate) : ('suppliers.inactive' | translate)"
+              [severity]="supplier.isActive ? 'success' : 'danger'"
+            />
+          </td>
+          <td class="actions-column">
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                (onClick)="openEditDialog(supplier)"
+                [pTooltip]="'common.edit' | translate"
+              />
+              <p-button
+                [icon]="supplier.isActive ? 'pi pi-ban' : 'pi pi-check'"
+                [rounded]="true"
+                [text]="true"
+                [severity]="supplier.isActive ? 'warn' : 'success'"
+                (onClick)="confirmToggleActive(supplier)"
+                [pTooltip]="supplier.isActive ? ('suppliers.deactivate' | translate) : ('suppliers.activate' | translate)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                (onClick)="confirmDelete(supplier)"
+                [pTooltip]="'common.delete' | translate"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            {{ 'suppliers.noSuppliers' | translate }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Dialog -->
+<app-supplier-form
+  [visible]="showDialog()"
+  [supplier]="selectedSupplier()"
+  (visibleChange)="closeDialog()"
+  (save)="onSave($event)"
+/>
+

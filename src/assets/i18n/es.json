@@ -1,0 +1,660 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Cargando...",
+    "noData": "No hay datos",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "back": "Volver",
+    "close": "Cerrar",
+    "select": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "clear": "Limpiar",
+    "refresh": "Actualizar",
+    "view": "Ver",
+    "actions": "Acciones",
+    "total": "Total",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "date": "Fecha",
+    "status": "Estado",
+    "showing": "Mostrando",
+    "to": "a",
+    "of": "de",
+    "records": "registros",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información",
+    "confirmDelete": "Confirmar eliminación",
+    "showingRecords": "Mostrando {first} a {last} de {totalRecords} registros",
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "invalidEmail": "El formato del email no es válido"
+    }
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Has olvidado la contraseña?",
+    "loginButton": "Entrar",
+    "loginError": "Credenciales incorrectas",
+    "accessDenied": "No tienes permisos para acceder al gestor. Solo los gestores y administradores pueden acceder.",
+    "welcome": "Bienvenido a Scrum Store",
+    "managerAccess": "Acceso para gestores de grupos de consumo",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "emailInvalid": "Introduce un correo válido",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMinLength": "Mínimo 6 caracteres"
+  },
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Únete a Scrum Store",
+    "validatingInvitation": "Validando invitación...",
+    "invitedTo": "Has sido invitado a unirte al grupo: {{groupName}}",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "goToLogin": "Inicia sesión",
+    "form": {
+      "name": "Nombre",
+      "surname": "Apellidos",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submit": "Registrarme"
+    },
+    "errors": {
+      "generic": "Error al registrar el usuario",
+      "invalidToken": "La invitación no es válida o ha caducado",
+      "passwordMinLength": "La contraseña debe tener mínimo 6 caracteres",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    }
+  },
+  "groupSelector": {
+    "title": "Selecciona tu grupo de consumo",
+    "description": "Elige el grupo de consumo con el que quieres trabajar. Puedes cambiarlo más tarde desde el menú de usuario.",
+    "default": "Por defecto",
+    "manager": "Gestor",
+    "client": "Cliente",
+    "noGroups": "No perteneces a ningún grupo de consumo",
+    "continue": "Continuar"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "catalog": "Catálogo",
+    "showcase": "Aparador",
+    "sales": "Ventas",
+    "users": "Usuarios",
+    "myGroup": "Mi grupo",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "notices": "Avisos"
+  },
+  "header": {
+    "home": "Inicio",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "userMenu": "Menú de usuario"
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "subtitle": "Gestiona tu información personal",
+    "personalInfo": "Información personal",
+    "comingSoon": "Pronto podrás actualizar tu perfil con más opciones"
+  },
+  "home": {
+    "welcome": "Bienvenido, {{name}}!",
+    "quickMetrics": {
+      "salesMonth": "Ventas del Mes",
+      "pendingPayment": "Pendiente",
+      "articles": "Artículos",
+      "members": "Miembros"
+    },
+    "modules": {
+      "catalog": {
+        "title": "Catálogo",
+        "description": "Gestión completa de artículos",
+        "metric": "{{count}} artículos"
+      },
+      "showcase": {
+        "title": "Aparador",
+        "description": "Artículos visibles para clientes",
+        "metric": "{{count}} en aparador"
+      },
+      "producers": {
+        "title": "Productores",
+        "description": "Gestiona tus productores"
+      },
+      "suppliers": {
+        "title": "Proveedores",
+        "description": "Gestiona empresas facturadoras"
+      },
+      "sales": {
+        "title": "Ventas",
+        "description": "Gestiona pedidos y pagos",
+        "metric": "{{count}} pendientes"
+      },
+      "users": {
+        "title": "Usuarios",
+        "description": "Gestiona miembros del grupo",
+        "metric": "{{count}} miembros"
+      },
+      "notices": {
+        "title": "Avisos",
+        "description": "Publica avisos para el grupo"
+      },
+      "settings": {
+        "title": "Configuración",
+        "description": "Perfil y ajustes del grupo",
+        "metric": "Gestionar grupo"
+      },
+      "adminGroups": {
+        "title": "Grupos de Consumo",
+        "description": "Gestión global de grupos"
+      },
+      "adminUsers": {
+        "title": "Usuarios Globales",
+        "description": "Gestión de usuarios de la aplicación"
+      }
+    }
+  },
+  "sales": {
+    "title": "Gestión de Ventas",
+    "tabs": {
+      "unpaid": "No Pagadas",
+      "partial": "Pago Parcial",
+      "paid": "Pagadas"
+    },
+    "table": {
+      "date": "Fecha",
+      "user": "Usuario",
+      "items": "Artículos",
+      "total": "Total",
+      "paid": "Pagado",
+      "remaining": "Pendiente",
+      "status": "Estado"
+    },
+    "status": {
+      "paid": "Pagado",
+      "partial": "Parcial",
+      "unpaid": "No Pagado"
+    },
+    "actions": {
+      "registerPayment": "Registrar Pago"
+    },
+    "noUnpaidSales": "No hay ventas pendientes de pago",
+    "noPartialSales": "No hay ventas con pago parcial",
+    "noPaidSales": "No hay ventas pagadas",
+    "payment": {
+      "title": "Registrar Pago",
+      "user": "Usuario",
+      "date": "Fecha de compra",
+      "total": "Total venta",
+      "alreadyPaid": "Ya pagado",
+      "remaining": "Pendiente de pago",
+      "items": "Artículos de la venta",
+      "article": "Artículo",
+      "quantity": "Cantidad",
+      "pricePerUnit": "Precio/unidad",
+      "itemTotal": "Total",
+      "itemPaid": "Pagado",
+      "itemRemaining": "Pendiente",
+      "payAmount": "A pagar ahora",
+      "payFullItem": "Pagar todo",
+      "payAll": "Pagar todo pendiente",
+      "totalThisPayment": "Total de este pago",
+      "remainingAfter": "Pendiente después del pago"
+    }
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "subtitle": "Gestión completa de artículos",
+    "empty": "No hay artículos en el catálogo",
+    "addArticle": "Añadir Artículo",
+    "editArticle": "Editar Artículo",
+    "deleteArticle": "Eliminar Artículo",
+    "name": "Nombre",
+    "price": "Precio",
+    "stock": "Stock",
+    "category": "Categoría",
+    "inShowcase": "En Aparador",
+    "priceHistory": "Histórico de Precios",
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre, descripción o productor...",
+      "showcase": "Aparador",
+      "category": "Categoría",
+      "all": "Todos",
+      "inShowcase": "En aparador",
+      "notInShowcase": "Fuera del aparador"
+    },
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "producer": "Productor",
+      "city": "Ciudad",
+      "price": "Precio",
+      "unit": "Unidad",
+      "maxQuantity": "Cantidad Máx.",
+      "seasonal": "Temporada",
+      "seasonalYes": "De temporada",
+      "seasonalNo": "No",
+      "showcase": "Aparador"
+    },
+    "status": {
+      "inShowcase": "En aparador",
+      "notInShowcase": "Fuera"
+    },
+    "actions": {
+      "create": "Nuevo Artículo",
+      "addToShowcase": "Añadir al aparador",
+      "removeFromShowcase": "Quitar del aparador"
+    },
+    "form": {
+      "titleCreate": "Crear Nuevo Artículo",
+      "titleEdit": "Editar Artículo",
+      "name": "Nombre",
+      "category": "Categoría",
+      "product": "Producto",
+      "variety": "Variedad",
+      "description": "Descripción",
+      "unitMeasure": "Unidad de Medida",
+      "pricePerUnit": "Precio por Unidad",
+      "producer": "Productor",
+      "city": "Ciudad",
+      "isSeasonal": "Producto de temporada",
+      "errors": {
+        "required": "Este campo es obligatorio",
+        "maxLength": "Has superado el máximo de caracteres",
+        "min": "El valor debe ser superior a 0"
+      }
+    }
+  },
+  "users": {
+    "title": "Gestión de Miembros",
+    "subtitle": "Gestiona los miembros del grupo: {{groupName}}",
+    "empty": "Todavía no hay miembros en este grupo",
+    "addMember": "Añadir Miembro",
+    "inviteViaLink": "Invitar por Enlace",
+    "addMemberTitle": "Añadir Nuevo Miembro",
+    "memberAdded": "Miembro añadido correctamente",
+    "memberRemoved": "Miembro eliminado correctamente",
+    "roleUpdated": "Rol actualizado correctamente",
+    "confirmRemove": "¿Estás seguro que quieres eliminar a {{email}} del grupo?",
+    "table": {
+      "email": "Email",
+      "name": "Nombre",
+      "roles": "Roles",
+      "joinedAt": "Fecha de alta"
+    },
+    "roles": {
+      "client": "Cliente",
+      "manager": "Gestor",
+      "admin": "Administrador"
+    },
+    "actions": {
+      "makeManager": "Hacer gestor",
+      "removeManager": "Quitar gestor",
+      "makeClient": "Hacer cliente",
+      "removeClient": "Quitar cliente",
+      "remove": "Eliminar miembro"
+    },
+    "form": {
+      "email": "Email del usuario",
+      "isClient": "Es cliente (puede comprar)",
+      "isClientHelp": "Los clientes pueden ver el aparador y hacer pedidos",
+      "isManager": "Es gestor (puede administrar)",
+      "isManagerHelp": "Los gestores pueden gestionar artículos, miembros y configuración"
+    },
+    "invitation": {
+      "title": "Invitar Nuevo Miembro",
+      "description": "Genera un enlace de invitación para compartir con nuevos miembros. El enlace no caduca y puede usarse múltiples veces.",
+      "generate": "Generar Enlace de Invitación",
+      "success": "¡Enlace generado!",
+      "successDesc": "Comparte este enlace con las personas que quieras invitar",
+      "link": "Enlace de invitación",
+      "copy": "Copiar enlace",
+      "copied": "Enlace copiado al portapapeles",
+      "shareVia": "Compartir vía",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "generated": "Invitación generada correctamente",
+      "infoTitle": "Enlace permanente",
+      "infoDesc": "Este enlace no caduca y puede ser utilizado por múltiples personas. Puedes compartirlo tantas veces como quieras.",
+      "errors": {
+        "generate": "Error al generar la invitación"
+      }
+    },
+    "errors": {
+      "loadMembers": "Error al cargar los miembros",
+      "addMember": "Error al añadir el miembro",
+      "updateRole": "Error al actualizar el rol",
+      "removeMember": "Error al eliminar el miembro"
+    }
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error",
+    "networkError": "Error de conexión",
+    "unauthorized": "No autorizado",
+    "notFound": "No encontrado",
+    "serverError": "Error del servidor"
+  },
+  "messages": {
+    "savedSuccessfully": "Guardado correctamente",
+    "deletedSuccessfully": "Eliminado correctamente",
+    "updatedSuccessfully": "Actualizado correctamente",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar este elemento?"
+  },
+  "notices": {
+    "title": "Avisos del Grupo",
+    "subtitle": "Gestiona los avisos y comunicaciones del grupo",
+    "empty": "Todavía no hay ningún aviso",
+    "loading": "Cargando avisos...",
+    "form": {
+      "placeholder": "Escribe un aviso para el grupo...",
+      "addImage": "Añadir imagen",
+      "publish": "Publicar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  },
+  "showcase": {
+    "title": "Aparador",
+    "subtitle": "Artículos visibles para los clientes",
+    "empty": "No hay artículos en el aparador",
+    "table": {
+      "category": "Categoría",
+      "product": "Producto",
+      "variety": "Variedad",
+      "description": "Descripción",
+      "producer": "Productor",
+      "supplier": "Proveedor",
+      "city": "Población",
+      "price": "Precio",
+      "unit": "Unidad",
+      "maxQuantity": "Cantidad Máx."
+    },
+    "actions": {
+      "remove": "Quitar del aparador"
+    }
+  },
+  "producers": {
+    "title": "Gestión de Productores",
+    "subtitle": "Administra los productores de tu grupo de consumo",
+    "create": "Nuevo Productor",
+    "edit": "Editar Productor",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "showInactive": "Mostrar inactivos",
+    "hideInactive": "Ocultar inactivos",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "noProducers": "No hay productores registrados",
+    "noContact": "Sin contacto",
+    "table": {
+      "name": "Nombre",
+      "supplier": "Proveedor",
+      "contact": "Contacto",
+      "location": "Ubicación",
+      "status": "Estado"
+    },
+    "form": {
+      "name": "Nombre del productor",
+      "supplier": "Proveedor / Empresa",
+      "supplierHint": "Empresa o cooperativa que factura",
+      "createSupplier": "Crear nuevo proveedor",
+      "email": "Email",
+      "phone": "Teléfono",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "notes": "Notas internas",
+      "isActive": "Productor activo"
+    }
+  },
+  "suppliers": {
+    "title": "Gestión de Proveedores",
+    "subtitle": "Administra los proveedores y empresas que facturan",
+    "create": "Nuevo Proveedor",
+    "edit": "Editar Proveedor",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "showInactive": "Mostrar inactivos",
+    "hideInactive": "Ocultar inactivos",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "noSuppliers": "No hay proveedores registrados",
+    "noContact": "Sin contacto",
+    "table": {
+      "name": "Nombre",
+      "taxId": "CIF/NIF",
+      "contact": "Contacto",
+      "location": "Ubicación",
+      "status": "Estado"
+    },
+    "form": {
+      "name": "Nombre del proveedor",
+      "taxId": "CIF / NIF",
+      "taxIdHint": "Identificador fiscal de la empresa",
+      "email": "Email",
+      "phone": "Teléfono",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "postalCode": "Código Postal",
+      "bankAccount": "IBAN",
+      "bankAccountHint": "Cuenta bancaria para pagos",
+      "notes": "Notas internas",
+      "isActive": "Proveedor activo"
+    }
+  },
+  "admin": {
+    "groups": {
+      "title": "Gestión de Grupos de Consumo",
+      "subtitle": "Administra todos los grupos de consumo de la plataforma",
+      "filters": {
+        "searchPlaceholder": "Buscar por nombre...",
+        "status": "Estado",
+        "all": "Todos",
+        "active": "Activos",
+        "inactive": "Inactivos"
+      },
+      "table": {
+        "name": "Nombre",
+        "email": "Email",
+        "city": "Ciudad",
+        "created": "Creado",
+        "status": "Estado",
+        "empty": "No se han encontrado grupos"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "create": "Crear Grupo",
+        "activate": "Activar",
+        "deactivate": "Desactivar"
+      },
+      "create": {
+        "title": "Crear Grupo de Consumo",
+        "fields": {
+          "name": "Nombre del grupo",
+          "email": "Email del grupo",
+          "managerEmail": "Email del gestor",
+          "city": "Ciudad",
+          "address": "Dirección",
+          "description": "Descripción"
+        },
+        "placeholders": {
+          "name": "Grupo de Consumo Barcelona",
+          "email": "grupo@ejemplo.com",
+          "managerEmail": "gestor@ejemplo.com",
+          "city": "Barcelona",
+          "address": "Calle Mayor 123",
+          "description": "Descripción del grupo..."
+        },
+        "help": {
+          "managerEmail": "Email del usuario que será el gestor de este grupo"
+        }
+      },
+      "success": {
+        "created": "Grupo creado correctamente",
+        "updated": "Grupo actualizado correctamente",
+        "deleted": "Grupo eliminado correctamente"
+      },
+      "errors": {
+        "loadFailed": "Error al cargar los grupos",
+        "createFailed": "Error al crear el grupo",
+        "statusUpdateFailed": "Error al actualizar el estado",
+        "deleteFailed": "Error al eliminar el grupo"
+      }
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "subtitle": "Administra todos los usuarios de la plataforma",
+      "detail": {
+        "title": "Detalle de Usuario",
+        "tabs": {
+          "general": "Información General",
+          "groups": "Grupos",
+          "activity": "Actividad"
+        },
+        "phone": "Teléfono",
+        "lastLogin": "Último acceso",
+        "createdAt": "Fecha de creación",
+        "updatedAt": "Última actualización",
+        "groupName": "Nombre del grupo",
+        "roles": "Roles",
+        "joinedAt": "Fecha de alta",
+        "noGroups": "Este usuario no pertenece a ningún grupo",
+        "activity": {
+          "lastLogin": "Último acceso",
+          "totalLogins": "Total de accesos",
+          "totalPurchases": "Pedidos totales",
+          "totalSales": "Ventas totales"
+        },
+        "rolesManagement": "Gestión de Roles",
+        "rolesDescription": "Selecciona los roles que tendrá este usuario. Los roles determinan los permisos y acceso a diferentes funcionalidades del sistema.",
+        "confirmRoleChange": "¿Estás seguro que quieres cambiar los roles de este usuario?",
+        "rolesUpdated": "Roles actualizados correctamente"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por nombre o email...",
+        "role": "Rol",
+        "status": "Estado",
+        "all": "Todos",
+        "active": "Activos",
+        "inactive": "Inactivos",
+        "allRoles": "Todos los roles"
+      },
+      "table": {
+        "name": "Nombre",
+        "email": "Email",
+        "roles": "Roles",
+        "lastLogin": "Último acceso",
+        "status": "Estado",
+        "empty": "No se han encontrado usuarios",
+        "neverLoggedIn": "Nunca ha accedido"
+      },
+      "roles": {
+        "superAdmin": "Super Admin",
+        "admin": "Administrador",
+        "client": "Cliente"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "resetPassword": "Restablecer contraseña",
+        "activate": "Activar",
+        "deactivate": "Desactivar"
+      },
+      "success": {
+        "created": "Usuario creado correctamente",
+        "updated": "Usuario actualizado correctamente",
+        "deleted": "Usuario eliminado correctamente"
+      },
+      "errors": {
+        "loadFailed": "Error al cargar los usuarios",
+        "createFailed": "Error al crear el usuario",
+        "statusUpdateFailed": "Error al actualizar el estado",
+        "resetPasswordFailed": "Error al restablecer la contraseña",
+        "deleteFailed": "Error al eliminar el usuario",
+        "updateRolesFailed": "Error al actualizar los roles"
+      }
+    }
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "El formato del email no es válido",
+    "invalidIban": "IBAN no válido (Formato: ES + 22 dígitos)",
+    "invalidPostalCode": "Código postal no válido (5 dígitos)",
+    "minLength": "Mínimo de caracteres no alcanzado",
+    "maxLength": "Se ha superado la longitud máxima"
+  },
+  "settings": {
+    "title": "Configuración",
+    "menu": {
+      "general": "General",
+      "categories": "Categorías y Productos"
+    },
+    "general": {
+      "title": "Configuración General",
+      "description": "Gestiona la información básica de tu grupo de consumo",
+      "groupName": "Nombre del grupo",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "defaultLanguage": "Idioma por defecto",
+      "saveSuccess": "Configuración guardada correctamente",
+      "saveError": "Error al guardar la configuración"
+    },
+    "categories": {
+      "title": "Categorías, Productos y Variedades",
+      "description": "Gestiona el árbol jerárquico de categorías para tus artículos",
+      "name": "Nombre",
+      "level": "Nivel",
+      "category": "Categoría",
+      "product": "Producto",
+      "variety": "Variedad",
+      "emptyState": "No hay categorías creadas aún",
+      "addCategory": "Añadir Categoría",
+      "addFirstCategory": "Crear Primera Categoría",
+      "addProduct": "Añadir Producto",
+      "addVariety": "Añadir Variedad",
+      "editCategory": "Editar Categoría",
+      "editProduct": "Editar Producto",
+      "editVariety": "Editar Variedad",
+      "categoryName": "Nombre de la categoría",
+      "productName": "Nombre del producto",
+      "varietyName": "Nombre de la variedad",
+      "enterName": "Introduce el nombre",
+      "inCategory": "En la categoría: {{name}}",
+      "inProduct": "Producto: {{product}} (Categoría: {{category}})",
+      "emptyName": "El nombre no puede estar vacío",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar '{{name}}'? Esta acción no se puede deshacer.",
+      "categoryCreated": "Categoría creada correctamente",
+      "productCreated": "Producto creado correctamente",
+      "varietyCreated": "Variedad creada correctamente",
+      "createError": "Error al crear el elemento",
+      "loadError": "Error al cargar las categorías",
+      "updateSuccess": "Elemento actualizado correctamente",
+      "updateError": "Error al actualizar el elemento",
+      "deleteSuccess": "Elemento eliminado correctamente",
+      "deleteError": "Error al eliminar el elemento"
+    }
+  }
+}

@@ -1,0 +1,182 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="supplier-dialog"
+  (onHide)="onHide()"
+  [style]="{ width: '700px' }"
+>
+  <ng-template pTemplate="header">
+    <h2 class="dialog-title">
+      {{ (isEditMode() ? 'suppliers.edit' : 'suppliers.create') | translate }}
+    </h2>
+  </ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <!-- Nom -->
+      <div class="form-field">
+        <label for="name">{{ 'suppliers.form.name' | translate }} *</label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          [class.ng-invalid]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <small class="error-message">
+            {{ 'validation.required' | translate }}
+          </small>
+        }
+      </div>
+
+      <!-- CIF/NIF -->
+      <div class="form-field">
+        <label for="taxId">{{ 'suppliers.form.taxId' | translate }}</label>
+        <input
+          id="taxId"
+          type="text"
+          pInputText
+          formControlName="taxId"
+        />
+        <small class="field-hint">{{ 'suppliers.form.taxIdHint' | translate }}</small>
+      </div>
+
+      <!-- Email i Telèfon -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="email">{{ 'suppliers.form.email' | translate }}</label>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            [class.ng-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          />
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <small class="error-message">
+              {{ 'validation.invalidEmail' | translate }}
+            </small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="phone">{{ 'suppliers.form.phone' | translate }}</label>
+          <p-inputMask
+            id="phone"
+            formControlName="phone"
+            mask="999 999 999"
+            [placeholder]="'666 777 888'"
+            [style]="{ width: '100%' }"
+          />
+          <small class="field-hint">9 dígitos</small>
+        </div>
+      </div>
+
+      <!-- Ciutat i Codi Postal -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="city">{{ 'suppliers.form.city' | translate }}</label>
+          <input
+            id="city"
+            type="text"
+            pInputText
+            formControlName="city"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="postalCode">{{ 'suppliers.form.postalCode' | translate }}</label>
+          <p-inputMask
+            id="postalCode"
+            formControlName="postalCode"
+            mask="99999"
+            [placeholder]="'08001'"
+            [style]="{ width: '100%' }"
+            [class.ng-invalid]="form.get('postalCode')?.invalid && form.get('postalCode')?.touched"
+          />
+          @if (form.get('postalCode')?.invalid && form.get('postalCode')?.touched) {
+            <small class="error-message">
+              {{ 'validation.invalidPostalCode' | translate }}
+            </small>
+          }
+        </div>
+      </div>
+
+      <!-- Adreça -->
+      <div class="form-field">
+        <label for="address">{{ 'suppliers.form.address' | translate }}</label>
+        <textarea
+          id="address"
+          pInputTextarea
+          formControlName="address"
+          [rows]="2"
+        ></textarea>
+      </div>
+
+      <!-- IBAN -->
+      <div class="form-field">
+        <label for="bankAccount">{{ 'suppliers.form.bankAccount' | translate }}</label>
+        <p-inputMask
+          id="bankAccount"
+          formControlName="bankAccount"
+          mask="aa99 9999 9999 9999 9999 9999"
+          [placeholder]="'ES12 1234 5678 9012 3456 7890'"
+          [style]="{ width: '100%' }"
+          [class.ng-invalid]="form.get('bankAccount')?.invalid && form.get('bankAccount')?.touched"
+        />
+        <small class="field-hint">{{ 'suppliers.form.bankAccountHint' | translate }}</small>
+        @if (form.get('bankAccount')?.invalid && form.get('bankAccount')?.touched) {
+          <small class="error-message">
+            {{ 'validation.invalidIban' | translate }}
+          </small>
+        }
+      </div>
+
+      <!-- Notes -->
+      <div class="form-field">
+        <label for="notes">{{ 'suppliers.form.notes' | translate }}</label>
+        <textarea
+          id="notes"
+          pInputTextarea
+          formControlName="notes"
+          [rows]="3"
+        ></textarea>
+      </div>
+
+      <!-- Actiu -->
+      @if (isEditMode()) {
+        <div class="form-field checkbox-field">
+          <p-checkbox
+            formControlName="isActive"
+            [binary]="true"
+            inputId="isActive"
+          />
+          <label for="isActive">{{ 'suppliers.form.isActive' | translate }}</label>
+        </div>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onHide()"
+      />
+      <p-button
+        [label]="'common.save' | translate"
+        icon="pi pi-check"
+        (onClick)="onSubmit()"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+

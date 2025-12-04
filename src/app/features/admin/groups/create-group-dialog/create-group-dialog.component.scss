@@ -1,0 +1,65 @@
+@import '../../../../../styles/variables';
+
+.create-group-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  .form-label {
+    font-weight: 500;
+    color: $text-dark;
+    font-size: 0.95rem;
+
+    .required {
+      color: $danger-color;
+      margin-left: $spacing-xs;
+    }
+  }
+
+  input,
+  textarea {
+    width: 100%;
+  }
+
+  .field-help {
+    color: $dark-gray;
+    font-size: 0.85rem;
+    margin-top: -$spacing-xs;
+  }
+
+  .p-error {
+    color: $danger-color;
+    font-size: 0.85rem;
+  }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-md;
+}
+
+::ng-deep .create-group-dialog {
+  .p-dialog-header {
+    background: $white;
+    border-bottom: 1px solid $medium-gray;
+  }
+
+  .p-dialog-content {
+    padding: $spacing-xl;
+  }
+
+  .p-dialog-footer {
+    padding: $spacing-lg $spacing-xl;
+    border-top: 1px solid $medium-gray;
+  }
+}
+
+

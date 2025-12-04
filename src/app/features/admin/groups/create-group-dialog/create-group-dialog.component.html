@@ -1,0 +1,138 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="'admin.groups.create.title' | translate"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="create-group-dialog"
+  [style]="{ width: '600px' }"
+>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="create-group-form">
+    <!-- Group Name -->
+    <div class="form-field">
+      <label for="name" class="form-label">
+        {{ 'admin.groups.create.fields.name' | translate }}
+        <span class="required">*</span>
+      </label>
+      <input
+        id="name"
+        type="text"
+        pInputText
+        formControlName="name"
+        [placeholder]="'admin.groups.create.placeholders.name' | translate"
+        [class.p-invalid]="isFieldInvalid('name')"
+      />
+      @if (isFieldInvalid('name')) {
+        <small class="p-error">{{ getFieldError('name') | translate }}</small>
+      }
+    </div>
+
+    <!-- Group Email -->
+    <div class="form-field">
+      <label for="email" class="form-label">
+        {{ 'admin.groups.create.fields.email' | translate }}
+        <span class="required">*</span>
+      </label>
+      <input
+        id="email"
+        type="email"
+        pInputText
+        formControlName="email"
+        [placeholder]="'admin.groups.create.placeholders.email' | translate"
+        [class.p-invalid]="isFieldInvalid('email')"
+      />
+      @if (isFieldInvalid('email')) {
+        <small class="p-error">{{ getFieldError('email') | translate }}</small>
+      }
+    </div>
+
+    <!-- Manager Email -->
+    <div class="form-field">
+      <label for="managerEmail" class="form-label">
+        {{ 'admin.groups.create.fields.managerEmail' | translate }}
+        <span class="required">*</span>
+      </label>
+      <input
+        id="managerEmail"
+        type="email"
+        pInputText
+        formControlName="managerEmail"
+        [placeholder]="'admin.groups.create.placeholders.managerEmail' | translate"
+        [class.p-invalid]="isFieldInvalid('managerEmail')"
+      />
+      @if (isFieldInvalid('managerEmail')) {
+        <small class="p-error">{{ getFieldError('managerEmail') | translate }}</small>
+      }
+      <small class="field-help">{{ 'admin.groups.create.help.managerEmail' | translate }}</small>
+    </div>
+
+    <!-- City -->
+    <div class="form-field">
+      <label for="city" class="form-label">
+        {{ 'admin.groups.create.fields.city' | translate }}
+        <span class="required">*</span>
+      </label>
+      <input
+        id="city"
+        type="text"
+        pInputText
+        formControlName="city"
+        [placeholder]="'admin.groups.create.placeholders.city' | translate"
+        [class.p-invalid]="isFieldInvalid('city')"
+      />
+      @if (isFieldInvalid('city')) {
+        <small class="p-error">{{ getFieldError('city') | translate }}</small>
+      }
+    </div>
+
+    <!-- Address -->
+    <div class="form-field">
+      <label for="address" class="form-label">
+        {{ 'admin.groups.create.fields.address' | translate }}
+      </label>
+      <input
+        id="address"
+        type="text"
+        pInputText
+        formControlName="address"
+        [placeholder]="'admin.groups.create.placeholders.address' | translate"
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="form-field">
+      <label for="description" class="form-label">
+        {{ 'admin.groups.create.fields.description' | translate }}
+      </label>
+      <textarea
+        id="description"
+        pInputTextarea
+        formControlName="description"
+        [placeholder]="'admin.groups.create.placeholders.description' | translate"
+        rows="4"
+      ></textarea>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        [text]="true"
+        (click)="onCancel()"
+        [disabled]="isSubmitting()"
+      />
+      <p-button
+        [label]="'common.create' | translate"
+        icon="pi pi-check"
+        (click)="onSubmit()"
+        [loading]="isSubmitting()"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+

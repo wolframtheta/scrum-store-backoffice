@@ -1,0 +1,56 @@
+.general-settings {
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-description {
+    color: var(--text-color-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 500;
+        color: var(--text-color);
+      }
+
+      input,
+      textarea {
+        width: 100%;
+      }
+
+      small.p-error {
+        color: var(--red-500);
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+

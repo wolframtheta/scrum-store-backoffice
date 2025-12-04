@@ -1,0 +1,156 @@
+@use 'sass:color';
+@import '../../../styles/variables';
+
+.home-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding: 2rem 2.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.home-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1e293b 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.home-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '•';
+    color: #10b981;
+    font-size: 1.2rem;
+  }
+}
+
+// Quick Metrics
+.quick-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.quick-metric {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $light-gray;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 4px 12px rgba(12, 117, 172, 0.12);
+    transform: translateY(-2px);
+  }
+
+  i {
+    font-size: 1.5rem;
+    color: $primary-color;
+  }
+}
+
+.quick-metric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.quick-metric-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $tertiary-color;
+  line-height: 1;
+}
+
+.quick-metric-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Modules Section
+.modules-container {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $tertiary-color;
+  margin: 0 0 1.5rem 0;
+}
+
+.modules-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: flex-start;
+}
+
+
+// Responsive
+@media screen and (max-width: 768px) {
+  .home-container {
+    padding: 1rem;
+  }
+
+  .home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .home-title {
+    font-size: 1.5rem;
+  }
+
+  .quick-metrics {
+    flex-direction: column;
+  }
+
+  .quick-metric {
+    flex: 1 1 auto;
+  }
+
+  .modules-grid {
+    flex-direction: column;
+  }
+
+  ::ng-deep .module-card {
+    flex: 1 1 auto;
+  }
+}

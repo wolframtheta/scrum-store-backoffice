@@ -1,0 +1,118 @@
+<p-dialog
+  [header]="'users.invitation.title' | translate"
+  [visible]="visible()"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <div class="invitation-content">
+    @if (!invitation()) {
+      <!-- Formulari per configurar la invitació -->
+      <form [formGroup]="form">
+        <p class="description">{{ 'users.invitation.description' | translate }}</p>
+
+        <div class="form-field">
+          <div class="checkbox-field">
+            <p-checkbox
+              formControlName="isClient"
+              [binary]="true"
+              inputId="isClient"
+            />
+            <label for="isClient">{{ 'users.form.isClient' | translate }}</label>
+          </div>
+          <small class="field-help">{{ 'users.form.isClientHelp' | translate }}</small>
+        </div>
+
+        <div class="form-field">
+          <div class="checkbox-field">
+            <p-checkbox
+              formControlName="isManager"
+              [binary]="true"
+              inputId="isManager"
+            />
+            <label for="isManager">{{ 'users.form.isManager' | translate }}</label>
+          </div>
+          <small class="field-help">{{ 'users.form.isManagerHelp' | translate }}</small>
+        </div>
+
+        <p-button
+          [label]="'users.invitation.generate' | translate"
+          icon="pi pi-link"
+          (click)="generateInvitation()"
+          [loading]="isGenerating()"
+          [style]="{ width: '100%' }"
+          styleClass="p-button-lg"
+        />
+      </form>
+    } @else {
+      <!-- Enllaç generat -->
+      <div class="invitation-generated">
+        <div class="success-message">
+          <i class="pi pi-check-circle"></i>
+          <h3>{{ 'users.invitation.success' | translate }}</h3>
+          <p>{{ 'users.invitation.successDesc' | translate }}</p>
+        </div>
+
+        <div class="link-container">
+          <label>{{ 'users.invitation.link' | translate }}</label>
+          <div class="link-input-group">
+            <input
+              type="text"
+              pInputText
+              [value]="invitationLink()"
+              readonly
+              class="link-input"
+            />
+            <p-button
+              icon="pi pi-copy"
+              (click)="copyLink()"
+              [pTooltip]="'users.invitation.copy' | translate"
+              severity="secondary"
+            />
+          </div>
+        </div>
+
+        <div class="share-options">
+          <p class="share-title">{{ 'users.invitation.shareVia' | translate }}</p>
+          <div class="share-buttons">
+            <p-button
+              icon="pi pi-whatsapp"
+              [label]="'users.invitation.whatsapp' | translate"
+              severity="success"
+              (click)="shareViaWhatsApp()"
+              [outlined]="true"
+            />
+            <p-button
+              icon="pi pi-envelope"
+              [label]="'users.invitation.email' | translate"
+              severity="secondary"
+              (click)="shareViaEmail()"
+              [outlined]="true"
+            />
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="pi pi-info-circle"></i>
+          <div>
+            <strong>{{ 'users.invitation.infoTitle' | translate }}</strong>
+            <p>{{ 'users.invitation.infoDesc' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.close' | translate"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (click)="onHide()"
+    />
+  </ng-template>
+</p-dialog>
+

@@ -1,0 +1,151 @@
+<div class="categories-settings">
+  <div class="header">
+    <div>
+      <h3>{{ 'settings.categories.title' | translate }}</h3>
+      <p class="section-description">{{ 'settings.categories.description' | translate }}</p>
+    </div>
+    <p-button
+      [label]="'settings.categories.addCategory' | translate"
+      icon="pi pi-plus"
+      (onClick)="addCategory()"
+    />
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <p>{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (treeNodes().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-inbox" style="font-size: 3rem"></i>
+      <p>{{ 'settings.categories.emptyState' | translate }}</p>
+      <p-button
+        [label]="'settings.categories.addFirstCategory' | translate"
+        icon="pi pi-plus"
+        (onClick)="addCategory()"
+      />
+    </div>
+  } @else {
+    <div class="table-container">
+      <p-treetable
+        [value]="treeNodes()"
+        [scrollable]="true"
+        scrollHeight="600px"
+        styleClass="category-tree-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 50%">{{ 'settings.categories.name' | translate }}</th>
+            <th style="width: 20%">{{ 'settings.categories.level' | translate }}</th>
+            <th style="width: 30%">{{ 'common.actions' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+          <tr [ttRow]="rowNode">
+            <td>
+              <p-treetable-toggler [rowNode]="rowNode" />
+              @if (editingNode() === rowNode.node.key) {
+                <input
+                  type="text"
+                  pInputText
+                  [(ngModel)]="editingValue"
+                  (keyup.enter)="saveEdit(rowNode.node)"
+                  (keyup.escape)="cancelEdit()"
+                  class="edit-input"
+                />
+              } @else {
+                <span class="node-name">{{ rowData.name }}</span>
+              }
+            </td>
+            <td>
+              @if (rowData.type === 'category') {
+                <p-tag severity="info" [value]="rowData.level" icon="pi pi-folder" />
+              } @else if (rowData.type === 'product') {
+                <p-tag severity="success" [value]="rowData.level" icon="pi pi-tag" />
+              } @else if (rowData.type === 'variety') {
+                <p-tag severity="secondary" [value]="rowData.level" icon="pi pi-circle" />
+              }
+            </td>
+            <td>
+              @if (editingNode() === rowNode.node.key) {
+                <div class="action-buttons">
+                  <p-button
+                    icon="pi pi-check"
+                    severity="success"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="saveEdit(rowNode.node)"
+                    [pTooltip]="'common.save' | translate"
+                  />
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="cancelEdit()"
+                    [pTooltip]="'common.cancel' | translate"
+                  />
+                </div>
+              } @else {
+                <div class="action-buttons">
+                  @if (rowData.type === 'category') {
+                    <p-button
+                      icon="pi pi-plus"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="addProduct(rowNode.node)"
+                      [pTooltip]="'settings.categories.addProduct' | translate"
+                    />
+                  }
+                  @if (rowData.type === 'product') {
+                    <p-button
+                      icon="pi pi-plus"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="addVariety(rowNode.node)"
+                      [pTooltip]="'settings.categories.addVariety' | translate"
+                    />
+                  }
+                  <p-button
+                    icon="pi pi-pencil"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="startEdit(rowNode.node)"
+                    [pTooltip]="'common.edit' | translate"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="confirmDelete(rowNode.node)"
+                    [pTooltip]="'common.delete' | translate"
+                  />
+                </div>
+              }
+            </td>
+          </tr>
+        </ng-template>
+      </p-treetable>
+    </div>
+  }
+</div>
+
+<p-confirmDialog />
+
+<app-category-item-modal
+  [visible]="modalVisible()"
+  [data]="modalData()"
+  (visibleChange)="modalVisible.set($event)"
+  (confirm)="onModalConfirm($event)"
+/>

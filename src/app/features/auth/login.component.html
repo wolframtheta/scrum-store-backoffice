@@ -1,0 +1,103 @@
+<div class="login-container">
+  <div class="login-card">
+    <!-- Header con logo y branding -->
+    <div class="login-header">
+      <div class="logo-container">
+        <img src="/assets/images/icon/ScrumS-icon.svg" alt="Scrum Store Logo" />
+      </div>
+      <h1>{{ 'auth.welcome' | translate }}</h1>
+      <p>{{ 'auth.managerAccess' | translate }}</p>
+    </div>
+
+    <!-- Formulario de login -->
+    <div class="login-body">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Campo Email -->
+        <div class="field">
+          <label class="label">{{ 'auth.email' | translate }}</label>
+          <p-inputgroup>
+            <p-inputgroup-addon>
+              <i class="pi pi-envelope"></i>
+            </p-inputgroup-addon>
+            <input
+              pInputText
+              type="email"
+              formControlName="email"
+              placeholder="tu@email.com"
+              [class.ng-invalid]="email?.invalid && email?.touched"
+            />
+          </p-inputgroup>
+          @if (email?.invalid && email?.touched) {
+            <small class="p-error block mt-1">
+              @if (email?.errors?.['required']) {
+                {{ 'auth.emailRequired' | translate }}
+              }
+              @if (email?.errors?.['email']) {
+                {{ 'auth.emailInvalid' | translate }}
+              }
+            </small>
+          }
+        </div>
+
+        <!-- Campo Contraseña -->
+        <div class="field">
+          <label class="label">{{ 'auth.password' | translate }}</label>
+          <p-inputgroup>
+            <p-inputgroup-addon>
+              <i class="pi pi-lock"></i>
+            </p-inputgroup-addon>
+            <p-password
+              formControlName="password"
+              placeholder="••••••••"
+              [feedback]="false"
+              [toggleMask]="true"
+              [class.ng-invalid]="password?.invalid && password?.touched"
+            />
+          </p-inputgroup>
+          @if (password?.invalid && password?.touched) {
+            <small class="p-error block mt-1">
+              @if (password?.errors?.['required']) {
+                {{ 'auth.passwordRequired' | translate }}
+              }
+              @if (password?.errors?.['minlength']) {
+                {{ 'auth.passwordMinLength' | translate }}
+              }
+            </small>
+          }
+        </div>
+
+        <!-- Mensaje de error -->
+        @if (errorMessage()) {
+          <div class="mb-3">
+            <p-message
+              severity="error"
+              [text]="errorMessage() || ''"
+              styleClass="w-full"
+            />
+          </div>
+        }
+
+        <!-- Botón de login -->
+        <div class="field">
+          <p-button
+            type="submit"
+            [label]="'auth.loginButton' | translate"
+            icon="pi pi-sign-in"
+            [disabled]="loginForm.invalid || authService.isLoading()"
+            [loading]="authService.isLoading()"
+            styleClass="w-full login-button"
+          />
+        </div>
+
+        <!-- Links adicionales -->
+        <div class="additional-links">
+          <a href="#">{{ 'auth.forgotPassword' | translate }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de selección de grupo -->
+<app-group-selector-modal />
+

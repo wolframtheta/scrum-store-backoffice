@@ -1,0 +1,95 @@
+<div class="general-settings">
+  <h3>{{ 'settings.general.title' | translate }}</h3>
+  <p class="section-description">{{ 'settings.general.description' | translate }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <div class="form-grid">
+      <!-- Nom del grup -->
+      <div class="form-field">
+        <label for="name">{{ 'settings.general.groupName' | translate }} *</label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          [class.ng-invalid]="isFieldInvalid('name')"
+          [class.ng-dirty]="isFieldInvalid('name')"
+        />
+        @if (isFieldInvalid('name')) {
+          <small class="p-error">{{ getFieldError('name') | translate }}</small>
+        }
+      </div>
+
+      <!-- Descripció -->
+      <div class="form-field">
+        <label for="description">{{ 'settings.general.description' | translate }}</label>
+        <textarea
+          id="description"
+          pTextarea
+          formControlName="description"
+          rows="3"
+          [autoResize]="true"
+        ></textarea>
+      </div>
+
+      <!-- Ciutat -->
+      <div class="form-field">
+        <label for="city">{{ 'settings.general.city' | translate }}</label>
+        <input id="city" type="text" pInputText formControlName="city" />
+      </div>
+
+      <!-- Adreça -->
+      <div class="form-field">
+        <label for="address">{{ 'settings.general.address' | translate }}</label>
+        <input id="address" type="text" pInputText formControlName="address" />
+      </div>
+
+      <!-- Telèfon i Email -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="phone">{{ 'settings.general.phone' | translate }}</label>
+          <input id="phone" type="tel" pInputText formControlName="phone" />
+        </div>
+
+        <div class="form-field">
+          <label for="email">{{ 'settings.general.email' | translate }}</label>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            [class.ng-invalid]="isFieldInvalid('email')"
+            [class.ng-dirty]="isFieldInvalid('email')"
+          />
+          @if (isFieldInvalid('email')) {
+            <small class="p-error">{{ getFieldError('email') | translate }}</small>
+          }
+        </div>
+      </div>
+
+      <!-- Idioma per defecte -->
+      <div class="form-field">
+        <label for="defaultLanguage">{{ 'settings.general.defaultLanguage' | translate }}</label>
+        <p-select
+          id="defaultLanguage"
+          formControlName="defaultLanguage"
+          [options]="languages"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <p-button
+        type="submit"
+        [label]="'common.save' | translate"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </form>
+</div>
+

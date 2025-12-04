@@ -1,0 +1,39 @@
+.form-field {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  input {
+    width: 100%;
+  }
+
+  .field-help {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
+.p-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+

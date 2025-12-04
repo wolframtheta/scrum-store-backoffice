@@ -1,0 +1,38 @@
+@import '../../../../../styles/variables';
+
+.context-info {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: $light-bg;
+  border-left: 3px solid $primary-color;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: $dark-gray;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: $dark-gray;
+
+    .required {
+      color: #ef4444;
+    }
+  }
+
+  input {
+    width: 100%;
+  }
+
+  small.p-error {
+    display: block;
+    margin-top: 0.25rem;
+  }
+}
+

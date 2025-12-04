@@ -1,0 +1,133 @@
+<p-dialog
+  [header]="'sales.payment.title' | translate"
+  [visible]="visible()"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  @if (sale()) {
+    <div class="payment-modal-content">
+      <!-- Sale Info -->
+      <div class="sale-info">
+        <div class="info-row">
+          <span class="label">{{ 'sales.payment.user' | translate }}:</span>
+          <span class="value">{{ sale()!.userEmail }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">{{ 'sales.payment.date' | translate }}:</span>
+          <span class="value">{{ sale()!.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">{{ 'sales.payment.total' | translate }}:</span>
+          <span class="value">{{ sale()!.totalAmount | number: '1.2-2' }} €</span>
+        </div>
+        <div class="info-row">
+          <span class="label">{{ 'sales.payment.alreadyPaid' | translate }}:</span>
+          <span class="value">{{ sale()!.paidAmount | number: '1.2-2' }} €</span>
+        </div>
+        <div class="info-row highlight">
+          <span class="label">{{ 'sales.payment.remaining' | translate }}:</span>
+          <span class="value">{{ (sale()!.totalAmount - sale()!.paidAmount) | number: '1.2-2' }} €</span>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="items-section">
+          <div class="section-header">
+            <h3>{{ 'sales.payment.items' | translate }}</h3>
+            <p-button
+              [label]="'sales.payment.payAll' | translate"
+              icon="pi pi-check-circle"
+              severity="success"
+              [text]="true"
+              (onClick)="payAllRemaining()"
+            />
+          </div>
+
+          <p-table [value]="sale()!.items" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'sales.payment.article' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.quantity' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.pricePerUnit' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.itemTotal' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.itemPaid' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.itemRemaining' | translate }}</th>
+                <th class="text-right">{{ 'sales.payment.payAmount' | translate }}</th>
+                <th></th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td>{{ item.articleName }}</td>
+                <td class="text-right">{{ item.quantity }}</td>
+                <td class="text-right">{{ item.pricePerUnit | number: '1.2-2' }} €</td>
+                <td class="text-right">{{ item.totalPrice | number: '1.2-2' }} €</td>
+                <td class="text-right">{{ item.paidAmount | number: '1.2-2' }} €</td>
+                <td class="text-right">{{ getRemainingForItem(item) | number: '1.2-2' }} €</td>
+                <td class="text-right">
+                  <p-inputNumber
+                    [formControlName]="'item_' + item.id"
+                    mode="decimal"
+                    locale="es-ES"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    [min]="0"
+                    [max]="getRemainingForItem(item)"
+                    suffix=" €"
+                    [style]="{ width: '120px' }"
+                  />
+                </td>
+                <td>
+                  <p-button
+                    icon="pi pi-check"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="success"
+                    size="small"
+                    [pTooltip]="'sales.payment.payFullItem' | translate"
+                    (onClick)="payAllForItem(item)"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- Payment Summary -->
+        <div class="payment-summary">
+          <div class="summary-row">
+            <span class="label">{{ 'sales.payment.totalThisPayment' | translate }}:</span>
+            <span class="value">{{ totalPayment() | number: '1.2-2' }} €</span>
+          </div>
+          <div class="summary-row highlight">
+            <span class="label">{{ 'sales.payment.remainingAfter' | translate }}:</span>
+            <span class="value">{{ remainingAfterPayment() | number: '1.2-2' }} €</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | translate"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (onClick)="onHide()"
+    />
+    <p-button
+      [label]="'common.save' | translate"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [loading]="isSaving()"
+      [disabled]="totalPayment() === 0"
+    />
+  </ng-template>
+</p-dialog>
+

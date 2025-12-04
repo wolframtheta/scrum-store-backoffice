@@ -1,0 +1,165 @@
+<div class="producers-container">
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Header -->
+  <div class="producers-header">
+    <div class="header-content">
+      <h1 class="producers-title">{{ 'producers.title' | translate }}</h1>
+      <p class="producers-subtitle">{{ 'producers.subtitle' | translate }}</p>
+    </div>
+    <p-button
+      [label]="'producers.create' | translate"
+      icon="pi pi-plus"
+      (onClick)="openCreateDialog()"
+    />
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <p-inputGroup class="search-input">
+      <p-inputGroupAddon>
+        <i class="pi pi-search"></i>
+      </p-inputGroupAddon>
+      <input
+        type="text"
+        pInputText
+        [placeholder]="'common.search' | translate"
+        (input)="onSearch($event)"
+      />
+      <p-button
+        icon="pi pi-search"
+        [label]="'common.search' | translate"
+        (onClick)="onSearchClick()"
+      />
+    </p-inputGroup>
+    
+    <p-button
+      [label]="showInactive() ? ('producers.hideInactive' | translate) : ('producers.showInactive' | translate)"
+      [icon]="showInactive() ? 'pi pi-eye-slash' : 'pi pi-eye'"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="toggleShowInactive()"
+    />
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <p-table
+      [value]="filteredProducers()"
+      [loading]="isLoading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'producers.table.name' | translate }}</th>
+          <th>{{ 'producers.table.supplier' | translate }}</th>
+          <th>{{ 'producers.table.contact' | translate }}</th>
+          <th>{{ 'producers.table.location' | translate }}</th>
+          <th>{{ 'producers.table.status' | translate }}</th>
+          <th class="actions-column">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-producer>
+        <tr>
+          <td>
+            <strong>{{ producer.name }}</strong>
+          </td>
+          <td>
+            @if (producer.supplierName) {
+              <span>{{ producer.supplierName }}</span>
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          </td>
+          <td>
+            <div class="contact-info">
+              @if (producer.email) {
+                <div class="contact-item">
+                  <i class="pi pi-envelope"></i>
+                  <span>{{ producer.email }}</span>
+                </div>
+              }
+              @if (producer.phone) {
+                <div class="contact-item">
+                  <i class="pi pi-phone"></i>
+                  <span>{{ producer.phone }}</span>
+                </div>
+              }
+              @if (!producer.email && !producer.phone) {
+                <span class="text-muted">{{ 'producers.noContact' | translate }}</span>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="location-info">
+              @if (producer.city) {
+                <i class="pi pi-map-marker"></i>
+                <span>{{ producer.city }}</span>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </div>
+          </td>
+          <td>
+            <p-tag
+              [value]="producer.isActive ? ('producers.active' | translate) : ('producers.inactive' | translate)"
+              [severity]="producer.isActive ? 'success' : 'danger'"
+            />
+          </td>
+          <td class="actions-column">
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                (onClick)="openEditDialog(producer)"
+                [pTooltip]="'common.edit' | translate"
+              />
+              <p-button
+                [icon]="producer.isActive ? 'pi pi-ban' : 'pi pi-check'"
+                [rounded]="true"
+                [text]="true"
+                [severity]="producer.isActive ? 'warn' : 'success'"
+                (onClick)="confirmToggleActive(producer)"
+                [pTooltip]="producer.isActive ? ('producers.deactivate' | translate) : ('producers.activate' | translate)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                (onClick)="confirmDelete(producer)"
+                [pTooltip]="'common.delete' | translate"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            {{ 'producers.noProducers' | translate }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Dialog -->
+<app-producer-form
+  [visible]="showDialog()"
+  [producer]="selectedProducer()"
+  (visibleChange)="closeDialog()"
+  (save)="onSave($event)"
+/>
+

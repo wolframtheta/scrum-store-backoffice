@@ -1,0 +1,230 @@
+<div class="user-detail-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header amb botó de tornar -->
+  <div class="page-header">
+    <div class="header-left">
+      <p-button
+        icon="pi pi-arrow-left"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        (click)="goBack()"
+        [pTooltip]="'common.back' | translate"
+      />
+      <div>
+        <h1 class="page-title">{{ 'admin.users.detail.title' | translate }}</h1>
+        @if (user()) {
+          <p class="page-subtitle">{{ user()!.email }}</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  } @else if (user()) {
+    <p-tabs [(value)]="activeTab">
+      <p-tablist>
+        <p-tab [value]="'general'">{{ 'admin.users.detail.tabs.general' | translate }}</p-tab>
+        <p-tab [value]="'groups'">{{ 'admin.users.detail.tabs.groups' | translate }}</p-tab>
+        <p-tab [value]="'activity'">{{ 'admin.users.detail.tabs.activity' | translate }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- Tab: Informació General -->
+        <p-tabpanel [value]="'general'">
+          <div class="detail-content">
+            <p-card>
+              <div class="user-header">
+                @if (user()!.profileImage) {
+                  <img [src]="user()!.profileImage" [alt]="user()!.name" class="user-avatar-large" />
+                } @else {
+                  <div class="user-avatar-large-placeholder">
+                    {{ user()!.name.charAt(0).toUpperCase() }}{{ user()!.surname.charAt(0).toUpperCase() }}
+                  </div>
+                }
+                <div class="user-info">
+                  <h2>{{ user()!.name }} {{ user()!.surname }}</h2>
+                  <p class="user-email">{{ user()!.email }}</p>
+                  <div class="user-badges">
+                    <p-tag
+                      [value]="getStatusLabel(user()!.isActive) | translate"
+                      [severity]="getStatusSeverity(user()!.isActive)"
+                    />
+                    @for (role of user()!.roles; track role) {
+                      <p-tag
+                        [value]="getRoleLabel(role) | translate"
+                        [severity]="getRoleSeverity(role)"
+                      />
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>{{ 'admin.users.detail.phone' | translate }}</label>
+                  <p>{{ user()!.phone || '-' }}</p>
+                </div>
+                <div class="info-item">
+                  <label>{{ 'admin.users.detail.lastLogin' | translate }}</label>
+                  <p>
+                    @if (user()!.lastLogin) {
+                      {{ user()!.lastLogin | date: 'dd/MM/yyyy HH:mm' }}
+                    } @else {
+                      <span class="text-muted">{{ 'admin.users.table.neverLoggedIn' | translate }}</span>
+                    }
+                  </p>
+                </div>
+                <div class="info-item">
+                  <label>{{ 'admin.users.detail.createdAt' | translate }}</label>
+                  <p>{{ user()!.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+                <div class="info-item">
+                  <label>{{ 'admin.users.detail.updatedAt' | translate }}</label>
+                  <p>{{ user()!.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+              </div>
+            </p-card>
+
+            <!-- Roles Management -->
+            <p-card [header]="'admin.users.detail.rolesManagement' | translate" class="roles-card">
+              <div class="roles-section">
+                <p class="roles-description">{{ 'admin.users.detail.rolesDescription' | translate }}</p>
+                <div class="roles-checkboxes">
+                  @for (role of availableRoles; track role.value) {
+                    <div class="role-checkbox-item">
+                      <p-checkbox
+                        [binary]="true"
+                        [inputId]="'role-' + role.value"
+                        [(ngModel)]="roleStates()[role.value]"
+                        (ngModelChange)="setRoleState(role.value, $event)"
+                      />
+                      <label [for]="'role-' + role.value" class="role-label">
+                        {{ role.label | translate }}
+                      </label>
+                      <p-tag
+                        [value]="role.label | translate"
+                        [severity]="getRoleSeverity(role.value)"
+                        styleClass="role-tag-preview"
+                      />
+                    </div>
+                  }
+                </div>
+                <div class="roles-actions">
+                  <p-button
+                    [label]="'common.save' | translate"
+                    icon="pi pi-save"
+                    [loading]="isSavingRoles()"
+                    [disabled]="!hasRoleChanges()"
+                    (click)="saveRoles()"
+                  />
+                </div>
+              </div>
+            </p-card>
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab: Grups -->
+        <p-tabpanel [value]="'groups'">
+          <div class="detail-content">
+            @if (isLoadingGroups()) {
+              <div class="loading-container">
+                <p-progressSpinner></p-progressSpinner>
+              </div>
+            } @else if (userGroups().length === 0) {
+              <p-card>
+                <div class="empty-state">
+                  <i class="pi pi-inbox"></i>
+                  <p>{{ 'admin.users.detail.noGroups' | translate }}</p>
+                </div>
+              </p-card>
+            } @else {
+              <p-table [value]="userGroups()" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>{{ 'admin.users.detail.groupName' | translate }}</th>
+                    <th>{{ 'admin.users.detail.roles' | translate }}</th>
+                    <th>{{ 'admin.users.detail.joinedAt' | translate }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-group>
+                  <tr>
+                    <td>{{ group.name }}</td>
+                    <td>
+                      <div class="role-tags">
+                        @if (group.role.isManager) {
+                          <p-tag
+                            severity="danger"
+                            value="{{ 'users.roles.manager' | translate }}"
+                            icon="pi pi-shield"
+                          />
+                        }
+                        @if (group.role.isClient) {
+                          <p-tag
+                            severity="success"
+                            value="{{ 'users.roles.client' | translate }}"
+                            icon="pi pi-user"
+                          />
+                        }
+                        @if (group.role.isDefault) {
+                          <p-tag
+                            severity="info"
+                            value="{{ 'groupSelector.default' | translate }}"
+                            icon="pi pi-star"
+                          />
+                        }
+                      </div>
+                    </td>
+                    <td>{{ group.joinedAt | date: 'dd/MM/yyyy' }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            }
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab: Activitat -->
+        <p-tabpanel [value]="'activity'">
+          <div class="detail-content">
+            @if (isLoadingActivity()) {
+              <div class="loading-container">
+                <p-progressSpinner></p-progressSpinner>
+              </div>
+            } @else if (userActivity()) {
+              <div class="activity-grid">
+                <p-card>
+                  <h3>{{ 'admin.users.detail.activity.lastLogin' | translate }}</h3>
+                  <p class="activity-value">
+                    @if (userActivity()!.lastLogin) {
+                      {{ userActivity()!.lastLogin | date: 'dd/MM/yyyy HH:mm' }}
+                    } @else {
+                      <span class="text-muted">{{ 'admin.users.table.neverLoggedIn' | translate }}</span>
+                    }
+                  </p>
+                </p-card>
+                <p-card>
+                  <h3>{{ 'admin.users.detail.activity.totalLogins' | translate }}</h3>
+                  <p class="activity-value">{{ userActivity()!.totalLogins }}</p>
+                </p-card>
+                <p-card>
+                  <h3>{{ 'admin.users.detail.activity.totalPurchases' | translate }}</h3>
+                  <p class="activity-value">{{ (userActivity()?.stats?.totalPurchases) ?? 0 }}</p>
+                </p-card>
+                <p-card>
+                  <h3>{{ 'admin.users.detail.activity.totalSales' | translate }}</h3>
+                  <p class="activity-value">{{ (userActivity()?.stats?.totalSales) ?? 0 }}</p>
+                </p-card>
+              </div>
+            }
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</div>
+

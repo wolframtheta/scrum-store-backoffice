@@ -1,0 +1,13 @@
+<p-card
+  [styleClass]="'module-card module-card-' + config().id"
+  (click)="handleClick()">
+  <div class="module-card-content" [class.module-card-disabled]="config().disabled">
+    <div class="module-icon">
+      <i [class]="'pi ' + config().icon"></i>
+    </div>
+    <h3 class="module-title">{{ config().title }}</h3>
+    <p class="module-description">{{ config().description }}</p>
+  </div>
+</p-card>
+
+

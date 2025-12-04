@@ -1,0 +1,67 @@
+<p-dialog
+  [header]="'users.addMemberTitle' | translate"
+  [visible]="visible()"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <div class="form-field">
+      <label for="userEmail">{{ 'users.form.email' | translate }} *</label>
+      <input
+        id="userEmail"
+        type="email"
+        pInputText
+        formControlName="userEmail"
+        [class.ng-invalid]="isFieldInvalid('userEmail')"
+        [class.ng-dirty]="isFieldInvalid('userEmail')"
+      />
+      @if (isFieldInvalid('userEmail')) {
+        <small class="p-error">{{ getFieldError('userEmail') | translate }}</small>
+      }
+    </div>
+
+    <div class="form-field">
+      <div class="checkbox-field">
+        <p-checkbox
+          formControlName="isClient"
+          [binary]="true"
+          inputId="isClient"
+        />
+        <label for="isClient">{{ 'users.form.isClient' | translate }}</label>
+      </div>
+      <small class="field-help">{{ 'users.form.isClientHelp' | translate }}</small>
+    </div>
+
+    <div class="form-field">
+      <div class="checkbox-field">
+        <p-checkbox
+          formControlName="isManager"
+          [binary]="true"
+          inputId="isManager"
+        />
+        <label for="isManager">{{ 'users.form.isManager' | translate }}</label>
+      </div>
+      <small class="field-help">{{ 'users.form.isManagerHelp' | translate }}</small>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | translate"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (click)="onHide()"
+    />
+    <p-button
+      [label]="'common.save' | translate"
+      icon="pi pi-check"
+      (click)="onSave()"
+      [disabled]="form.invalid"
+    />
+  </ng-template>
+</p-dialog>
+

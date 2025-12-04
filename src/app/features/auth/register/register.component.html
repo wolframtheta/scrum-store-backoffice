@@ -1,0 +1,138 @@
+<div class="register-container">
+  <div class="register-card">
+    <!-- Logo i títol -->
+    <div class="header">
+      <h1>{{ 'register.title' | translate }}</h1>
+      
+      @if (isValidatingToken()) {
+        <div class="validating">
+          <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+          <p>{{ 'register.validatingInvitation' | translate }}</p>
+        </div>
+      } @else if (invitationToken() && tokenValid()) {
+        <p-message
+          severity="success"
+          [text]="'register.invitedTo' | translate: { groupName: groupName() }"
+          styleClass="invitation-message"
+        ></p-message>
+      } @else if (invitationToken() && !tokenValid()) {
+        <p-message
+          severity="error"
+          [text]="'register.errors.invalidToken' | translate"
+        ></p-message>
+      } @else {
+        <p class="subtitle">{{ 'register.subtitle' | translate }}</p>
+      }
+    </div>
+
+    <!-- Formulari de registre -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (errorMessage()) {
+        <p-message
+          severity="error"
+          [text]="errorMessage()!"
+          styleClass="error-message"
+        ></p-message>
+      }
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="name">{{ 'register.form.name' | translate }} *</label>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            [class.ng-invalid]="isFieldInvalid('name')"
+            [class.ng-dirty]="isFieldInvalid('name')"
+          />
+          @if (isFieldInvalid('name')) {
+            <small class="p-error">{{ getFieldError('name') | translate }}</small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="surname">{{ 'register.form.surname' | translate }} *</label>
+          <input
+            id="surname"
+            type="text"
+            pInputText
+            formControlName="surname"
+            [class.ng-invalid]="isFieldInvalid('surname')"
+            [class.ng-dirty]="isFieldInvalid('surname')"
+          />
+          @if (isFieldInvalid('surname')) {
+            <small class="p-error">{{ getFieldError('surname') | translate }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="email">{{ 'register.form.email' | translate }} *</label>
+        <input
+          id="email"
+          type="email"
+          pInputText
+          formControlName="email"
+          [class.ng-invalid]="isFieldInvalid('email')"
+          [class.ng-dirty]="isFieldInvalid('email')"
+        />
+        @if (isFieldInvalid('email')) {
+          <small class="p-error">{{ getFieldError('email') | translate }}</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">{{ 'register.form.password' | translate }} *</label>
+        <p-password
+          id="password"
+          formControlName="password"
+          [toggleMask]="true"
+          [feedback]="true"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+          [class.ng-invalid]="isFieldInvalid('password')"
+          [class.ng-dirty]="isFieldInvalid('password')"
+        ></p-password>
+        @if (isFieldInvalid('password')) {
+          <small class="p-error">{{ getFieldError('password') | translate }}</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="confirmPassword">{{ 'register.form.confirmPassword' | translate }} *</label>
+        <p-password
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          [toggleMask]="true"
+          [feedback]="false"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+          [class.ng-invalid]="isFieldInvalid('confirmPassword')"
+          [class.ng-dirty]="isFieldInvalid('confirmPassword')"
+        ></p-password>
+        @if (isFieldInvalid('confirmPassword')) {
+          <small class="p-error">{{ getFieldError('confirmPassword') | translate }}</small>
+        }
+      </div>
+
+      <p-button
+        type="submit"
+        [label]="'register.form.submit' | translate"
+        [loading]="isRegistering()"
+        [disabled]="form.invalid || isRegistering()"
+        [style]="{ width: '100%' }"
+        styleClass="p-button-lg"
+      />
+    </form>
+
+    <!-- Enllaç al login -->
+    <div class="footer">
+      <p>
+        {{ 'register.alreadyHaveAccount' | translate }}
+        <a (click)="goToLogin()" class="link">{{ 'register.goToLogin' | translate }}</a>
+      </p>
+    </div>
+  </div>
+</div>
+

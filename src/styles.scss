@@ -1,1 +1,231 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importar font moderna Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Importar PrimeNG - Rutas correctas */
+@import 'primeicons/primeicons.css';
+@import 'styles/variables';
+
+/* Estilos globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $dark-gray;
+  background: $light-bg;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Clases de utilidad personalizadas */
+.is-fullheight {
+  min-height: 100vh;
+}
+
+.card-equal-height {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-equal-height .card-content {
+  flex-grow: 1;
+}
+
+/* Scrollbar personalizado elegante */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: $light-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $light-gray;
+  border-radius: 8px;
+  border: 2px solid $light-bg;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $gray;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Animaciones de entrada/salida */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Responsive utilities adicionales */
+@media screen and (max-width: 768px) {
+  .is-hidden-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Mejoras para tablas */
+.table-container {
+  overflow-x: auto;
+}
+
+/* Estados de pago */
+.payment-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.unpaid {
+    background-color: #FEE2E2;
+    color: $danger;
+    border: 1px solid lighten($danger, 20%);
+  }
+
+  &.partial {
+    background-color: #FEF3C7;
+    color: $warning;
+    border: 1px solid lighten($warning, 20%);
+  }
+
+  &.paid {
+    background-color: #D1FAE5;
+    color: $success;
+    border: 1px solid lighten($success, 20%);
+  }
+}
+
+/* Estilos globales PrimeNG para elegancia */
+::ng-deep {
+  // Botones más elegantes
+  .p-button {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // Cards más elegantes
+  .p-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid $light-gray;
+
+    .p-card-title {
+      color: $tertiary-color;
+      font-weight: 600;
+    }
+  }
+
+  // Inputs más elegantes
+  .p-inputtext {
+    border-radius: 8px;
+    border: 1px solid $light-gray;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(12, 117, 172, 0.1);
+    }
+  }
+
+  // Dropdowns más elegantes
+  .p-dropdown {
+    border-radius: 8px;
+    border: 1px solid $light-gray;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(12, 117, 172, 0.1);
+    }
+  }
+
+  // Tablas más elegantes
+  .p-datatable {
+    border-radius: 12px;
+    overflow: hidden;
+
+    .p-datatable-thead > tr > th {
+      background: $light-bg;
+      color: $gray;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid $light-gray;
+    }
+
+    .p-datatable-tbody > tr {
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: rgba(12, 117, 172, 0.03);
+      }
+    }
+  }
+
+  // Dialogs más elegantes
+  .p-dialog {
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+    .p-dialog-header {
+      border-radius: 16px 16px 0 0;
+      background: $white;
+      border-bottom: 1px solid $light-gray;
+    }
+  }
+
+  // Toasts más elegantes
+  .p-toast {
+    .p-toast-message {
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border-left: 4px solid;
+    }
+  }
+}

@@ -1,0 +1,224 @@
+<div class="sales-container">
+  <p-toast />
+
+  <div class="header">
+    <h1>{{ 'sales.title' | translate }}</h1>
+  </div>
+
+  <p-tabs [(value)]="activeTab">
+    <p-tablist>
+      <p-tab [value]="'unpaid'">{{'sales.tabs.unpaid' | translate}}</p-tab>
+      <p-tab [value]="'partial'">{{'sales.tabs.partial' | translate}}</p-tab>
+      <p-tab [value]="'paid'">{{'sales.tabs.paid' | translate}}</p-tab>
+    </p-tablist>
+    <!-- Tab: No Pagades -->
+
+    <p-tabpanels>
+
+      <p-tabpanel [value]="'unpaid'">
+        <p-table
+          [value]="unpaidSales()"
+          [loading]="salesService.isLoading()"
+          [paginator]="true"
+          [rows]="10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="{first} - {last} de {totalRecords}"
+          styleClass="p-datatable-striped"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="createdAt">
+                {{ 'sales.table.date' | translate }}
+                <p-sortIcon field="createdAt" />
+              </th>
+              <th pSortableColumn="userEmail">
+                {{ 'sales.table.user' | translate }}
+                <p-sortIcon field="userEmail" />
+              </th>
+              <th class="text-right">{{ 'sales.table.items' | translate }}</th>
+              <th class="text-right" pSortableColumn="totalAmount">
+                {{ 'sales.table.total' | translate }}
+                <p-sortIcon field="totalAmount" />
+              </th>
+              <th>{{ 'sales.table.status' | translate }}</th>
+              <th class="text-center">{{ 'common.actions' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-sale>
+            <tr>
+              <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ sale.userEmail }}</td>
+              <td class="text-right">{{ sale.items.length }}</td>
+              <td class="text-right">{{ sale.totalAmount | number: '1.2-2' }} €</td>
+              <td>
+                <p-tag
+                  [value]="getStatusLabel(sale.paymentStatus) | translate"
+                  [severity]="getStatusSeverity(sale.paymentStatus)"
+                />
+              </td>
+              <td class="text-center">
+                <p-button
+                  icon="pi pi-money-bill"
+                  [pTooltip]="'sales.actions.registerPayment' | translate"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="success"
+                  (onClick)="openPaymentModal(sale)"
+                />
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6" class="text-center">
+                {{ 'sales.noUnpaidSales' | translate }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+      <!-- Tab: Pagament Parcial -->
+      <p-tabpanel [value]="'partial'">
+        <p-table
+          [value]="partialSales()"
+          [loading]="salesService.isLoading()"
+          [paginator]="true"
+          [rows]="10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="{first} - {last} de {totalRecords}"
+          styleClass="p-datatable-striped"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="createdAt">
+                {{ 'sales.table.date' | translate }}
+                <p-sortIcon field="createdAt" />
+              </th>
+              <th pSortableColumn="userEmail">
+                {{ 'sales.table.user' | translate }}
+                <p-sortIcon field="userEmail" />
+              </th>
+              <th class="text-right">{{ 'sales.table.items' | translate }}</th>
+              <th class="text-right" pSortableColumn="totalAmount">
+                {{ 'sales.table.total' | translate }}
+                <p-sortIcon field="totalAmount" />
+              </th>
+              <th class="text-right">{{ 'sales.table.paid' | translate }}</th>
+              <th class="text-right">{{ 'sales.table.remaining' | translate }}</th>
+              <th>{{ 'sales.table.status' | translate }}</th>
+              <th class="text-center">{{ 'common.actions' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-sale>
+            <tr>
+              <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ sale.userEmail }}</td>
+              <td class="text-right">{{ sale.items.length }}</td>
+              <td class="text-right">{{ sale.totalAmount | number: '1.2-2' }} €</td>
+              <td class="text-right">{{ sale.paidAmount | number: '1.2-2' }} €</td>
+              <td class="text-right">{{ getRemainingAmount(sale) | number: '1.2-2' }} €</td>
+              <td>
+                <p-tag
+                  [value]="getStatusLabel(sale.paymentStatus) | translate"
+                  [severity]="getStatusSeverity(sale.paymentStatus)"
+                />
+              </td>
+              <td class="text-center">
+                <p-button
+                  icon="pi pi-money-bill"
+                  [pTooltip]="'sales.actions.registerPayment' | translate"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="success"
+                  (onClick)="openPaymentModal(sale)"
+                />
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8" class="text-center">
+                {{ 'sales.noPartialSales' | translate }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+
+      <!-- Tab: Pagades -->
+      <p-tabpanel [value]="'paid'">
+        <p-table
+          [value]="paidSales()"
+          [loading]="salesService.isLoading()"
+          [paginator]="true"
+          [rows]="10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="{first} - {last} de {totalRecords}"
+          styleClass="p-datatable-striped"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="createdAt">
+                {{ 'sales.table.date' | translate }}
+                <p-sortIcon field="createdAt" />
+              </th>
+              <th pSortableColumn="userEmail">
+                {{ 'sales.table.user' | translate }}
+                <p-sortIcon field="userEmail" />
+              </th>
+              <th class="text-right">{{ 'sales.table.items' | translate }}</th>
+              <th class="text-right" pSortableColumn="totalAmount">
+                {{ 'sales.table.total' | translate }}
+                <p-sortIcon field="totalAmount" />
+              </th>
+              <th>{{ 'sales.table.status' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-sale>
+            <tr>
+              <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ sale.userEmail }}</td>
+              <td class="text-right">{{ sale.items.length }}</td>
+              <td class="text-right">{{ sale.totalAmount | number: '1.2-2' }} €</td>
+              <td>
+                <p-tag
+                  [value]="getStatusLabel(sale.paymentStatus) | translate"
+                  [severity]="getStatusSeverity(sale.paymentStatus)"
+                />
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="text-center">
+                {{ 'sales.noPaidSales' | translate }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+    </p-tabpanels>
+
+  </p-tabs>
+</div>
+
+<!-- Payment Modal -->
+<app-payment-modal
+  [visible]="showPaymentModal()"
+  [sale]="selectedSale()"
+  (visibleChange)="showPaymentModal.set($event)"
+  (paymentRegistered)="onPaymentRegistered()"
+/>
+

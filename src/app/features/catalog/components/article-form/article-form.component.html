@@ -1,0 +1,185 @@
+<p-dialog
+  [header]="(isEditMode() ? 'catalog.form.titleEdit' : 'catalog.form.titleCreate') | translate"
+  [visible]="visible()"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <div class="form-grid">
+      <!-- Categoria i Producte -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="category">{{ 'catalog.form.category' | translate }} *</label>
+          <p-autoComplete
+          id="category"
+          formControlName="category"
+          [suggestions]="filteredCategories()"
+          (completeMethod)="filterCategories($event)"
+          (onSelect)="onCategorySelect($event)"
+          [forceSelection]="false"
+          [dropdown]="true"
+          [style]="{ width: '100%' }"
+          />
+        </div>
+        <div class="form-field">
+          <label for="product">{{ 'catalog.form.product' | translate }} *</label>
+          <p-autoComplete
+            id="product"
+            formControlName="product"
+            [suggestions]="filteredProducts()"
+            (completeMethod)="filterProducts($event)"
+            (onSelect)="onProductSelect($event)"
+            [forceSelection]="false"
+            [dropdown]="true"
+            [style]="{ width: '100%' }"
+            [disabled]="!form.get('category')?.value"
+          />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="variety">{{ 'catalog.form.variety' | translate }}</label>
+        <p-autoComplete
+          id="variety"
+          formControlName="variety"
+          [suggestions]="filteredVarieties()"
+          (completeMethod)="filterVarieties($event)"
+          (onSelect)="onVarietySelect($event)"
+          [forceSelection]="false"
+          [dropdown]="true"
+          [style]="{ width: '100%' }"
+          [disabled]="!form.get('product')?.value"
+        />
+      </div>
+
+      <!-- Descripció -->
+      <div class="form-field">
+        <label for="description">{{ 'catalog.form.description' | translate }}</label>
+        <textarea
+          id="description"
+          pInputTextarea
+          formControlName="description"
+          [rows]="3"
+          [autoResize]="true"
+        ></textarea>
+      </div>
+
+      <!-- Unitat de mesura i Preu -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="unitMeasure">{{ 'catalog.form.unitMeasure' | translate }} *</label>
+          <p-autoComplete
+            id="unitMeasure"
+            formControlName="unitMeasure"
+            [suggestions]="filteredUnitMeasures()"
+            (completeMethod)="filterUnitMeasures($event)"
+            field="label"
+            dataKey="value"
+            [forceSelection]="true"
+            [dropdown]="true"
+            [style]="{ width: '100%' }"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="pricePerUnit">{{ 'catalog.form.pricePerUnit' | translate }} * (€)</label>
+          <p-inputNumber
+            id="pricePerUnit"
+            formControlName="pricePerUnit"
+            mode="decimal"
+            locale="es-ES"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            [min]="0"
+            [style]="{ width: '100%' }"
+            [class.ng-invalid]="isFieldInvalid('pricePerUnit')"
+            [class.ng-dirty]="isFieldInvalid('pricePerUnit')"
+          />
+          @if (isFieldInvalid('pricePerUnit')) {
+            <small class="p-error">{{ getFieldError('pricePerUnit') | translate }}</small>
+          }
+        </div>
+      </div>
+
+      <!-- Productor i Ciutat -->
+      <div class="form-row">
+        <div class="form-field">
+          <label for="producer">{{ 'catalog.form.producer' | translate }}</label>
+          <div class="input-with-button">
+            <p-autoComplete
+              id="producer"
+              formControlName="producer"
+              [suggestions]="filteredProducers()"
+              (completeMethod)="filterProducers($event)"
+              optionLabel="name"
+              dataKey="id"
+              [forceSelection]="false"
+              [dropdown]="true"
+              [style]="{ width: '100%' }"
+            >
+            </p-autoComplete>
+            <p-button
+              icon="pi pi-plus"
+              [rounded]="true"
+              severity="success"
+              [text]="true"
+              (onClick)="openProducerDialog()"
+              [pTooltip]="'catalog.form.createProducer' | translate"
+              tooltipPosition="top"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="city">{{ 'catalog.form.city' | translate }}</label>
+          <input
+            id="city"
+            type="text"
+            pInputText
+            formControlName="city"
+          />
+        </div>
+      </div>
+
+      <!-- És de temporada -->
+      <div class="form-field">
+        <div class="checkbox-field">
+          <p-checkbox
+            formControlName="isSeasonal"
+            [binary]="true"
+            inputId="isSeasonal"
+          />
+          <label for="isSeasonal">{{ 'catalog.form.isSeasonal' | translate }}</label>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | translate"
+      icon="pi pi-times"
+      [text]="true"
+      severity="secondary"
+      (click)="onHide()"
+    />
+    <p-button
+      [label]="'common.save' | translate"
+      icon="pi pi-check"
+      (click)="onSave()"
+      [disabled]="form.invalid"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Producer Quick Create Dialog -->
+<app-producer-form
+  [visible]="showProducerDialog()"
+  [producer]="null"
+  (visibleChange)="closeProducerDialog()"
+  (save)="onProducerCreated($event)"
+/>
+

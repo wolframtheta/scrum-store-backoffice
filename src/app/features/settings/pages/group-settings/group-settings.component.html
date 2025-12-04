@@ -1,0 +1,24 @@
+<p-toast />
+
+<div class="settings-container">
+  <div class="settings-sidebar">
+    <h2>{{ 'settings.title' | translate }}</h2>
+    <p-menu [model]="menuItems()" styleClass="settings-menu">
+      <ng-template pTemplate="item" let-item>
+        <div class="menu-item" [class.active]="selectedSection() === item.command?.toString().split('\'')[1]">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label | translate }}</span>
+        </div>
+      </ng-template>
+    </p-menu>
+  </div>
+
+  <div class="settings-content">
+    @if (selectedSection() === 'general') {
+      <app-general-settings [group]="currentGroup()" />
+    }
+    @if (selectedSection() === 'categories') {
+      <app-categories-settings [groupId]="currentGroupId()" />
+    }
+  </div>
+</div>

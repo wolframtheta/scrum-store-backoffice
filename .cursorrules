@@ -1,0 +1,357 @@
+You are an expert in TypeScript, Angular, and scalable web application development. You write maintainable, performant, and accessible code following Angular and TypeScript best practices.
+
+## TypeScript Best Practices
+
+- Use strict type checking
+- Prefer type inference when the type is obvious
+- Avoid the `any` type; use `unknown` when type is uncertain
+
+## Angular Best Practices
+
+- Always use standalone components over NgModules
+- Must NOT set `standalone: true` inside Angular decorators. It's the default.
+- Use signals for state management
+- Implement lazy loading for feature routes
+- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
+- Use `NgOptimizedImage` for all static images.
+  - `NgOptimizedImage` does not work for inline base64 images.
+
+## Components
+
+- Keep components small and focused on a single responsibility
+- Use `input()` and `output()` functions instead of decorators
+- Use `computed()` for derived state
+- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
+- Prefer Reactive forms instead of Template-driven ones
+- Do NOT use `ngClass`, use `class` bindings instead
+- Do NOT use `ngStyle`, use `style` bindings instead
+
+### Component File Structure
+
+- **ALWAYS create three separate files for each component:**
+  1. `component-name.component.ts` - TypeScript logic
+  2. `component-name.component.html` - HTML template
+  3. `component-name.component.scss` - SCSS styles
+- **DO NOT use inline templates or inline styles** except for very trivial components (< 3 lines)
+- Use `templateUrl: './component-name.component.html'` instead of `template:`
+- Use `styleUrl: './component-name.component.scss'` instead of `styles:`
+- This keeps code organized, readable, and easier to maintain
+- Example:
+  ```typescript
+  @Component({
+    selector: 'app-example',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    templateUrl: './example.component.html',
+    styleUrl: './example.component.scss'
+  })
+  export class ExampleComponent { }
+  ```
+
+### Reusable Components with Configuration
+
+- **When repeating similar HTML structures, create a reusable component**
+- Use configuration objects (interfaces) with `input()` for component props
+- Define constants array/object with all configurations
+- Use `@for` to iterate over configurations
+- Example pattern:
+  ```typescript
+  // 1. Create interface for configuration
+  export interface ModuleCardConfig {
+    id: string;
+    title: string;
+    icon: string;
+    color: string;
+    route?: string;
+    disabled?: boolean;
+  }
+  
+  // 2. Create reusable component
+  @Component({
+    selector: 'app-module-card',
+    template: `<p-card (click)="handleClick()">...</p-card>`
+  })
+  export class ModuleCardComponent {
+    config = input.required<ModuleCardConfig>();
+    cardClick = output<string>();
+  }
+  
+  // 3. Define constant with configurations
+  protected readonly modules = computed<ModuleCardConfig[]>(() => [
+    {
+      id: 'catalog',
+      title: this.translate.instant('home.modules.catalog.title'),
+      icon: 'pi-box',
+      color: '#3b82f6',
+      route: '/catalog'
+    },
+    // ... more modules
+  ]);
+  
+  // 4. Use @for in template
+  @for (module of modules(); track module.id) {
+    <app-module-card [config]="module" (cardClick)="onModuleClick($event)" />
+  }
+  ```
+- Benefits: DRY, maintainable, type-safe, easy to add/remove items
+
+## State Management
+
+- Use signals for local component state
+- Use `computed()` for derived state
+- Keep state transformations pure and predictable
+- Do NOT use `mutate` on signals, use `update` or `set` instead
+
+## Templates
+
+- Keep templates simple and avoid complex logic
+- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
+- Use the async pipe to handle observables
+
+## Internationalization (i18n)
+
+- **NEVER hardcode text in templates or components**
+- **ALL user-facing text MUST be in i18n files**: `src/assets/i18n/es.json` and `src/assets/i18n/ca.json`
+- Use `@ngx-translate/core` with TranslateService (configured in `app.config.ts`)
+- **Import TranslateModule** in components that use translations
+- Use translate pipe in templates: `{{ 'key.path' | translate }}`
+- Use TranslateService in components: `this.translate.instant('key.path')`
+- For dynamic values use interpolation: `{{ 'home.welcome' | translate:{name: userName} }}`
+- Default language: Spanish (es), with Catalan (ca) support
+- Organization of translation keys:
+  - `common.*` - Common actions and labels
+  - `auth.*` - Authentication related
+  - `nav.*` - Navigation items
+  - `home.*` - Home/Dashboard
+  - `sales.*` - Sales module
+  - `catalog.*` - Catalog module
+  - `users.*` - Users module
+  - `settings.*` - Settings module
+  - `errors.*` - Error messages
+  - `messages.*` - Success/info messages
+- Keep Spanish (es) and Catalan (ca) translations synchronized
+- Use descriptive keys: `module.component.purpose` (e.g., `sales.table.columnTotal`)
+
+## Services
+
+- Design services around a single responsibility
+- Use the `providedIn: 'root'` option for singleton services
+- Use the `inject()` function instead of constructor injection
+
+## LocalStorage Best Practices
+
+- **NEVER hardcode localStorage keys** directly in services
+- **ALL storage keys MUST be in** `src/app/core/constants/storage-keys.ts`
+- Use the centralized `LocalStorageService` with generic methods:
+  ```typescript
+  // ✅ GOOD: Using generic methods with constants
+  import { STORAGE_KEYS } from '../constants/storage-keys';
+  
+  localStorage.set(STORAGE_KEYS.ACCESS_TOKEN, token);
+  const token = localStorage.get(STORAGE_KEYS.ACCESS_TOKEN);
+  localStorage.remove(STORAGE_KEYS.ACCESS_TOKEN);
+  
+  // ❌ BAD: Hardcoded keys and direct localStorage
+  localStorage.setItem('access_token', token);
+  localStorage.getItem('access_token');
+  ```
+- The service provides:
+  - `get<T>(key)` - Generic getter with optional JSON parsing
+  - `set<T>(key, value)` - Generic setter with auto JSON stringify
+  - `remove(key)` - Generic remover
+  - `has(key)` - Check if key exists
+  - Convenience methods for common operations (tokens, language, etc.)
+- Use TypeScript's `as const` for constants to enable autocomplete
+
+## RxJS and Observables
+
+- **IMPORTANT: Prefer promises over subscriptions**
+- Use `firstValueFrom()` or `lastValueFrom()` to convert observables to promises
+- Only use `.subscribe()` when you need to react to multiple emissions over time
+- Use `async/await` with promises for cleaner, more readable code
+- In services, return promises instead of observables when possible
+- Example:
+  ```typescript
+  // ❌ BAD: Using subscribe
+  this.http.get('/api/data').subscribe(data => {
+    this.data = data;
+  });
+
+  // ✅ GOOD: Using promises with async/await
+  async loadData() {
+    this.data = await firstValueFrom(this.http.get('/api/data'));
+  }
+  ```
+
+## PrimeNG Usage
+
+- **ALWAYS use PrimeNG components** for UI elements instead of plain HTML
+- **IMPORTANT: PrimeNG uses NgModules, NOT standalone components**
+- **Import PrimeNG Modules** (e.g., `ButtonModule`, `TableModule`, `InputTextModule`) not standalone components
+- **NEVER import** `Button`, `Table`, `InputText` directly - always use the Module version
+- **NEVER use `alert()`, `prompt()`, or `confirm()`** - always use PrimeNG modals (`p-dialog`) instead
+- **Create reusable modal components** for common operations (create, edit, confirm)
+
+### Correct PrimeNG Module Names (CRITICAL):
+```typescript
+// ✅ CORRECT imports:
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';           // NOT DropdownModule!
+import { TextareaModule } from 'primeng/textarea';       // NOT InputTextareaModule!
+import { TooltipModule } from 'primeng/tooltip';         // ALWAYS import when using pTooltip
+import { PasswordModule } from 'primeng/password';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TreeModule } from 'primeng/tree';
+import { MenuModule } from 'primeng/menu';
+import { TabsModule } from 'primeng/tabs';
+
+// ❌ WRONG imports (DO NOT USE):
+import { DropdownModule } from 'primeng/dropdown';      // Use SelectModule instead
+import { InputTextareaModule } from 'primeng/inputtextarea'; // Use TextareaModule instead
+```
+
+### Important Rules:
+- **ALWAYS import `TooltipModule`** when using `pTooltip` directive in templates
+- Use `p-select` (not `p-dropdown`) in HTML with `SelectModule`
+- Use `textarea` with `pTextarea` directive and `TextareaModule`
+- Use `p-button` instead of `<button>`
+- Use `p-inputtext` directive on inputs
+- Use `p-password` for password fields
+- Use `p-table` for tables with pagination, sorting, and filtering
+- Use `p-card` for card layouts
+- Use `p-dialog` for modals
+- Use `p-toast` for notifications
+- Use `p-chart` for charts (requires chart.js)
+- Use `p-inputgroup` and `p-inputgroup-addon` for inputs with icons
+- Do NOT use Bulma CSS framework - use only PrimeNG components
+- Configure PrimeNG properly in `app.config.ts` with `providePrimeNG()`
+
+## Styling & Design System
+
+- **ALWAYS follow the Design System** documented in `.cursor/design-system.md`
+- Use SCSS for component styles
+- Import global variables: `@import 'styles/variables'`
+- Follow BEM naming convention when needed
+- Use CSS variables for theming
+- Prefer PrimeNG's built-in styling system
+- Keep component styles scoped and specific
+
+### Elegant Design Principles
+
+**Colors:**
+- Primary: `#0C75AC` (Azul)
+- Secondary: `#fccb34` (Amarillo/Dorado)
+- Tertiary: `#AC0C74` (Magenta)
+- Use `$light-bg: #F7FAFC` for backgrounds, never pure white
+- Use gray scale for text, never pure black (#000)
+
+**Spacing & Layout:**
+- Use spacing scale: xs(4px), sm(8px), md(16px), lg(24px), xl(32px), 2xl(48px)
+- Container max-width: 1400px
+- Gap between elements: minimum 1.5rem (24px)
+- Padding: 2rem desktop, 1rem mobile
+
+**Components:**
+- Border radius: 8px (inputs), 12px (cards), 16px (large cards), 24px (modals)
+- Box shadows: Subtle and layered
+  - sm: `0 2px 4px rgba(0,0,0,0.04)`
+  - md: `0 4px 8px rgba(0,0,0,0.06)`
+  - lg: `0 8px 16px rgba(0,0,0,0.1)`
+  - xl: `0 20px 60px rgba(12,117,172,0.15)`
+- Transitions: 0.3s ease for most interactions
+- Hover: `transform: translateY(-2px)` + enhanced shadow
+
+**Typography:**
+- h1: 2rem (32px), Bold, $tertiary-color
+- h2: 1.5rem (24px), SemiBold, $tertiary-color
+- h3: 1.25rem (20px), SemiBold, $dark-gray
+- body: 1rem (16px), Regular, $dark-gray
+- Line-height: 1.5 for body, 1.2 for headers
+- Use text-transform: uppercase sparingly with letter-spacing: 0.5px
+
+**Buttons:**
+- Primary: Gradient with primary color, uppercase, letter-spacing
+- Border-radius: 8px, padding: 0.75rem 1.5rem
+- Font-weight: 600
+- Hover: translateY(-2px) + enhanced shadow
+- Use p-button from PrimeNG, customize with ::ng-deep
+
+**Cards:**
+- Background: $white
+- Border-radius: 12-16px
+- Border: 1px solid $light-gray
+- Box-shadow: subtle (0 2px 8px rgba(0,0,0,0.06))
+- Hover: Elevate with transform and enhanced shadow
+- Padding: 1.5rem - 2rem
+
+**Forms:**
+- Border-radius: 8px
+- Border: 1px solid $light-gray
+- Focus: border-color $primary-color + box-shadow ring
+- Labels: uppercase, 0.875rem, font-weight: 600, $dark-gray
+
+**Animations:**
+- Use cubic-bezier for elegant easing
+- Prefer transform and opacity (GPU accelerated)
+- Loading: Skeleton screens with shimmer effect
+- Page transitions: fadeIn with translateY
+
+**Mobile Responsiveness:**
+- Mobile-first approach
+- Breakpoints: mobile(768px), tablet(1024px), desktop(1400px)
+- Use flex-wrap for adaptive layouts
+- Touch targets: minimum 44x44px
+
+## Performance
+
+- Use `OnPush` change detection strategy
+- Implement `trackBy` functions for `@for` loops
+- Lazy load feature modules
+- Avoid unnecessary computations in templates
+- Use `computed()` for derived values
+
+## Error Handling
+
+- Always handle errors in async operations
+- Use try-catch blocks with async/await
+- Provide meaningful error messages to users
+- Log errors appropriately for debugging
+
+## Code Organization
+
+- Follow the feature-based folder structure
+- Keep related files together
+- Use barrel exports (index.ts) for public APIs
+- Maintain clear separation of concerns (components, services, models)
+
+## Best Practices Summary
+
+1. **Follow the Design System** - Refer to `.cursor/design-system.md` for all design decisions
+2. Use signals for reactive state
+3. Prefer promises over observables subscriptions
+4. Use PrimeNG components exclusively for UI
+5. Use standalone components with lazy loading
+6. Implement OnPush change detection
+7. Use inject() function for dependency injection
+8. Use native Angular control flow
+9. Keep components small and focused
+10. Write type-safe code
+11. Handle errors gracefully
+12. **Elegant Design**:
+    - Import variables: `@import 'styles/variables'`
+    - Consistent spacing using the scale (4px base)
+    - Subtle shadows and smooth transitions
+    - Border-radius: 8-16px depending on component
+    - Hover effects: translateY(-2px) + shadow
+    - Colors from the defined palette only
+    - Mobile-first responsive design
+
+

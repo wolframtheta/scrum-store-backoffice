@@ -1,0 +1,43 @@
+<header class="app-header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="logo-section">
+      <img src="/assets/images/icon/ScrumS-icon.svg" alt="Scrum Store Logo" width="100" height="100" />
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-section">
+      <p-button
+        icon="pi pi-home"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        size="large"
+        (click)="goHome()"
+        [pTooltip]="'header.home' | translate"
+        tooltipPosition="bottom"
+      />
+    </div>
+
+    <!-- User Menu -->
+    <div class="user-section">
+      <p-button
+        icon="pi pi-user"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        size="large"
+        (click)="menu.toggle($event)"
+        [pTooltip]="'header.userMenu' | translate"
+        tooltipPosition="bottom"
+      />
+      <p-menu
+        #menu
+        [model]="userMenuItems()"
+        [popup]="true"
+        appendTo="body"
+      ></p-menu>
+    </div>
+  </div>
+</header>
+

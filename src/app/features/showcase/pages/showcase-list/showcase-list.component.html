@@ -1,0 +1,80 @@
+<div class="showcase-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="header">
+    <div>
+      <h1>{{ 'showcase.title' | translate }}</h1>
+      <p class="subtitle">{{ 'showcase.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <p-table
+    [value]="showcaseService.articles()"
+    [loading]="showcaseService.isLoading()"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+    responsiveLayout="scroll">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'showcase.table.category' | translate }}</th>
+        <th>{{ 'showcase.table.product' | translate }}</th>
+        <th>{{ 'showcase.table.variety' | translate }}</th>
+        <th>{{ 'showcase.table.description' | translate }}</th>
+        <th>{{ 'showcase.table.producer' | translate }}</th>
+        <th>{{ 'showcase.table.supplier' | translate }}</th>
+        <th>{{ 'showcase.table.city' | translate }}</th>
+        <th>{{ 'showcase.table.price' | translate }}</th>
+        <th style="width: 10rem">{{ 'common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-article>
+      <tr>
+        <td>{{ article.category || '—' }}</td>
+        <td>{{ article.product || '—' }}</td>
+        <td>{{ article.variety || '—' }}</td>
+        <td>
+          <span class="text-secondary">
+            {{ article.description || '—' }}
+          </span>
+        </td>
+        <td>{{ article.producerName || '—' }}</td>
+        <td>{{ article.supplierName || '—' }}</td>
+        <td>{{ article.city || '—' }}</td>
+        <td>
+          <strong>{{ formatPrice(article) }}</strong>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-times"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              size="small"
+              (click)="removeFromShowcase(article)"
+              pTooltip="{{ 'showcase.actions.remove' | translate }}"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+            <p>{{ 'showcase.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+

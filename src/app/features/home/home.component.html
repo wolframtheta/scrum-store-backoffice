@@ -1,0 +1,24 @@
+<div class="home-container">
+  <!-- Header -->
+  <div class="home-header">
+    <div>
+      <h1 class="home-title">{{ 'home.welcome' | translate:{name: authService.currentUser()?.name} }}</h1>
+      @if (groupService.selectedGroup()) {
+        <p class="home-subtitle">{{ groupService.selectedGroup()?.name }}</p>
+      }
+    </div>
+    <p-button icon="pi pi-sign-out" [label]="'auth.logout' | translate" severity="secondary" (click)="logout()" />
+  </div>
+
+  <!-- Module Cards -->
+  <div class="modules-container">
+    <div class="modules-grid">
+      @for (module of modules(); track module.id) {
+        <app-module-card
+          [config]="module"
+          (cardClick)="onModuleClick($event)" />
+      }
+    </div>
+  </div>
+</div>
+

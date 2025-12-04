@@ -1,0 +1,178 @@
+@import '../../../../styles/variables';
+
+.users-list-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  
+  .page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  .page-subtitle {
+    color: $dark-gray;
+    margin: 0;
+  }
+}
+
+.filters-section {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+
+  .search-input {
+    flex: 1;
+    max-width: 400px;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .role-dropdown,
+  .status-dropdown {
+    min-width: 180px;
+  }
+}
+
+// Table styles
+::ng-deep .admin-table {
+  background: $white;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+
+  .p-datatable-header {
+    background: $white;
+    border: none;
+    padding: $spacing-lg;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: $light-gray;
+    color: $text-dark;
+    font-weight: 600;
+    padding: $spacing-md $spacing-lg;
+    border: none;
+  }
+
+  .p-datatable-tbody > tr {
+    transition: background-color $transition-speed $transition-ease;
+
+    &:hover {
+      background: $light-gray;
+    }
+
+    > td {
+      padding: $spacing-md $spacing-lg;
+      border-bottom: 1px solid $medium-gray;
+    }
+  }
+
+  .text-center {
+    text-align: center;
+  }
+}
+
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .user-avatar,
+  .user-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .user-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary-color;
+    color: $white;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: $text-dark;
+  }
+}
+
+.roles-cell {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+
+  .role-tag {
+    font-size: 0.75rem;
+  }
+}
+
+.text-muted {
+  color: $dark-gray;
+  font-style: italic;
+}
+
+.action-buttons {
+  display: flex;
+  gap: $spacing-xs;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: $spacing-xxl !important;
+
+  i {
+    font-size: 3rem;
+    color: $dark-gray;
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    color: $dark-gray;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .users-list-container {
+    padding: $spacing-lg;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  .filters-section {
+    flex-direction: column;
+
+    .search-input {
+      max-width: none;
+    }
+
+    .role-dropdown,
+    .status-dropdown {
+      width: 100%;
+    }
+  }
+}
+
+

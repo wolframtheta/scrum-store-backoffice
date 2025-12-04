@@ -1,0 +1,32 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">{{ 'profile.title' | translate }}</h1>
+    <p class="profile-subtitle">{{ 'profile.subtitle' | translate }}</p>
+  </div>
+
+  <div class="profile-content">
+    <p-card>
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'profile.personalInfo' | translate }}</h2>
+        
+        <div class="form-field">
+          <label for="email">{{ 'auth.email' | translate }}</label>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            [value]="userEmail()"
+            [disabled]="true"
+            class="w-full"
+          />
+        </div>
+
+        <p class="info-text">
+          <i class="pi pi-info-circle"></i>
+          {{ 'profile.comingSoon' | translate }}
+        </p>
+      </div>
+    </p-card>
+  </div>
+</div>
+

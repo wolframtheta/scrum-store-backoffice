@@ -1,0 +1,177 @@
+<div class="users-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ 'admin.users.title' | translate }}</h1>
+      <p class="page-subtitle">{{ 'admin.users.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <span class="p-input-icon-left search-input">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        [placeholder]="'admin.users.filters.searchPlaceholder' | translate"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+      />
+    </span>
+
+    <p-autocomplete
+      [suggestions]="roleOptions"
+      [(ngModel)]="selectedRole"
+      optionLabel="label"
+      [placeholder]="'admin.users.filters.role' | translate"
+      (onChange)="onRoleChange()"
+      styleClass="role-dropdown"
+    >
+      <ng-template let-option pTemplate="selectedItem">
+        {{ option.label | translate }}
+      </ng-template>
+      <ng-template let-option pTemplate="item">
+        {{ option.label | translate }}
+      </ng-template>
+    </p-autocomplete>
+
+    <p-autocomplete
+      [suggestions]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      optionLabel="label"
+      [placeholder]="'admin.users.filters.status' | translate"
+      (onChange)="onStatusChange()"
+      styleClass="status-dropdown"
+    >
+      <ng-template let-option pTemplate="selectedItem">
+        {{ option.label | translate }}
+      </ng-template>
+      <ng-template let-option pTemplate="item">
+        {{ option.label | translate }}
+      </ng-template>
+    </p-autocomplete>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="adminUsersService.users()"
+    [loading]="adminUsersService.isLoading()"
+    [paginator]="true"
+    [rows]="10"
+    [totalRecords]="adminUsersService.totalUsers()"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    styleClass="admin-table"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'admin.users.table.name' | translate }}</th>
+        <th>{{ 'admin.users.table.email' | translate }}</th>
+        <th>{{ 'admin.users.table.roles' | translate }}</th>
+        <th>{{ 'admin.users.table.lastLogin' | translate }}</th>
+        <th class="text-center">{{ 'admin.users.table.status' | translate }}</th>
+        <th class="text-center">{{ 'common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-user>
+      <tr>
+        <td>
+          <div class="user-name-cell">
+            @if (user.profileImage) {
+              <img [src]="user.profileImage" [alt]="user.name" class="user-avatar" />
+            } @else {
+              <div class="user-avatar-placeholder">
+                {{ user.name.charAt(0).toUpperCase() }}{{ user.surname.charAt(0).toUpperCase() }}
+              </div>
+            }
+            <span class="user-name">{{ user.name }} {{ user.surname }}</span>
+          </div>
+        </td>
+        <td>{{ user.email }}</td>
+        <td>
+          <div class="roles-cell">
+            @for (role of user.roles; track role) {
+              <p-tag
+                [value]="getRoleLabel(role) | translate"
+                [severity]="getRoleSeverity(role)"
+                styleClass="role-tag"
+              />
+            }
+          </div>
+        </td>
+        <td>
+          @if (user.lastLogin) {
+            {{ user.lastLogin | date: 'dd/MM/yyyy HH:mm' }}
+          } @else {
+            <span class="text-muted">{{ 'admin.users.table.neverLoggedIn' | translate }}</span>
+          }
+        </td>
+        <td class="text-center">
+          <p-tag
+            [value]="getStatusLabel(user.isActive) | translate"
+            [severity]="getStatusSeverity(user.isActive)"
+          />
+        </td>
+        <td class="text-center">
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              size="small"
+              [pTooltip]="'common.view' | translate"
+              tooltipPosition="top"
+              (click)="viewUserDetail(user)"
+            />
+            <p-button
+              icon="pi pi-key"
+              [text]="true"
+              [rounded]="true"
+              severity="warn"
+              size="small"
+              [pTooltip]="'admin.users.actions.resetPassword' | translate"
+              tooltipPosition="top"
+              (click)="resetPassword(user)"
+            />
+            <p-button
+              [icon]="user.isActive ? 'pi pi-ban' : 'pi pi-check'"
+              [text]="true"
+              [rounded]="true"
+              [severity]="user.isActive ? 'warn' : 'success'"
+              size="small"
+              [pTooltip]="(user.isActive ? 'admin.users.actions.deactivate' : 'admin.users.actions.activate') | translate"
+              tooltipPosition="top"
+              (click)="toggleUserStatus(user)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              size="small"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (click)="deleteUser(user)"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" class="empty-message">
+          <i class="pi pi-inbox"></i>
+          <p>{{ 'admin.users.table.empty' | translate }}</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast />
+<p-confirmDialog />
+
