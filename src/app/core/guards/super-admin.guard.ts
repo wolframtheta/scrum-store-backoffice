@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, type CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { UserRole } from '../models/user-role.enum';
 
 export const superAdminGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -14,7 +15,7 @@ export const superAdminGuard: CanActivateFn = (route, state) => {
   }
 
   // Check if user has SUPER_ADMIN role
-  const isSuperAdmin = currentUser.roles?.includes('super_admin');
+  const isSuperAdmin = currentUser.roles?.includes(UserRole.SUPER_ADMIN);
 
   if (!isSuperAdmin) {
     // Redirect to home if user is not SuperAdmin

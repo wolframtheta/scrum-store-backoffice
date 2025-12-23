@@ -53,6 +53,12 @@ export class CategoriesService {
     return category;
   }
 
+  async createCategoriesBatch(data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<{ created: number; categories: Category[] }> {
+    const result = await this.api.post<{ created: number; categories: Category[] }>('categories/batch', data);
+    await this.loadCategories();
+    return result;
+  }
+
   async updateCategory(id: string, data: Partial<Category>): Promise<Category> {
     const groupId = this.groupService.selectedGroupId();
     const category = await this.api.patch<Category>(`categories/${id}?consumerGroupId=${groupId}`, data);

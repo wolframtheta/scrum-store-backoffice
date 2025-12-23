@@ -4,6 +4,7 @@ import { Observable, from } from 'rxjs';
 import { ApiService } from './api.service';
 import { LocalStorageService } from './local-storage.service';
 import { User, AuthResponse, LoginCredentials, RegisterData } from '../models/user.model';
+import { UserRole } from '../models/user-role.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class AuthService {
   // Signals
   readonly currentUser = signal<User | null>(null);
   readonly isAuthenticated = computed(() => !!this.currentUser());
-  readonly isSuperAdmin = computed(() => this.currentUser()?.roles.includes('SUPERADMIN') || false);
+  readonly isSuperAdmin = computed(() => this.currentUser()?.roles.includes(UserRole.SUPER_ADMIN) || false);
   readonly isLoading = signal(false);
 
   constructor() {

@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { UserRole } from '../models/user-role.enum';
 
 export interface UserAdmin {
   id: string;
@@ -10,7 +11,7 @@ export interface UserAdmin {
   surname: string;
   phone?: string;
   profileImage?: string;
-  roles: string[];
+  roles: UserRole[];
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
@@ -44,7 +45,7 @@ export interface CreateUserDto {
   surname: string;
   phone?: string;
   password: string;
-  roles: string[];
+  roles: UserRole[];
 }
 
 @Injectable({
@@ -85,7 +86,7 @@ export class AdminUsersService {
 
     try {
       let params = new HttpParams();
-      
+
       if (options?.page) params = params.set('page', options.page.toString());
       if (options?.limit) params = params.set('limit', options.limit.toString());
       if (options?.search) params = params.set('search', options.search);
@@ -182,7 +183,7 @@ export class AdminUsersService {
   /**
    * Update user roles
    */
-  async updateUserRoles(email: string, roles: string[]): Promise<void> {
+  async updateUserRoles(email: string, roles: UserRole[]): Promise<void> {
     this._isLoading.set(true);
     this._error.set(null);
 

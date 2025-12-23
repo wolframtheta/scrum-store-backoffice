@@ -63,23 +63,23 @@ export class LoginComponent {
       // 1. Login
       await this.authService.login(this.loginForm.value);
 
-      // 2. Comprobar si es SuperAdmin
+      // 2. Cargar grupos del usuario (siempre, incluso para super_admin)
+      await this.groupService.loadUserGroups();
+
+      // 3. Comprobar si es SuperAdmin
       const isSuperAdmin = this.authService.isSuperAdmin();
 
-      // 3. Si es SuperAdmin, ir directo a /home sin modal ni grupos
+      // 4. Si es SuperAdmin, ir directo a /home sin modal
       if (isSuperAdmin) {
         await this.router.navigate(['/home']);
         return;
       }
 
-      // 4. Para usuarios normales: cargar grupos del usuario
-      await this.groupService.loadUserGroups();
-
-      // 5. Comprovar si és manager d'almenys un grup
+      // 5. Para usuarios normales: comprobar si es manager de al menos un grupo
       const hasManagerRole = this.groupService.userGroups().some(group => group.role?.isManager === true);
 
       if (!hasManagerRole) {
-        // L'usuari no és SuperAdmin ni manager, no pot accedir al backoffice
+        // El usuario no es SuperAdmin ni manager, no puede acceder al backoffice
         await this.authService.logout();
         this.errorMessage.set(this.translate.instant('auth.accessDenied'));
         return;

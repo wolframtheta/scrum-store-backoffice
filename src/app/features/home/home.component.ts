@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { ButtonModule } from 'primeng/button';
 import { ModuleCardComponent, ModuleCardConfig } from './components/module-card/module-card.component';
+import { UserRole } from '../../core/models/user-role.enum';
 
 @Component({
   selector: 'app-home',
@@ -26,10 +27,36 @@ export class HomeComponent implements OnInit {
   private readonly translate = inject(TranslateService);
 
   protected readonly isSuperAdmin = computed(() =>
-    this.authService.currentUser()?.roles?.includes('super_admin') ?? false
+    this.authService.currentUser()?.roles?.includes(UserRole.SUPER_ADMIN) ?? false
   );
 
   protected readonly modules = computed<ModuleCardConfig[]>(() => {
+    const hasGroups = this.groupService.userGroups().length > 0;
+    const adminModules: ModuleCardConfig[] = [
+      {
+        id: 'admin-groups',
+        title: this.translate.instant('home.modules.adminGroups.title'),
+        description: this.translate.instant('home.modules.adminGroups.description'),
+        icon: 'pi-building',
+        color: '#ea580c',
+        route: '/admin/groups'
+      },
+      {
+        id: 'admin-users',
+        title: this.translate.instant('home.modules.adminUsers.title'),
+        description: this.translate.instant('home.modules.adminUsers.description'),
+        icon: 'pi-shield',
+        color: '#dc2626',
+        route: '/admin/users'
+      }
+    ];
+
+    // Si es super_admin sin grupos asignados, solo mostrar módulos de administración global
+    if (this.isSuperAdmin() && !hasGroups) {
+      return adminModules;
+    }
+
+    // Módulos base que requieren un grupo de consumo seleccionado
     const baseModules: ModuleCardConfig[] = [
       {
         id: 'catalog',
@@ -97,28 +124,12 @@ export class HomeComponent implements OnInit {
       }
     ];
 
-    // Add admin modules if super admin
+    // Si es super_admin con grupos asignados, mostrar todo
     if (this.isSuperAdmin()) {
-      baseModules.push(
-        {
-          id: 'admin-groups',
-          title: this.translate.instant('home.modules.adminGroups.title'),
-          description: this.translate.instant('home.modules.adminGroups.description'),
-          icon: 'pi-building',
-          color: '#ea580c',
-          route: '/admin/groups'
-        },
-        {
-          id: 'admin-users',
-          title: this.translate.instant('home.modules.adminUsers.title'),
-          description: this.translate.instant('home.modules.adminUsers.description'),
-          icon: 'pi-shield',
-          color: '#dc2626',
-          route: '/admin/users'
-        }
-      );
+      return [...baseModules, ...adminModules];
     }
 
+    // Para managers normales, solo módulos base
     return baseModules;
   });
 

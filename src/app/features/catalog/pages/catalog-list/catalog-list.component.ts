@@ -129,9 +129,10 @@ export class CatalogListComponent implements OnInit {
   protected async toggleShowcase(article: Article) {
     const action = article.inShowcase ? 'treure' : 'afegir';
     const actionPast = article.inShowcase ? 'tret' : 'afegit';
+    const articleName = this.getArticleName(article);
 
     this.confirmationService.confirm({
-      message: `¿Segur que vols ${action} "${article.name}" ${article.inShowcase ? 'de' : 'a'} l'aparador?`,
+      message: `¿Segur que vols ${action} "${articleName}" ${article.inShowcase ? 'de' : 'a'} l'aparador?`,
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
@@ -154,8 +155,10 @@ export class CatalogListComponent implements OnInit {
   }
 
   protected deleteArticle(article: Article) {
+    const articleName = this.getArticleName(article);
+
     this.confirmationService.confirm({
-      message: `¿Segur que vols eliminar "${article.name}"? Aquesta acció no es pot desfer.`,
+      message: `¿Segur que vols eliminar "${articleName}"? Aquesta acció no es pot desfer.`,
       header: 'Confirmar eliminació',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
@@ -233,5 +236,9 @@ export class CatalogListComponent implements OnInit {
     }
   }
 
+  protected getArticleName(article: Article): string {
+    const parts = [article.category, article.product, article.variety].filter(Boolean);
+    return parts.join(' - ');
+  }
 }
 

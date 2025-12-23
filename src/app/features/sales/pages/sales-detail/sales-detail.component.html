@@ -1,0 +1,121 @@
+<div class="sales-detail-container">
+  <p-toast />
+
+  <div class="header">
+    <p-button
+      icon="pi pi-arrow-left"
+      [text]="true"
+      [rounded]="true"
+      (onClick)="goBack()"
+      [label]="'common.back' | translate"
+    />
+    <h1>{{ 'sales.detail.title' | translate }}</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <p>{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (sale()) {
+    <div class="detail-content">
+      <!-- Order Information Card -->
+      <p-card [header]="'sales.detail.orderInfo' | translate">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>{{ 'sales.table.date' | translate }}:</label>
+            <span>{{ formatDate(sale()!.createdAt) }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ 'sales.table.user' | translate }}:</label>
+            <span>{{ sale()!.userName || sale()!.userEmail }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ 'sales.table.status' | translate }}:</label>
+            <p-tag
+              [value]="getStatusLabel(sale()!.paymentStatus) | translate"
+              [severity]="getStatusSeverity(sale()!.paymentStatus)"
+            />
+          </div>
+          <div class="info-item">
+            <label>{{ 'sales.table.delivered' | translate }}:</label>
+            <i [class]="sale()!.isDelivered ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+               [style.color]="sale()!.isDelivered ? 'var(--green-500)' : 'var(--red-500)'"></i>
+          </div>
+        </div>
+
+        <p-divider />
+
+        <div class="totals-grid">
+          <div class="total-item">
+            <label>{{ 'sales.table.total' | translate }}:</label>
+            <span class="amount">{{ formatPrice(sale()!.totalAmount) }} €</span>
+          </div>
+          <div class="total-item">
+            <label>{{ 'sales.table.paid' | translate }}:</label>
+            <span class="amount paid">{{ formatPrice(getTotalPaid()) }} €</span>
+          </div>
+          <div class="total-item">
+            <label>{{ 'sales.table.remaining' | translate }}:</label>
+            <span class="amount remaining">{{ formatPrice(getTotalRemaining()) }} €</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Items Table -->
+      <p-card [header]="'sales.detail.items' | translate" class="items-card">
+        <p-table [value]="sale()!.items" styleClass="p-datatable-striped">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'sales.detail.article' | translate }}</th>
+              <th>{{ 'sales.detail.category' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.quantity' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.pricePerUnit' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.itemTotal' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.itemPaid' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.itemRemaining' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <div class="article-info">
+                  <strong>{{ getArticleName(item.article) }}</strong>
+                  @if (item.article?.description) {
+                    <small class="variety">{{ item.article.description }}</small>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="category-badge">{{ item.article?.category || '-' }}</span>
+              </td>
+              <td class="text-right">
+                {{ item.quantity }} {{ item.article?.unitMeasure || 'ud' }}
+              </td>
+              <td class="text-right">{{ formatPrice(item.pricePerUnit) }} €</td>
+              <td class="text-right"><strong>{{ formatPrice(item.totalPrice) }} €</strong></td>
+              <td class="text-right paid">{{ formatPrice(item.paidAmount || 0) }} €</td>
+              <td class="text-right remaining">
+                {{ formatPrice((item.totalPrice || 0) - (item.paidAmount || 0)) }} €
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="text-center">
+                {{ 'sales.detail.noItems' | translate }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+  }
+</div>
+
+
+
+
+

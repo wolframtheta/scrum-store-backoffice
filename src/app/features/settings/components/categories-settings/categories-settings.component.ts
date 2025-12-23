@@ -240,7 +240,7 @@ export class CategoriesSettingsComponent implements OnInit {
 
   protected confirmDelete(node: TreeNode): void {
     this.confirmationService.confirm({
-      message: this.translate.instant('settings.categories.deleteConfirm', { name: node.label }),
+      message: this.translate.instant('settings.categories.deleteConfirm', { name: node.data.name }),
       header: this.translate.instant('common.confirmDelete'),
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: this.translate.instant('common.yes'),

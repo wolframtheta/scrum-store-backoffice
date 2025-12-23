@@ -4,18 +4,24 @@ import { ConsumerGroupService } from '../../../core/services/consumer-group.serv
 import { Article, UnitMeasure } from '../../../core/models/article.model';
 
 export interface CreateArticleDto {
-  name: string;
+  category: string;
+  product: string;
+  variety?: string;
   description?: string;
   unitMeasure: UnitMeasure;
   pricePerUnit: number;
   city?: string;
-  producer?: string;
+  producerId?: string;
+  isEco?: boolean;
+  taxRate?: number;
   consumerGroupId: string;
   maxQuantity?: number;
 }
 
 export interface UpdateArticleDto {
-  name?: string;
+  category?: string;
+  product?: string;
+  variety?: string;
   description?: string;
   unitMeasure?: UnitMeasure;
   pricePerUnit?: number;
@@ -62,11 +68,11 @@ export class CatalogService {
 
     try {
       const params: any = { groupId };
-      
+
       if (this._searchTerm()) {
         params.search = this._searchTerm();
       }
-      
+
       if (this._showcaseFilter() !== null) {
         params.inShowcase = this._showcaseFilter();
       }
@@ -90,13 +96,37 @@ export class CatalogService {
 
     try {
       const article = await this.api.post<Article>('articles', dto);
-      
+
       // Afegir a la llista local
       this._articles.update(articles => [article, ...articles]);
-      
+
       return article;
     } catch (error: any) {
       this._error.set(error?.error?.message || 'Error creant article');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Crear múltiples articles en batch
+   */
+  async createArticlesBatch(dtos: CreateArticleDto[]): Promise<{ created: number; failed: number; articles: Article[] }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ created: number; failed: number; articles: Article[] }>('articles/batch', dtos);
+
+      // Afegir els articles nous a la llista local
+      if (result.articles.length > 0) {
+        this._articles.update(articles => [...result.articles, ...articles]);
+      }
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error creant articles');
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -112,12 +142,12 @@ export class CatalogService {
 
     try {
       const updatedArticle = await this.api.patch<Article>(`articles/${articleId}`, dto);
-      
+
       // Actualitzar a la llista local
       this._articles.update(articles =>
         articles.map(a => a.id === articleId ? updatedArticle : a)
       );
-      
+
       return updatedArticle;
     } catch (error: any) {
       this._error.set(error?.error?.message || 'Error actualitzant article');
@@ -136,7 +166,7 @@ export class CatalogService {
 
     try {
       await this.api.delete(`articles/${articleId}`);
-      
+
       // Eliminar de la llista local
       this._articles.update(articles => articles.filter(a => a.id !== articleId));
     } catch (error: any) {
@@ -159,7 +189,7 @@ export class CatalogService {
         `articles/${articleId}/toggle-showcase`,
         { inShowcase }
       );
-      
+
       // Actualitzar a la llista local
       this._articles.update(articles =>
         articles.map(a => a.id === articleId ? updatedArticle : a)
@@ -187,12 +217,12 @@ export class CatalogService {
         `articles/${articleId}/image`,
         formData
       );
-      
+
       // Actualitzar a la llista local
       this._articles.update(articles =>
         articles.map(a => a.id === articleId ? updatedArticle : a)
       );
-      
+
       return updatedArticle;
     } catch (error: any) {
       this._error.set(error?.error?.message || 'Error pujant imatge');

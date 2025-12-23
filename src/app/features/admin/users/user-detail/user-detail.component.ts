@@ -17,6 +17,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { AdminUsersService, UserAdmin, UserActivity } from '../../../../core/services/admin-users.service';
+import { UserRole } from '../../../../core/models/user-role.enum';
 
 interface UserGroup {
   id: string;
@@ -67,15 +68,15 @@ export class UserDetailComponent implements OnInit {
   protected readonly isLoadingGroups = signal<boolean>(false);
   protected readonly isLoadingActivity = signal<boolean>(false);
   protected readonly activeTab = signal<string>('general');
-  protected readonly selectedRoles = signal<string[]>([]);
+  protected readonly selectedRoles = signal<UserRole[]>([]);
   protected readonly isSavingRoles = signal<boolean>(false);
   protected readonly roleStates = signal<Record<string, boolean>>({});
 
   // Available roles
   protected readonly availableRoles = [
-    { value: 'super_admin', label: 'admin.users.roles.superAdmin' },
-    { value: 'admin', label: 'admin.users.roles.admin' },
-    { value: 'client', label: 'admin.users.roles.client' }
+    { value: UserRole.SUPER_ADMIN, label: 'admin.users.roles.superAdmin' },
+    { value: UserRole.ADMIN, label: 'admin.users.roles.admin' },
+    { value: UserRole.CLIENT, label: 'admin.users.roles.client' }
   ];
 
   async ngOnInit(): Promise<void> {
@@ -155,25 +156,25 @@ export class UserDetailComponent implements OnInit {
     return isActive ? 'admin.users.status.active' : 'admin.users.status.inactive';
   }
 
-  protected getRoleSeverity(role: string): 'danger' | 'warn' | 'info' {
-    const severityMap: Record<string, 'danger' | 'warn' | 'info'> = {
-      'super_admin': 'danger',
-      'admin': 'warn',
-      'client': 'info',
+  protected getRoleSeverity(role: UserRole): 'danger' | 'warn' | 'info' {
+    const severityMap: Record<UserRole, 'danger' | 'warn' | 'info'> = {
+      [UserRole.SUPER_ADMIN]: 'danger',
+      [UserRole.ADMIN]: 'warn',
+      [UserRole.CLIENT]: 'info',
     };
     return severityMap[role] || 'info';
   }
 
-  protected getRoleLabel(role: string): string {
-    const labelMap: Record<string, string> = {
-      'super_admin': 'admin.users.roles.superAdmin',
-      'admin': 'admin.users.roles.admin',
-      'client': 'admin.users.roles.client',
+  protected getRoleLabel(role: UserRole): string {
+    const labelMap: Record<UserRole, string> = {
+      [UserRole.SUPER_ADMIN]: 'admin.users.roles.superAdmin',
+      [UserRole.ADMIN]: 'admin.users.roles.admin',
+      [UserRole.CLIENT]: 'admin.users.roles.client',
     };
     return labelMap[role] || role;
   }
 
-  protected onRoleChange(role: string): void {
+  protected onRoleChange(role: UserRole): void {
     const roleStates = this.roleStates();
     const checked = roleStates[role];
 
@@ -187,11 +188,11 @@ export class UserDetailComponent implements OnInit {
     }
   }
 
-  protected getRoleState(role: string): boolean {
+  protected getRoleState(role: UserRole): boolean {
     return this.roleStates()[role] || false;
   }
 
-  protected setRoleState(role: string, value: boolean): void {
+  protected setRoleState(role: UserRole, value: boolean): void {
     const roleStates = { ...this.roleStates() };
     roleStates[role] = value;
     this.roleStates.set(roleStates);

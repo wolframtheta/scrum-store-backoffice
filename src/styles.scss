@@ -5,6 +5,13 @@
 @import 'primeicons/primeicons.css';
 @import 'styles/variables';
 
+/* Personalització de variables globals del DatePicker */
+:root {
+  /* Canvi del color del rang seleccionat del DatePicker */
+  --p-datepicker-date-range-selected-background: red;
+  --p-datepicker-date-range-selected-color: var(--text-color);
+}
+
 /* Estilos globales */
 * {
   margin: 0;

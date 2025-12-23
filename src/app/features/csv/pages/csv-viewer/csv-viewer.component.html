@@ -1,0 +1,463 @@
+<div class="csv-viewer-container">
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Loading Modal -->
+  <p-blockUI [blocked]="isLoading()">
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <p-progressSpinner
+          styleClass="custom-spinner"
+          strokeWidth="4"
+          fill="transparent"
+          animationDuration="1s"
+        />
+        <h3>{{ loadingMessage() || 'Carregant...' }}</h3>
+        <p>Si us plau, espera mentre processem la informació</p>
+      </div>
+    </div>
+  </p-blockUI>
+
+  <div class="header-section">
+    <h1>Importar Catàleg des de CSV</h1>
+    <p class="subtitle">Carrega un fitxer CSV per importar articles al catàleg</p>
+  </div>
+
+  <!-- Upload Section -->
+  <p-card>
+    <div class="upload-section">
+      @if (!csvData()) {
+        <div class="custom-drop-zone"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()"
+             [class.drag-active]="isDragging()">
+          <input
+            #fileInput
+            type="file"
+            accept=".csv"
+            style="display: none"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="drop-content">
+            <div class="icon-wrapper">
+              <i class="pi pi-cloud-upload"></i>
+            </div>
+            <h2 class="drop-title">Arrossega i deixa anar per pujar el fitxer</h2>
+            <p class="drop-divider">O fes clic aquí per seleccionar</p>
+            <div class="upload-specs">
+              <div class="spec-item">
+                <i class="pi pi-file"></i>
+                <span>Format CSV</span>
+              </div>
+              <div class="spec-item">
+                <i class="pi pi-database"></i>
+                <span>Màxim 10MB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="file-info">
+          <span class="file-name">
+            <i class="pi pi-file"></i>
+            {{ fileName() }}
+            <p-tag
+              [value]="csvData()!.rows.length + ' files'"
+              severity="success"
+            />
+          </span>
+          <p-button
+            label="Carregar un altre fitxer"
+            icon="pi pi-refresh"
+            severity="secondary"
+            (onClick)="clearData()"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- Supplier Selection -->
+    @if (csvData()) {
+      <div class="supplier-selection">
+        <h3>Proveïdor de la importació</h3>
+        <p class="selection-description">
+          Selecciona el proveïdor d'aquesta importació. Els productors creats quedaran associats a aquest proveïdor.
+        </p>
+        <p-select
+          [options]="suppliersService.suppliers()"
+          [(ngModel)]="selectedSupplierId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Selecciona un proveïdor"
+          [showClear]="true"
+          styleClass="w-full"
+        >
+          <ng-template #selectedItem let-supplier>
+            <div class="supplier-item">
+              <strong>{{ supplier.name }}</strong>
+              @if (supplier.city) {
+                <small> - {{ supplier.city }}</small>
+              }
+            </div>
+          </ng-template>
+          <ng-template #item let-supplier>
+            <div class="supplier-item">
+              <strong>{{ supplier.name }}</strong>
+              @if (supplier.city) {
+                <small> - {{ supplier.city }}</small>
+              }
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <!-- Period Selection -->
+      <div class="supplier-selection">
+        <h3>Període de comanda <span class="optional-label">(Opcional)</span></h3>
+        <p class="selection-description">
+          Si vols associar els articles importats a un període específic, selecciona'l aquí. Els articles apareixeran automàticament a l'aparador durant aquest període.
+        </p>
+        <p-select
+          [options]="availablePeriods()"
+          [(ngModel)]="selectedPeriodId"
+          optionLabel="schedule.name"
+          optionValue="id"
+          placeholder="Selecciona un període (opcional)"
+          [showClear]="true"
+          styleClass="w-full"
+        >
+          <ng-template #selectedItem let-period>
+            <div class="period-item">
+              <strong>{{ period.schedule?.name }}</strong>
+              <small> - Entrega: {{ formatPeriodDate(period.deliveryDate) }}</small>
+            </div>
+          </ng-template>
+          <ng-template #item let-period>
+            <div class="period-item">
+              <div>
+                <strong>{{ period.schedule?.name }}</strong>
+                <p-tag [value]="'periods.status.' + period.status.toLowerCase() | translate" [severity]="getPeriodSeverity(period.status)" class="ml-2"></p-tag>
+              </div>
+              <small>
+                Inici: {{ formatPeriodDate(period.startDate) }} - Fi: {{ formatPeriodDate(period.endDate) }}
+                @if (period.deliveryDate) {
+                  - Entrega: {{ formatPeriodDate(period.deliveryDate) }}
+                }
+              </small>
+            </div>
+          </ng-template>
+        </p-select>
+        @if (availablePeriods().length === 0) {
+          <small class="text-color-secondary mt-2">
+            <i class="pi pi-info-circle"></i>
+            No hi ha períodes oberts disponibles. Pots crear-ne un des de la secció "Períodes de Comanda".
+          </small>
+        }
+      </div>
+    }
+  </p-card>
+
+  <!-- Mapping Section -->
+  @if (csvData()) {
+    <p-card>
+      <div class="mapping-section">
+        <h2>Mapejar Columnes</h2>
+        <p class="mapping-description">
+          Selecciona quina columna del CSV correspon a cada camp de l'article
+        </p>
+
+        <form [formGroup]="mappingForm" class="mapping-form">
+          @for (mapping of columnMappings; track mapping.articleField) {
+            <div class="mapping-row">
+              <label>
+                {{ mapping.label }}
+                @if (mapping.required) {
+                  <span class="required">*</span>
+                }
+              </label>
+              <p-select
+                [formControlName]="mapping.articleField"
+                [options]="getColumnOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona columna"
+                [showClear]="!mapping.required"
+                styleClass="w-full"
+              />
+            </div>
+          }
+        </form>
+
+        <div class="mapping-actions">
+          <p-button
+            label="Actualitzar vista prèvia"
+            icon="pi pi-refresh"
+            (onClick)="refreshPreview()"
+            [outlined]="true"
+          />
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Preview Section -->
+    <p-card>
+      <div class="preview-section">
+        <div class="preview-header">
+          <h2>Articles detectats</h2>
+          <div class="preview-stats">
+            <p-tag
+              [value]="selectedArticles().length + ' seleccionats'"
+              severity="success"
+            />
+            <p-tag
+              [value]="parsedArticles().length + ' total'"
+              severity="info"
+            />
+          </div>
+        </div>
+
+        <p-table
+          [value]="parsedArticles()"
+          [scrollable]="true"
+          scrollHeight="500px"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template #header>
+            <tr>
+              <th style="width: 3rem">
+                <p-checkbox
+                  [binary]="true"
+                  [ngModel]="allValidSelected"
+                  [indeterminate]="someValidSelected"
+                  (onChange)="toggleAll($event.checked)"
+                />
+              </th>
+              <th>Estat</th>
+              <th>Categoria</th>
+              <th>Producte</th>
+              <th>Varietat</th>
+              <th>Descripció</th>
+              <th>Preu</th>
+              <th>Unitat</th>
+              <th>Ciutat</th>
+              <th>Productor</th>
+              <th>Eco</th>
+              <th>IVA (%)</th>
+              <th>Errors</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-article let-rowIndex="rowIndex">
+            <tr [class.row-invalid]="!article.isValid">
+              <td>
+                <p-checkbox
+                  [binary]="true"
+                  [(ngModel)]="article.selected"
+                  [disabled]="!article.isValid"
+                  (onChange)="selectionState.set(rowIndex, article.selected)"
+                />
+              </td>
+              <td>
+                @if (article.isValid) {
+                  <i class="pi pi-check-circle" style="color: var(--green-500)"></i>
+                } @else {
+                  <i class="pi pi-times-circle" style="color: var(--red-500)"></i>
+                }
+              </td>
+              <td>{{ article.category || '-' }}</td>
+              <td>{{ article.product || '-' }}</td>
+              <td>{{ article.variety || '-' }}</td>
+              <td>{{ article.description || '-' }}</td>
+              <td>
+                @if (article.pricePerUnit) {
+                  {{ article.pricePerUnit | number: '1.2-2' }} €
+                } @else {
+                  -
+                }
+              </td>
+              <td>{{ article.unitMeasure || '-' }}</td>
+              <td>{{ article.city || '-' }}</td>
+              <td>{{ article.producer || '-' }}</td>
+              <td>
+                @if (article.isEco !== undefined) {
+                  @if (article.isEco) {
+                    <i class="fa fa-recycle eco-icon" title="Ecològic"></i>
+                  } @else {
+                    <span style="color: var(--text-color-secondary)">-</span>
+                  }
+                } @else {
+                  <span style="color: var(--text-color-secondary)">-</span>
+                }
+              </td>
+              <td>{{ article.taxRate !== undefined ? article.taxRate + '%' : '-' }}</td>
+              <td>
+                @for (error of article.errors; track error) {
+                  <p-tag [value]="error" severity="danger" styleClass="mr-1" />
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div class="import-actions">
+          <p-button
+            label="Importar {{ selectedArticles().length }} articles"
+            icon="pi pi-download"
+            [loading]="isLoading()"
+            [disabled]="selectedArticles().length === 0"
+            (onClick)="importArticles()"
+          />
+        </div>
+      </div>
+    </p-card>
+
+    <!-- New Categories Preview -->
+    @if (newCategoryItems().length > 0) {
+      <p-card>
+        <div class="new-categories-section">
+          <div class="header">
+            <div>
+              <h2>
+                <i class="pi pi-info-circle"></i>
+                Categories, productes i varietats noves
+              </h2>
+              <p class="section-description">
+                Aquestes categories/productes/varietats no existeixen i es crearan automàticament durant la importació
+              </p>
+            </div>
+          </div>
+
+          <div class="tree-container">
+            <p-treetable
+              [value]="newCategoriesTree()"
+              [scrollable]="true"
+              scrollHeight="400px"
+              styleClass="new-category-tree-table"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 60%">Nom</th>
+                  <th style="width: 40%">Nivell</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                <tr [ttRow]="rowNode">
+                  <td>
+                    <p-treetable-toggler [rowNode]="rowNode" />
+                    <span class="node-name">{{ rowData.name }}</span>
+                  </td>
+                  <td>
+                    @if (rowData.type === 'category') {
+                      <p-tag severity="info" value="Categoria" icon="pi pi-folder" />
+                    } @else if (rowData.type === 'product') {
+                      <p-tag severity="success" value="Producte" icon="pi pi-box" />
+                    } @else if (rowData.type === 'variety') {
+                      <p-tag severity="secondary" value="Varietat" icon="pi pi-circle" />
+                    }
+                  </td>
+                </tr>
+              </ng-template>
+            </p-treetable>
+          </div>
+        </div>
+      </p-card>
+    }
+
+    <!-- Debug Section: Parsed Articles -->
+    <p-card>
+      <div class="debug-section">
+        <h2>Debug: Articles parseats</h2>
+        <p class="debug-description">
+          Aquesta taula mostra els articles després d'aplicar els mapejaments
+        </p>
+
+        <p-table
+          [value]="parsedArticles()"
+          [scrollable]="true"
+          scrollHeight="400px"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template #header>
+            <tr>
+              <th style="width: 3rem">#</th>
+              <th>category</th>
+              <th>product</th>
+              <th>variety</th>
+              <th>description</th>
+              <th>unitMeasure</th>
+              <th>pricePerUnit</th>
+              <th>city</th>
+              <th>producer</th>
+              <th>isEco</th>
+              <th>taxRate</th>
+              <th>isValid</th>
+              <th>selected</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-article let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ article.category || '-' }}</td>
+              <td>{{ article.product || '-' }}</td>
+              <td>{{ article.variety || '-' }}</td>
+              <td>{{ article.description || '-' }}</td>
+              <td>{{ article.unitMeasure || '-' }}</td>
+              <td>{{ article.pricePerUnit || '-' }}</td>
+              <td>{{ article.city || '-' }}</td>
+              <td>{{ article.producer || '-' }}</td>
+              <td>{{ article.isEco !== undefined ? article.isEco : '-' }}</td>
+              <td>{{ article.taxRate !== undefined ? article.taxRate + '%' : '-' }}</td>
+              <td>
+                <p-tag [value]="article.isValid ? 'true' : 'false'" [severity]="article.isValid ? 'success' : 'danger'" />
+              </td>
+              <td>
+                <p-tag [value]="article.selected ? 'true' : 'false'" [severity]="article.selected ? 'info' : 'secondary'" />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </p-card>
+
+    <!-- Debug Section: Raw CSV Data -->
+    <p-card>
+      <div class="debug-section">
+        <h2>Debug: Dades CSV originals</h2>
+        <p class="debug-description">
+          Aquesta taula mostra les dades tal com estan al fitxer CSV ({{ csvData()!.headers.length }} columnes)
+        </p>
+
+        <p-table
+          [value]="csvData()!.rowsAsObjects"
+          [scrollable]="true"
+          scrollHeight="400px"
+          styleClass="p-datatable-sm debug-table"
+        >
+          <ng-template #header>
+            <tr>
+              @for (header of csvData()!.headers; track header; let i = $index) {
+                <th>
+                  <div class="header-cell">
+                    <span class="header-index">[{{ i }}]</span>
+                    <span class="header-name">{{ header }}</span>
+                  </div>
+                </th>
+              }
+            </tr>
+          </ng-template>
+          <ng-template #body let-row let-rowIndex="rowIndex">
+            <tr>
+              @for (header of csvData()!.headers; track header) {
+                <td>{{ row[header] || '-' }}</td>
+              }
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </p-card>
+  }
+</div>
+
+
+

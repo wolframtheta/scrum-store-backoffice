@@ -15,6 +15,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { AdminUsersService, UserAdmin } from '../../../core/services/admin-users.service';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { UserRole } from '../../../core/models/user-role.enum';
 
 @Component({
   selector: 'app-users-list',
@@ -55,9 +56,9 @@ export class UsersListComponent implements OnInit {
 
   protected readonly roleOptions = [
     { label: 'admin.users.filters.allRoles', value: null },
-    { label: 'admin.users.roles.superAdmin', value: 'super_admin' },
-    { label: 'admin.users.roles.admin', value: 'admin' },
-    { label: 'admin.users.roles.client', value: 'client' },
+    { label: 'admin.users.roles.superAdmin', value: UserRole.SUPER_ADMIN },
+    { label: 'admin.users.roles.admin', value: UserRole.ADMIN },
+    { label: 'admin.users.roles.client', value: UserRole.CLIENT },
   ];
 
   protected readonly statusOptions = [
@@ -196,20 +197,20 @@ export class UsersListComponent implements OnInit {
     return isActive ? 'admin.users.status.active' : 'admin.users.status.inactive';
   }
 
-  protected getRoleSeverity(role: string): 'danger' | 'warn' | 'info' {
-    const severityMap: Record<string, 'danger' | 'warn' | 'info'> = {
-      'super_admin': 'danger',
-      'admin': 'warn',
-      'client': 'info',
+  protected getRoleSeverity(role: UserRole): 'danger' | 'warn' | 'info' {
+    const severityMap: Record<UserRole, 'danger' | 'warn' | 'info'> = {
+      [UserRole.SUPER_ADMIN]: 'danger',
+      [UserRole.ADMIN]: 'warn',
+      [UserRole.CLIENT]: 'info',
     };
     return severityMap[role] || 'info';
   }
 
-  protected getRoleLabel(role: string): string {
-    const labelMap: Record<string, string> = {
-      'super_admin': 'admin.users.roles.superAdmin',
-      'admin': 'admin.users.roles.admin',
-      'client': 'admin.users.roles.client',
+  protected getRoleLabel(role: UserRole): string {
+    const labelMap: Record<UserRole, string> = {
+      [UserRole.SUPER_ADMIN]: 'admin.users.roles.superAdmin',
+      [UserRole.ADMIN]: 'admin.users.roles.admin',
+      [UserRole.CLIENT]: 'admin.users.roles.client',
     };
     return labelMap[role] || role;
   }

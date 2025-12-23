@@ -66,7 +66,7 @@ export class InvitationService {
 
   generateInvitationLink(token: string): string {
     const baseUrl = window.location.origin;
-    return `${baseUrl}/register?token=${token}`;
+    return `${baseUrl}/gestor/register?token=${token}`;
   }
 
   async copyToClipboard(text: string): Promise<void> {

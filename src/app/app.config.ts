@@ -8,6 +8,15 @@ import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import {
+  faUser, faHouse, faBox, faUsers, faChartSimple, faCog, faRightFromBracket,
+  faPlus, faPencil, faTrash, faEye, faSearch, faFilter, faFileExport, faFileImport,
+  faCheck, faXmark, faBars, faChevronDown, faChevronUp, faChevronLeft, faChevronRight
+} from '@fortawesome/pro-solid-svg-icons';
+import {
+  faCircleCheck, faCircleXmark, faBell
+} from '@fortawesome/pro-regular-svg-icons';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -17,6 +26,20 @@ import { AuthService } from './core/services/auth.service';
 
 // Registrar locale espanyol
 registerLocaleData(localeEs);
+
+// Factory function per inicialitzar FontAwesome
+function initializeFontAwesome(library: FaIconLibrary): () => void {
+  return () => {
+    // Icons solid més comuns
+    library.addIcons(
+      faUser, faHouse, faBox, faUsers, faChartSimple, faCog, faRightFromBracket,
+      faPlus, faPencil, faTrash, faEye, faSearch, faFilter, faFileExport, faFileImport,
+      faCheck, faXmark, faBars, faChevronDown, faChevronUp, faChevronLeft, faChevronRight
+    );
+    // Icons regular
+    library.addIcons(faCircleCheck, faCircleXmark, faBell);
+  };
+}
 
 // Factory function per carregar grups d'usuari al iniciar l'app
 function initializeApp(
@@ -66,6 +89,12 @@ export const appConfig: ApplicationConfig = {
         useClass: TranslateHttpLoader
       }
     }),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeFontAwesome,
+      deps: [FaIconLibrary],
+      multi: true
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,

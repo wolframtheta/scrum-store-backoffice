@@ -95,12 +95,13 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th>{{ 'catalog.table.name' | translate }}</th>
+        <th>{{ 'catalog.table.category' | translate }}</th>
+        <th>{{ 'catalog.table.product' | translate }}</th>
+        <th>{{ 'catalog.table.variety' | translate }}</th>
         <th>{{ 'catalog.table.producer' | translate }}</th>
         <th>{{ 'catalog.table.city' | translate }}</th>
         <th>{{ 'catalog.table.price' | translate }}</th>
         <th>{{ 'catalog.table.unit' | translate }}</th>
-        <th>{{ 'catalog.table.maxQuantity' | translate }}</th>
         <th>{{ 'catalog.table.seasonal' | translate }}</th>
         <th>{{ 'catalog.table.showcase' | translate }}</th>
         <th style="width: 12rem">{{ 'common.actions' | translate }}</th>
@@ -110,21 +111,21 @@
     <ng-template pTemplate="body" let-article>
       <tr>
         <td>
-          <div class="article-cell">
-            @if (article.image) {
-              <img
-                [src]="article.image"
-                [alt]="article.name"
-                class="article-image"
-              />
-            }
-            <div class="article-info">
-              <strong>{{ article.name }}</strong>
-              @if (article.description) {
-                <small class="text-secondary">{{ article.description }}</small>
-              }
-            </div>
-          </div>
+          <p-tag [value]="article.category" severity="info" />
+        </td>
+        <td>
+          <strong>{{ article.product }}</strong>
+          @if (article.description) {
+            <br />
+            <small class="text-secondary">{{ article.description }}</small>
+          }
+        </td>
+        <td>
+          @if (article.variety) {
+            <p-tag [value]="article.variety" severity="secondary" />
+          } @else {
+            <span class="text-secondary">—</span>
+          }
         </td>
         <td>{{ article.producerName || '—' }}</td>
         <td>{{ article.city || '—' }}</td>
@@ -133,13 +134,6 @@
         </td>
         <td>
           <p-tag [value]="article.unitMeasure" severity="secondary"></p-tag>
-        </td>
-        <td>
-          @if (article.maxQuantity) {
-            {{ article.maxQuantity }}
-          } @else {
-            <span class="text-secondary">—</span>
-          }
         </td>
         <td>
           @if (article.isSeasonal) {
@@ -209,7 +203,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center">
+        <td colspan="10" class="text-center">
           <div class="empty-state">
             <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
             <p>{{ 'catalog.empty' | translate }}</p>

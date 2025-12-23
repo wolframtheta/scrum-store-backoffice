@@ -222,18 +222,8 @@ export class ArticleFormComponent {
       return;
     }
 
-    // Generar el nom automàticament a partir de categoria, producte i varietat
-    const nameParts = [
-      formValue.category,
-      formValue.product,
-      formValue.variety
-    ].filter(Boolean); // Eliminar valors buits
-
-    const name = nameParts.join(' - ') || 'Article sense nom';
-
     // Preparar dades
     const data: any = {
-      name: name,
       category: formValue.category,
       product: formValue.product,
       variety: formValue.variety,
@@ -243,7 +233,7 @@ export class ArticleFormComponent {
       city: formValue.city,
       producerId: formValue.producer?.id || null,
       isSeasonal: Boolean(formValue.isSeasonal),
-      consumerGroupId: groupId, // Sempre afegir groupId perquè el guard el necessita
+      consumerGroupId: groupId,
     };
 
     this.save.emit(data);

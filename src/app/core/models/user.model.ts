@@ -1,3 +1,5 @@
+import { UserRole } from './user-role.enum';
+
 export interface User {
   id: string;
   email: string;
@@ -5,7 +7,7 @@ export interface User {
   surname: string;
   phone?: string;
   profileImage?: string;
-  roles: string[];
+  roles: UserRole[];
   isActive: boolean;
   lastLogin?: Date;
   createdAt: Date;

@@ -9,9 +9,8 @@ export enum UnitMeasure {
 
 export interface Article {
   id: string;
-  name: string;
-  category?: string;
-  product?: string;
+  category: string;
+  product: string;
   variety?: string;
   description?: string;
   image?: string;
@@ -21,6 +20,8 @@ export interface Article {
   producerId?: string;
   producerName?: string;
   supplierName?: string;
+  isEco?: boolean;
+  taxRate?: number;
   consumerGroupId: string;
   inShowcase: boolean;
   isSeasonal: boolean;

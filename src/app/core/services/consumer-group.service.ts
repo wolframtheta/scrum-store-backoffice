@@ -25,18 +25,29 @@ export class ConsumerGroupService {
 
     try {
       const groups = await this.api.get<ConsumerGroupWithRole[]>('consumer-groups');
+      console.log('Grupos cargados:', groups);
+      console.log('Roles de cada grupo:', groups.map(g => ({ name: g.name, role: g.role })));
 
       this.userGroups.set(groups);
 
       // Auto-select logic:
       // 1. If no group is selected and user has groups
       if (!this.selectedGroupId() && groups.length > 0) {
-        // 2. Only auto-select if there's exactly ONE group
-        if (groups.length === 1) {
+        // 2. First priority: check if there's a default group (isDefault = true)
+        const defaultGroup = groups.find(g => g.role?.isDefault === true);
+        console.log('Grupo por defecto encontrado:', defaultGroup?.name, defaultGroup?.role);
+
+        if (defaultGroup) {
+          console.log('Auto-seleccionando grupo por defecto:', defaultGroup.name);
+          this.setSelectedGroup(defaultGroup.id);
+        } else if (groups.length === 1) {
+          // 3. If no default but only one group, auto-select it
+          console.log('Solo hay 1 grupo, auto-seleccionando:', groups[0].name);
           this.setSelectedGroup(groups[0].id);
+        } else {
+          // 4. Multiple groups without default - user must choose via modal
+          console.warn('Múltiples grupos sin grupo por defecto. El usuario debe seleccionar manualmente.');
         }
-        // 3. If multiple groups, let the user choose via modal
-        // (don't auto-select anything)
       }
 
       // Validate selected group still exists in user's groups

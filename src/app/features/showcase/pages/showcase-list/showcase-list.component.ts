@@ -52,8 +52,10 @@ export class ShowcaseListComponent implements OnInit {
   }
 
   protected removeFromShowcase(article: Article) {
+    const articleName = this.getArticleName(article);
+
     this.confirmationService.confirm({
-      message: `¿Segur que vols treure "${article.name}" de l'aparador?`,
+      message: `¿Segur que vols treure "${articleName}" de l'aparador?`,
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
@@ -82,15 +84,20 @@ export class ShowcaseListComponent implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(article.pricePerUnit);
-    
+
     const unit = article.unitMeasure;
     let formatted = `${price}€/${unit}`;
-    
+
     if (article.isSeasonal) {
       formatted = `🌱 ${formatted}`;
     }
-    
+
     return formatted;
+  }
+
+  protected getArticleName(article: Article): string {
+    const parts = [article.category, article.product, article.variety].filter(Boolean);
+    return parts.join(' - ');
   }
 }
 

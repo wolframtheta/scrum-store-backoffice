@@ -14,16 +14,18 @@ export class SalesService {
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
 
-  async loadSalesByGroup(groupId: string, paymentStatus?: PaymentStatus): Promise<void> {
+  async loadSalesByGroup(groupId: string, paymentStatus?: string): Promise<void> {
     this.isLoading.set(true);
     this.error.set(null);
 
     try {
       const params = paymentStatus ? `?paymentStatus=${paymentStatus}` : '';
-      const sales = await this.api.get<Sale[]>(`sales/by-group/${groupId}${params}`);
+      console.log('Fetching orders from:', `orders/by-group/${groupId}${params}`);
+      const sales = await this.api.get<Sale[]>(`orders/by-group/${groupId}${params}`);
+      console.log('Orders received:', sales.length);
       this.sales.set(sales);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant vendes');
+      this.error.set(err?.error?.message || 'Error carregant comandes');
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -35,9 +37,34 @@ export class SalesService {
     this.error.set(null);
 
     try {
-      return await this.api.get<Sale>(`sales/${id}`);
+      return await this.api.get<Sale>(`orders/${id}`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant venda');
+      this.error.set(err?.error?.message || 'Error carregant comanda');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async updateOrderStatus(orderId: string, status: string): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const order = await this.api.patch<Sale>(`orders/${orderId}/status`, { status });
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === orderId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = order;
+        this.sales.set(updatedSales);
+      }
+
+      return order;
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error actualitzant estat de la comanda');
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -49,8 +76,8 @@ export class SalesService {
     this.error.set(null);
 
     try {
-      const sale = await this.api.patch<Sale>(`sales/${saleId}/payment`, paymentDto);
-      
+      const sale = await this.api.patch<Sale>(`orders/${saleId}/payment`, paymentDto);
+
       // Update the sales list
       const currentSales = this.sales();
       const index = currentSales.findIndex(s => s.id === saleId);
@@ -69,8 +96,32 @@ export class SalesService {
     }
   }
 
+  async updateDeliveryStatus(saleId: string, isDelivered: boolean): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const sale = await this.api.patch<Sale>(`orders/${saleId}/delivery`, { isDelivered });
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === saleId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = sale;
+        this.sales.set(updatedSales);
+      }
+
+      return sale;
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error actualitzant estat d\'entrega');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   clearError(): void {
     this.error.set(null);
   }
 }
-
