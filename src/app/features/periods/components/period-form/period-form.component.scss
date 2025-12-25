@@ -1,0 +1,90 @@
+.period-dialog {
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .error-message {
+      color: var(--red-500);
+      font-size: 0.875rem;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .form-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--surface-border);
+
+    h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+  }
+
+  .add-article-section {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+
+    p-autoComplete {
+      flex: 1;
+    }
+  }
+
+  .article-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    strong {
+      color: var(--text-color);
+    }
+
+    small {
+      color: var(--text-color-secondary);
+      font-size: 0.875rem;
+    }
+  }
+
+  .articles-table {
+    margin-top: 1rem;
+  }
+
+  .no-articles {
+    text-align: center;
+    color: var(--text-color-secondary);
+    padding: 2rem;
+    font-style: italic;
+  }
+
+  .actions-column {
+    width: 80px;
+    text-align: center;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+

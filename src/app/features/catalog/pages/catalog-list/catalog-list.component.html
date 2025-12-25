@@ -82,6 +82,62 @@
     />
   </form>
 
+  <!-- Accions massives -->
+  @if (hasSelection()) {
+    <div class="batch-actions">
+      <span class="selection-count">{{ getSelectedCount() }} {{ 'catalog.batch.selected' | translate }}</span>
+      <p-button
+        icon="pi pi-eye"
+        [label]="'catalog.batch.addToShowcase' | translate"
+        severity="success"
+        size="small"
+        (click)="batchToggleShowcase(true)"
+      />
+      <p-button
+        icon="pi pi-eye-slash"
+        [label]="'catalog.batch.removeFromShowcase' | translate"
+        severity="warn"
+        size="small"
+        (click)="batchToggleShowcase(false)"
+      />
+      <p-button
+        icon="pi pi-leaf"
+        [label]="'catalog.batch.markSeasonal' | translate"
+        severity="info"
+        size="small"
+        (click)="batchToggleSeasonal(true)"
+      />
+      <p-button
+        icon="pi pi-leaf"
+        [label]="'catalog.batch.unmarkSeasonal' | translate"
+        severity="secondary"
+        size="small"
+        (click)="batchToggleSeasonal(false)"
+      />
+      <p-button
+        icon="pi pi-check-circle"
+        [label]="'catalog.batch.markEco' | translate"
+        severity="success"
+        size="small"
+        (click)="batchToggleEco(true)"
+      />
+      <p-button
+        icon="pi pi-times-circle"
+        [label]="'catalog.batch.unmarkEco' | translate"
+        severity="secondary"
+        size="small"
+        (click)="batchToggleEco(false)"
+      />
+      <p-button
+        icon="pi pi-trash"
+        [label]="'catalog.batch.delete' | translate"
+        severity="danger"
+        size="small"
+        (click)="batchDelete()"
+      />
+    </div>
+  }
+
   <!-- Taula -->
   <p-table
     [value]="catalogService.articles()"
@@ -91,10 +147,16 @@
     [rowsPerPageOptions]="[10, 25, 50]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
-    responsiveLayout="scroll">
+    responsiveLayout="scroll"
+    [selection]="selectedArticles()"
+    (selectionChange)="onSelectionChange($event)"
+    dataKey="id">
 
     <ng-template pTemplate="header">
       <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
         <th>{{ 'catalog.table.category' | translate }}</th>
         <th>{{ 'catalog.table.product' | translate }}</th>
         <th>{{ 'catalog.table.variety' | translate }}</th>
@@ -102,6 +164,7 @@
         <th>{{ 'catalog.table.city' | translate }}</th>
         <th>{{ 'catalog.table.price' | translate }}</th>
         <th>{{ 'catalog.table.unit' | translate }}</th>
+        <th>{{ 'catalog.table.eco' | translate }}</th>
         <th>{{ 'catalog.table.seasonal' | translate }}</th>
         <th>{{ 'catalog.table.showcase' | translate }}</th>
         <th style="width: 12rem">{{ 'common.actions' | translate }}</th>
@@ -110,6 +173,9 @@
 
     <ng-template pTemplate="body" let-article>
       <tr>
+        <td>
+          <p-tableCheckbox [value]="article"></p-tableCheckbox>
+        </td>
         <td>
           <p-tag [value]="article.category" severity="info" />
         </td>
@@ -134,6 +200,13 @@
         </td>
         <td>
           <p-tag [value]="article.unitMeasure" severity="secondary"></p-tag>
+        </td>
+        <td>
+          @if (article.isEco) {
+            <i class="fa fa-recycle eco-icon" title="Ecològic"></i>
+          } @else {
+            <span class="text-secondary">—</span>
+          }
         </td>
         <td>
           @if (article.isSeasonal) {
@@ -203,7 +276,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="10" class="text-center">
+        <td colspan="12" class="text-center">
           <div class="empty-state">
             <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
             <p>{{ 'catalog.empty' | translate }}</p>

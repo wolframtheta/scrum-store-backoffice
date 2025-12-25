@@ -91,12 +91,28 @@ export class HomeComponent implements OnInit {
         route: '/suppliers'
       },
       {
+        id: 'periods',
+        title: this.translate.instant('home.modules.periods.title'),
+        description: this.translate.instant('home.modules.periods.description'),
+        icon: 'pi-calendar',
+        color: '#f97316',
+        route: '/periods'
+      },
+      {
         id: 'sales',
         title: this.translate.instant('home.modules.sales.title'),
         description: this.translate.instant('home.modules.sales.description'),
         icon: 'pi-shopping-cart',
         color: '#10b981',
         route: '/sales'
+      },
+      {
+        id: 'basket-preparation',
+        title: this.translate.instant('home.modules.basketPreparation.title'),
+        description: this.translate.instant('home.modules.basketPreparation.description'),
+        icon: 'pi-shopping-bag',
+        color: '#8b5cf6',
+        route: '/basket-preparation'
       },
       {
         id: 'users',
@@ -113,6 +129,14 @@ export class HomeComponent implements OnInit {
         icon: 'pi-megaphone',
         color: '#8b5cf6',
         route: '/notices'
+      },
+      {
+        id: 'csv-import',
+        title: this.translate.instant('home.modules.csvImport.title'),
+        description: this.translate.instant('home.modules.csvImport.description'),
+        icon: 'pi-file-import',
+        color: '#14b8a6',
+        route: '/csv-import'
       },
       {
         id: 'settings',

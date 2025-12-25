@@ -93,6 +93,7 @@
           placeholder="Selecciona un proveïdor"
           [showClear]="true"
           styleClass="w-full"
+          (onChange)="loadPeriods()"
         >
           <ng-template #selectedItem let-supplier>
             <div class="supplier-item">
@@ -122,7 +123,6 @@
         <p-select
           [options]="availablePeriods()"
           [(ngModel)]="selectedPeriodId"
-          optionLabel="schedule.name"
           optionValue="id"
           placeholder="Selecciona un període (opcional)"
           [showClear]="true"
@@ -130,15 +130,19 @@
         >
           <ng-template #selectedItem let-period>
             <div class="period-item">
-              <strong>{{ period.schedule?.name }}</strong>
-              <small> - Entrega: {{ formatPeriodDate(period.deliveryDate) }}</small>
+              <strong>{{ getPeriodName(period) }}</strong>
+              @if (period?.deliveryDate) {
+                <small> - Entrega: {{ formatPeriodDate(period.deliveryDate) }}</small>
+              }
             </div>
           </ng-template>
           <ng-template #item let-period>
             <div class="period-item">
               <div>
-                <strong>{{ period.schedule?.name }}</strong>
-                <p-tag [value]="'periods.status.' + period.status.toLowerCase() | translate" [severity]="getPeriodSeverity(period.status)" class="ml-2"></p-tag>
+                <strong>{{ getPeriodName(period) }}</strong>
+                @if (period.status) {
+                  <p-tag [value]="'periods.status.' + period.status.toLowerCase() | translate" [severity]="getPeriodSeverity(period.status)" class="ml-2"></p-tag>
+                }
               </div>
               <small>
                 Inici: {{ formatPeriodDate(period.startDate) }} - Fi: {{ formatPeriodDate(period.endDate) }}
@@ -333,12 +337,12 @@
               [value]="newCategoriesTree()"
               [scrollable]="true"
               scrollHeight="400px"
-              styleClass="new-category-tree-table"
+              styleClass="category-tree-table"
             >
               <ng-template pTemplate="header">
                 <tr>
-                  <th style="width: 60%">Nom</th>
-                  <th style="width: 40%">Nivell</th>
+                  <th style="width: 50%">{{ 'settings.categories.name' | translate }}</th>
+                  <th style="width: 50%">{{ 'settings.categories.level' | translate }}</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
@@ -349,11 +353,11 @@
                   </td>
                   <td>
                     @if (rowData.type === 'category') {
-                      <p-tag severity="info" value="Categoria" icon="pi pi-folder" />
+                      <p-tag severity="info" [value]="rowData.level" icon="pi pi-folder" />
                     } @else if (rowData.type === 'product') {
-                      <p-tag severity="success" value="Producte" icon="pi pi-box" />
+                      <p-tag severity="success" [value]="rowData.level" icon="pi pi-tag" />
                     } @else if (rowData.type === 'variety') {
-                      <p-tag severity="secondary" value="Varietat" icon="pi pi-circle" />
+                      <p-tag severity="secondary" [value]="rowData.level" icon="pi pi-circle" />
                     }
                   </td>
                 </tr>

@@ -24,6 +24,25 @@
     .header-actions {
       display: flex;
       gap: 0.5rem;
+      align-items: center;
+    }
+  }
+
+  .batch-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--surface-ground);
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+
+    .selection-count {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-right: 0.5rem;
     }
   }
 
@@ -146,6 +165,11 @@
 
   .text-center {
     text-align: center;
+  }
+
+  .eco-icon {
+    color: var(--green-600);
+    font-size: 1.2rem;
   }
 }
 

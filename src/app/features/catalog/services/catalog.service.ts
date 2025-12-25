@@ -262,5 +262,110 @@ export class CatalogService {
     this._error.set(null);
     this.clearFilters();
   }
+
+  /**
+   * Eliminar múltiples articles en batch
+   */
+  async batchDelete(articleIds: string[]): Promise<{ deleted: number; failed: number }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ deleted: number; failed: number }>('articles/batch/delete', {
+        articleIds,
+      });
+
+      // Eliminar de la llista local
+      this._articles.update(articles => articles.filter(a => !articleIds.includes(a.id)));
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error eliminant articles');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Canviar visibilitat a l'aparador de múltiples articles en batch
+   */
+  async batchToggleShowcase(articleIds: string[], inShowcase: boolean): Promise<{ updated: number; failed: number }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ updated: number; failed: number }>('articles/batch/toggle-showcase', {
+        articleIds,
+        inShowcase,
+      });
+
+      // Actualitzar a la llista local
+      this._articles.update(articles =>
+        articles.map(a => articleIds.includes(a.id) ? { ...a, inShowcase } : a)
+      );
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error canviant estat de l\'aparador');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Canviar estat de temporada de múltiples articles en batch
+   */
+  async batchToggleSeasonal(articleIds: string[], isSeasonal: boolean): Promise<{ updated: number; failed: number }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ updated: number; failed: number }>('articles/batch/toggle-seasonal', {
+        articleIds,
+        isSeasonal,
+      });
+
+      // Actualitzar a la llista local
+      this._articles.update(articles =>
+        articles.map(a => articleIds.includes(a.id) ? { ...a, isSeasonal } : a)
+      );
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error canviant estat de temporada');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Canviar estat ecològic de múltiples articles en batch
+   */
+  async batchToggleEco(articleIds: string[], isEco: boolean): Promise<{ updated: number; failed: number }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ updated: number; failed: number }>('articles/batch/toggle-eco', {
+        articleIds,
+        isEco,
+      });
+
+      // Actualitzar a la llista local
+      this._articles.update(articles =>
+        articles.map(a => articleIds.includes(a.id) ? { ...a, isEco } : a)
+      );
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error canviant estat ecològic');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
 }
 

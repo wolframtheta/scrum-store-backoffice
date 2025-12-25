@@ -18,7 +18,8 @@ export interface SaleItem {
 
 export interface Sale {
   id: string;
-  userEmail: string;
+  userId?: string; // Per comandes (orders)
+  userEmail?: string; // Per vendes (sales)
   userName?: string;
   consumerGroupId: string;
   items: SaleItem[];

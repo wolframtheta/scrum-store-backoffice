@@ -19,10 +19,9 @@ export class SalesService {
     this.error.set(null);
 
     try {
+      // Si no es passa paymentStatus, carregar totes les comandes
       const params = paymentStatus ? `?paymentStatus=${paymentStatus}` : '';
-      console.log('Fetching orders from:', `orders/by-group/${groupId}${params}`);
       const sales = await this.api.get<Sale[]>(`orders/by-group/${groupId}${params}`);
-      console.log('Orders received:', sales.length);
       this.sales.set(sales);
     } catch (err: any) {
       this.error.set(err?.error?.message || 'Error carregant comandes');

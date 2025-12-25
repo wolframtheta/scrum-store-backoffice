@@ -12,6 +12,47 @@
     }
   }
 
+  .filters-container {
+    background: var(--surface-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--surface-border);
+
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-end;
+
+      .filter-item {
+        flex: 1;
+        min-width: 200px;
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          color: var(--text-color);
+          font-size: 0.9rem;
+        }
+
+        ::ng-deep {
+          .p-inputgroup {
+            width: 100%;
+          }
+        }
+      }
+
+      .filter-actions {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.5rem;
+      }
+    }
+  }
+
   .text-right {
     text-align: right;
   }

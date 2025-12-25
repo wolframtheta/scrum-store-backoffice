@@ -51,8 +51,32 @@ export const routes: Routes = [
         loadComponent: () => import('./features/suppliers/pages/suppliers-list').then(m => m.SuppliersListComponent)
       },
       {
-        path: 'orders',
-        loadComponent: () => import('./features/orders/pages/orders-list/orders-list.component').then(m => m.OrdersListComponent)
+        path: 'periods/:periodId/orders-summary',
+        loadComponent: () => import('./features/periods/pages/period-orders-summary/period-orders-summary.component').then(m => m.PeriodOrdersSummaryComponent)
+      },
+      {
+        path: 'periods/new',
+        loadComponent: () => import('./features/periods/pages/period-form/period-form-page.component').then(m => m.PeriodFormPageComponent)
+      },
+      {
+        path: 'periods/edit/:id',
+        loadComponent: () => import('./features/periods/pages/period-form/period-form-page.component').then(m => m.PeriodFormPageComponent)
+      },
+      {
+        path: 'periods/:supplierId',
+        loadComponent: () => import('./features/periods/pages/periods-list/periods-list.component').then(m => m.PeriodsListComponent)
+      },
+      {
+        path: 'periods',
+        loadComponent: () => import('./features/periods/pages/periods-list/periods-list.component').then(m => m.PeriodsListComponent)
+      },
+      {
+        path: 'sales',
+        loadComponent: () => import('./features/sales/pages/sales-list/sales-list.component').then(m => m.SalesListComponent)
+      },
+      {
+        path: 'basket-preparation',
+        loadComponent: () => import('./features/sales/pages/basket-preparation/basket-preparation.component').then(m => m.BasketPreparationComponent)
       },
       {
         path: 'users',
@@ -61,6 +85,10 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/pages/group-settings/group-settings.component').then(m => m.GroupSettingsComponent)
+      },
+      {
+        path: 'csv-import',
+        loadComponent: () => import('./features/csv/pages/csv-viewer/csv-viewer.component').then(m => m.CsvViewerComponent)
       },
       {
         path: 'admin',

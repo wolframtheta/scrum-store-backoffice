@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -65,6 +66,7 @@ export class SuppliersListComponent implements OnInit {
 
   protected readonly showDialog = signal<boolean>(false);
   protected readonly selectedSupplier = signal<Supplier | null>(null);
+  protected readonly router = inject(Router);
 
   async ngOnInit(): Promise<void> {
     await this.loadSuppliers();
@@ -198,6 +200,10 @@ export class SuppliersListComponent implements OnInit {
         detail: 'No s\'ha pogut eliminar el proveïdor'
       });
     }
+  }
+
+  protected openPeriods(supplier: Supplier): void {
+    this.router.navigate(['/periods', supplier.id]);
   }
 }
 

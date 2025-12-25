@@ -1,0 +1,193 @@
+<div class="basket-preparation-container">
+  <p-toast />
+
+  <div class="header">
+    <div>
+      <h1>{{ 'basketPreparation.title' | translate }}</h1>
+      <p class="subtitle">{{ 'basketPreparation.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-container">
+    <div class="filters-row">
+      <div class="filter-item">
+        <label for="filter-user">{{ 'sales.filters.user' | translate }}</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-search"></i>
+          </p-inputGroupAddon>
+          <p-autoComplete
+            id="filter-user"
+            [suggestions]="userSuggestions"
+            [(ngModel)]="selectedUser"
+            (completeMethod)="onUserSearch($event)"
+            (onSelect)="onUserSelect($event)"
+            (onClear)="onUserClear()"
+            [optionLabel]="'userName'"
+            [placeholder]="'sales.filters.userPlaceholder' | translate"
+            [showClear]="true"
+            [style]="{ width: '100%', border: 'none' }"
+          />
+        </p-inputGroup>
+      </div>
+
+      <div class="filter-item">
+        <label for="filter-date-from">{{ 'sales.filters.dateFrom' | translate }}</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-calendar"></i>
+          </p-inputGroupAddon>
+          <p-datePicker
+            id="filter-date-from"
+            [(ngModel)]="filterDateFromValue"
+            [showIcon]="false"
+            [showClear]="true"
+            dateFormat="dd/mm/yy"
+            [placeholder]="'sales.filters.dateFromPlaceholder' | translate"
+            [style]="{ width: '100%', border: 'none' }"
+          />
+        </p-inputGroup>
+      </div>
+
+      <div class="filter-item">
+        <label for="filter-date-to">{{ 'sales.filters.dateTo' | translate }}</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-calendar"></i>
+          </p-inputGroupAddon>
+          <p-datePicker
+            id="filter-date-to"
+            [(ngModel)]="filterDateToValue"
+            [showIcon]="false"
+            [showClear]="true"
+            dateFormat="dd/mm/yy"
+            [placeholder]="'sales.filters.dateToPlaceholder' | translate"
+            [style]="{ width: '100%', border: 'none' }"
+          />
+        </p-inputGroup>
+      </div>
+
+      <div class="filter-item">
+        <label for="filter-delivered">{{ 'sales.filters.delivered' | translate }}</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-filter"></i>
+          </p-inputGroupAddon>
+          <p-select
+            id="filter-delivered"
+            [options]="deliveredOptions()"
+            [(ngModel)]="filterDeliveredValue"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="'sales.filters.deliveredPlaceholder' | translate"
+            [style]="{ width: '100%', border: 'none' }"
+          />
+        </p-inputGroup>
+      </div>
+
+      <div class="filter-actions">
+        <p-button
+          [label]="'common.clearFilters' | translate"
+          icon="pi pi-times"
+          (onClick)="clearFilters()"
+          [text]="true"
+          styleClass="p-button-secondary"
+        />
+      </div>
+    </div>
+  </div>
+
+  @if (salesService.isLoading() || periodsService.isLoading()) {
+    <div class="loading-container">
+      <p>{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (basketTree().length === 0) {
+    <div class="empty-container">
+      <p>{{ 'basketPreparation.noItems' | translate }}</p>
+    </div>
+  } @else {
+    <div class="tree-container">
+      @for (periodNode of basketTree(); track periodNode.key) {
+        <div class="period-section">
+          <!-- Period Node -->
+          <div class="period-node">
+            @if (ordersByPeriod().has(periodNode.data.periodId)) {
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="areAllOrdersPrepared(periodNode.data.periodId)"
+                (ngModelChange)="onPeriodOrdersPreparedChange(periodNode.data.periodId, $event)"
+                [inputId]="'prepared-period-' + periodNode.key"
+                styleClass="period-checkbox"
+              />
+            }
+            <i class="pi pi-calendar period-icon"></i>
+            <span class="period-name" [class.finished]="periodNode.data.isFinished">
+              {{ periodNode.label }}
+            </span>
+            @if (periodNode.data.isFinished) {
+              <p-tag [value]="'basketPreparation.finished' | translate" severity="secondary" styleClass="finished-tag" />
+            }
+          </div>
+
+          <!-- Articles -->
+          @if (periodNode.children) {
+            @for (articleNode of periodNode.children; track articleNode.key) {
+              <div class="article-section">
+                <!-- Article Node -->
+                <div class="article-node" [class.order-prepared]="isOrderPreparedForNode(articleNode)">
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="isArticlePrepared(articleNode)"
+                    (ngModelChange)="onArticlePreparedChange(articleNode, $event)"
+                    [inputId]="'prepared-' + articleNode.key"
+                    styleClass="article-checkbox"
+                    [disabled]="isOrderPreparedForNode(articleNode)"
+                  />
+                  <i class="pi pi-box article-icon"></i>
+                  <span class="article-name">{{ articleNode.label }}</span>
+                  <span class="article-quantity">
+                    <span class="quantity-label">Total:</span>
+                    <span class="quantity-value">{{ articleNode.data.totalQuantity }}</span>
+                    @if (articleNode.data.unitMeasure) {
+                      <span class="quantity-unit">{{ articleNode.data.unitMeasure }}</span>
+                    }
+                    @if (articleNode.children && articleNode.children.length > 0) {
+                      <span class="quantity-summary">({{ articleNode.children.length }} {{ articleNode.children.length === 1 ? 'client' : 'clients' }})</span>
+                    }
+                  </span>
+                </div>
+
+                <!-- Users -->
+                @if (articleNode.children) {
+                  <div class="users-container">
+                    @for (userNode of articleNode.children; track userNode.key) {
+                      <div class="user-node" [class.order-prepared]="userNode.data.orderId && isOrderPrepared(userNode.data.orderId)">
+                        <p-checkbox
+                          [binary]="true"
+                          [ngModel]="isUserPrepared(userNode)"
+                          (ngModelChange)="onUserPreparedChange(userNode, $event)"
+                          [inputId]="'prepared-user-' + userNode.key"
+                          styleClass="user-checkbox"
+                          [disabled]="userNode.data.orderId && isOrderPrepared(userNode.data.orderId)"
+                        />
+                        <i class="pi pi-user user-icon"></i>
+                        <span class="user-name">{{ userNode.label }}</span>
+                        <span class="user-quantity">
+                          <span class="quantity-value">{{ userNode.data.quantity }}</span>
+                          @if (userNode.data.unitMeasure) {
+                            <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
+                          }
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

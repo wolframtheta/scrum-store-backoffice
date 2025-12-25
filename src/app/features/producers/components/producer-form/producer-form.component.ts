@@ -126,17 +126,35 @@ export class ProducerFormComponent {
       }
 
       const formValue = this.form.value;
-      const formData = {
+      const formData: any = {
         name: formValue.name,
-        supplierId: formValue.supplier?.id || null, // Extreu només l'ID del supplier
-        email: formValue.email,
-        phone: formValue.phone,
-        city: formValue.city,
-        address: formValue.address,
-        notes: formValue.notes,
         isActive: formValue.isActive,
-        consumerGroupId: groupId,
       };
+
+      // Afegir camps opcionals només si tenen valor (no null/undefined/empty string)
+      if (formValue.supplier?.id) {
+        formData.supplierId = formValue.supplier.id;
+      }
+      if (formValue.email?.trim()) {
+        formData.email = formValue.email.trim();
+      }
+      if (formValue.phone?.trim()) {
+        formData.phone = formValue.phone.trim();
+      }
+      if (formValue.city?.trim()) {
+        formData.city = formValue.city.trim();
+      }
+      if (formValue.address?.trim()) {
+        formData.address = formValue.address.trim();
+      }
+      if (formValue.notes?.trim()) {
+        formData.notes = formValue.notes.trim();
+      }
+
+      // Només afegir consumerGroupId quan es crea (no quan s'actualitza)
+      if (!this.isEditMode()) {
+        formData.consumerGroupId = groupId;
+      }
 
       this.save.emit(formData);
     }

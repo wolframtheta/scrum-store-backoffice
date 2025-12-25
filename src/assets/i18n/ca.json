@@ -17,6 +17,7 @@
     "select": "Seleccionar",
     "selectAll": "Seleccionar tot",
     "clear": "Netejar",
+    "clearFilters": "Netejar filtres",
     "refresh": "Actualitzar",
     "view": "Veure",
     "actions": "Accions",
@@ -138,10 +139,18 @@
         "title": "Proveïdors",
         "description": "Gestiona empreses facturadores"
       },
+      "periods": {
+        "title": "Períodes",
+        "description": "Gestiona períodes de comanda i preus"
+      },
       "sales": {
-        "title": "Vendes",
-        "description": "Gestiona comandes i pagaments",
+        "title": "Comandes",
+        "description": "Veure totes les comandes realitzades",
         "metric": "{{count}} pendents"
+      },
+      "basketPreparation": {
+        "title": "Preparació de Cistelles",
+        "description": "Veure com preparar les cistelles per article"
       },
       "users": {
         "title": "Usuaris",
@@ -151,6 +160,10 @@
       "notices": {
         "title": "Avisos",
         "description": "Publica avisos per al grup"
+      },
+      "csvImport": {
+        "title": "Importar CSV",
+        "description": "Importa articles des de fitxer CSV"
       },
       "settings": {
         "title": "Configuració",
@@ -168,7 +181,8 @@
     }
   },
   "sales": {
-    "title": "Gestió de Vendes",
+    "title": "Comandes",
+    "subtitle": "Llistat complet de totes les comandes realitzades",
     "tabs": {
       "unpaid": "No Pagades",
       "partial": "Pagament Parcial",
@@ -180,8 +194,10 @@
       "items": "Articles",
       "total": "Total",
       "paid": "Pagat",
+      "pending": "Pendent",
       "remaining": "Pendent",
-      "status": "Estat"
+      "status": "Estat de pagament",
+      "delivered": "Entregat"
     },
     "status": {
       "paid": "Pagat",
@@ -194,6 +210,22 @@
     "noUnpaidSales": "No hi ha vendes pendents de pagament",
     "noPartialSales": "No hi ha vendes amb pagament parcial",
     "noPaidSales": "No hi ha vendes pagades",
+    "noOrders": "No hi ha comandes",
+    "filters": {
+      "user": "Usuari",
+      "userPlaceholder": "Cercar usuari...",
+      "dateFrom": "Data des de",
+      "dateFromPlaceholder": "Seleccionar data",
+      "dateTo": "Data fins a",
+      "dateToPlaceholder": "Seleccionar data",
+      "delivered": "Estat d'entrega",
+      "deliveredPlaceholder": "Seleccionar estat",
+      "options": {
+        "all": "Totes",
+        "delivered": "Entregades",
+        "undelivered": "No entregades"
+      }
+    },
     "payment": {
       "title": "Registrar Pagament",
       "user": "Usuari",
@@ -214,6 +246,12 @@
       "totalThisPayment": "Total d'aquest pagament",
       "remainingAfter": "Pendent després del pagament"
     }
+  },
+  "basketPreparation": {
+    "title": "Preparació de Cistelles",
+    "subtitle": "Agrupa les comandes per període i article per preparar les cistelles",
+    "noItems": "No hi ha articles per preparar",
+    "finished": "Finalitzat"
   },
   "catalog": {
     "title": "Catàleg",
@@ -239,10 +277,14 @@
     "table": {
       "name": "Nom",
       "description": "Descripció",
+      "category": "Categoria",
+      "product": "Producte",
+      "variety": "Varietat",
       "producer": "Productor",
       "city": "Ciutat",
       "price": "Preu",
       "unit": "Unitat",
+      "eco": "Ecològic",
       "maxQuantity": "Quantitat Màx.",
       "seasonal": "Temporada",
       "seasonalYes": "De temporada",
@@ -257,6 +299,16 @@
       "create": "Nou Article",
       "addToShowcase": "Afegir a l'aparador",
       "removeFromShowcase": "Treure de l'aparador"
+    },
+    "batch": {
+      "selected": "seleccionats",
+      "addToShowcase": "Afegir a l'aparador",
+      "removeFromShowcase": "Treure de l'aparador",
+      "markSeasonal": "Marcar temporada",
+      "unmarkSeasonal": "Desmarcar temporada",
+      "markEco": "Marcar ecològic",
+      "unmarkEco": "Desmarcar ecològic",
+      "delete": "Eliminar"
     },
     "form": {
       "titleCreate": "Crear Nou Article",
@@ -456,6 +508,65 @@
       "bankAccountHint": "Compte bancari per a pagaments",
       "notes": "Notes internes",
       "isActive": "Proveïdor actiu"
+    },
+    "periods": "Veure Períodes"
+  },
+  "periods": {
+    "title": "Gestió de Períodes",
+    "subtitle": "Gestiona períodes de comanda i preus per proveïdor",
+    "create": "Nou Període",
+    "edit": "Editar Període",
+    "duplicate": "Duplicar Període",
+    "noPeriods": "No hi ha períodes registrats",
+    "articles": "articles",
+    "viewPeriods": "Veure Períodes",
+    "table": {
+      "name": "Nom",
+      "startDate": "Data d'inici",
+      "endDate": "Data de fi",
+      "deliveryDate": "Data d'entrega",
+      "recurrence": "Recurrència",
+      "articles": "Articles"
+    },
+    "form": {
+      "supplier": "Proveïdor",
+      "selectSupplier": "Selecciona un proveïdor",
+      "name": "Nom del període",
+      "dateRange": "Rang de dates (Inici - Fi)",
+      "startDate": "Data d'inici",
+      "endDate": "Data de fi",
+      "deliveryDate": "Data d'entrega",
+      "recurrence": "Recurrència",
+      "articles": "Articles",
+      "article": "Article",
+      "unit": "Unitat",
+      "price": "Preu",
+      "searchArticle": "Cercar article...",
+      "addArticle": "Afegir Article",
+      "noArticles": "No hi ha articles afegits al període",
+      "deliveryDateAfterEnd": "La data d'entrega ha de ser posterior a la data de fi"
+    },
+    "table": {
+      "name": "Nom",
+      "supplier": "Proveïdor",
+      "startDate": "Data d'inici",
+      "endDate": "Data de fi",
+      "deliveryDate": "Data d'entrega",
+      "recurrence": "Recurrència",
+      "articles": "Articles"
+    },
+    "filterBySupplier": "Filtrar per proveïdor",
+    "ordersSummary": {
+      "title": "Resum de Comandes del Període",
+      "totalOrders": "Total Comandes",
+      "totalArticles": "Total Articles",
+      "table": {
+        "article": "Article",
+        "quantity": "Quantitat Total",
+        "unit": "Unitat",
+        "orders": "Comandes"
+      },
+      "noOrders": "No hi ha comandes per a aquest període"
     }
   },
   "admin": {

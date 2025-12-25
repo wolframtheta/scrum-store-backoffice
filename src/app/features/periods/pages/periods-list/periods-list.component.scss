@@ -1,0 +1,74 @@
+.periods-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.periods-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+
+  .header-content {
+    flex: 1;
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .periods-title {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .periods-subtitle {
+      margin: 0;
+      color: var(--text-color-secondary);
+      font-size: 1rem;
+    }
+  }
+}
+
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+
+  .search-input {
+    flex: 1;
+    max-width: 400px;
+  }
+}
+
+.table-container {
+  background: var(--surface-card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actions-column {
+  width: 120px;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+}
+

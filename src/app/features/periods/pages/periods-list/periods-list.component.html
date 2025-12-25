@@ -1,0 +1,244 @@
+<div class="periods-container">
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Header -->
+  <div class="periods-header">
+    <div class="header-content">
+      <div class="header-top">
+        @if (supplierId()) {
+          <p-button
+            icon="pi pi-arrow-left"
+            [text]="true"
+            severity="secondary"
+            (onClick)="router.navigate(['/periods'])"
+            [pTooltip]="'common.back' | translate"
+          />
+        }
+        <h1 class="periods-title">{{ 'periods.title' | translate }}</h1>
+      </div>
+      @if (supplier()) {
+        <p class="periods-subtitle">{{ supplier()?.name }}</p>
+      }
+    </div>
+    <p-button
+      [label]="'periods.create' | translate"
+      icon="pi pi-plus"
+      (onClick)="openCreateDialog()"
+    />
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <p-inputGroup class="search-input">
+      <p-inputGroupAddon>
+        <i class="pi pi-search"></i>
+      </p-inputGroupAddon>
+      <input
+        type="text"
+        pInputText
+        [placeholder]="'common.search' | translate"
+        (input)="onSearch($event)"
+      />
+    </p-inputGroup>
+    @if (suppliers().length > 0) {
+      <p-select
+        [options]="supplierFilterOptions()"
+        optionLabel="name"
+        optionValue="id"
+        [placeholder]="'periods.filterBySupplier' | translate"
+        [style]="{ width: '250px' }"
+        (onChange)="filterBySupplier($event.value)"
+        [ngModel]="selectedSupplierFilter()"
+        (ngModelChange)="filterBySupplier($event)"
+        [showClear]="true"
+      />
+    }
+  </div>
+
+  <!-- Suppliers Table (ocult) -->
+  @if (false) {
+    <div class="table-container">
+      <p-table
+        [value]="filteredSuppliers()"
+        [loading]="isLoading()"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+        styleClass="p-datatable-sm"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'suppliers.table.name' | translate }}</th>
+            <th>{{ 'suppliers.table.taxId' | translate }}</th>
+            <th>{{ 'suppliers.table.contact' | translate }}</th>
+            <th>{{ 'suppliers.table.location' | translate }}</th>
+            <th class="actions-column">{{ 'common.actions' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-supplier>
+          <tr>
+            <td>
+              <strong>{{ supplier.name }}</strong>
+            </td>
+            <td>
+              @if (supplier.taxId) {
+                <span>{{ supplier.taxId }}</span>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </td>
+            <td>
+              <div class="contact-info">
+                @if (supplier.email) {
+                  <div class="contact-item">
+                    <i class="pi pi-envelope"></i>
+                    <span>{{ supplier.email }}</span>
+                  </div>
+                }
+                @if (supplier.phone) {
+                  <div class="contact-item">
+                    <i class="pi pi-phone"></i>
+                    <span>{{ supplier.phone }}</span>
+                  </div>
+                }
+                @if (!supplier.email && !supplier.phone) {
+                  <span class="text-muted">{{ 'suppliers.noContact' | translate }}</span>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="location-info">
+                @if (supplier.city) {
+                  <i class="pi pi-map-marker"></i>
+                  <span>{{ supplier.city }}</span>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </div>
+            </td>
+            <td class="actions-column">
+              <div class="action-buttons">
+                <p-button
+                  icon="pi pi-calendar"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="primary"
+                  (onClick)="openSupplierPeriods(supplier)"
+                  [pTooltip]="'periods.viewPeriods' | translate"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center">
+              {{ 'suppliers.noSuppliers' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+  <!-- Periods Table -->
+  <div class="table-container">
+    <p-table
+      [value]="filteredPeriods()"
+      [loading]="isLoading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'periods.table.name' | translate }}</th>
+          <th>{{ 'periods.table.supplier' | translate }}</th>
+          <th>{{ 'periods.table.startDate' | translate }}</th>
+          <th>{{ 'periods.table.endDate' | translate }}</th>
+          <th>{{ 'periods.table.deliveryDate' | translate }}</th>
+          <th>{{ 'periods.table.recurrence' | translate }}</th>
+          <th>{{ 'periods.table.articles' | translate }}</th>
+          <th class="actions-column">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-period>
+        <tr 
+          [style.cursor]="'pointer'"
+          (click)="openPeriodOrdersSummary(period)"
+          (click.stop)="true"
+        >
+          <td>
+            <strong>{{ period.name }}</strong>
+          </td>
+          <td>
+            @if (period.supplier) {
+              <span>{{ period.supplier.name }}</span>
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          </td>
+          <td>{{ formatDate(period.startDate) }}</td>
+          <td>{{ formatDate(period.endDate) }}</td>
+          <td>{{ formatDate(period.deliveryDate) }}</td>
+          <td>
+            <p-tag
+              [value]="getRecurrenceLabel(period.recurrence)"
+              severity="info"
+            />
+          </td>
+          <td>
+            <span>{{ period.periodArticles?.length || 0 }} {{ 'periods.articles' | translate }}</span>
+          </td>
+            <td class="actions-column">
+              <div class="action-buttons" (click.stop)="true">
+                <p-button
+                  icon="pi pi-copy"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  (onClick)="duplicatePeriod(period)"
+                  [pTooltip]="'periods.duplicate' | translate"
+                />
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  (onClick)="openEditDialog(period)"
+                  [pTooltip]="'common.edit' | translate"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  (onClick)="confirmDelete(period)"
+                  [pTooltip]="'common.delete' | translate"
+                />
+              </div>
+            </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center">
+            {{ 'periods.noPeriods' | translate }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+

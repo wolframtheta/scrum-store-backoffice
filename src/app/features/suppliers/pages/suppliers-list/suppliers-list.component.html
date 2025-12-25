@@ -116,6 +116,14 @@
           <td class="actions-column">
             <div class="action-buttons">
               <p-button
+                icon="pi pi-calendar"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                (onClick)="openPeriods(supplier)"
+                [pTooltip]="'suppliers.periods' | translate"
+              />
+              <p-button
                 icon="pi pi-pencil"
                 [rounded]="true"
                 [text]="true"

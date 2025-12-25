@@ -17,6 +17,7 @@
     "select": "Seleccionar",
     "selectAll": "Seleccionar todo",
     "clear": "Limpiar",
+    "clearFilters": "Limpiar filtros",
     "refresh": "Actualizar",
     "view": "Ver",
     "actions": "Acciones",
@@ -138,10 +139,18 @@
         "title": "Proveedores",
         "description": "Gestiona empresas facturadoras"
       },
+      "periods": {
+        "title": "Períodos",
+        "description": "Gestiona períodos de pedido y precios"
+      },
       "sales": {
-        "title": "Ventas",
-        "description": "Gestiona pedidos y pagos",
+        "title": "Pedidos",
+        "description": "Ver todos los pedidos realizados",
         "metric": "{{count}} pendientes"
+      },
+      "basketPreparation": {
+        "title": "Preparación de Cestas",
+        "description": "Ver cómo preparar las cestas por artículo"
       },
       "users": {
         "title": "Usuarios",
@@ -151,6 +160,10 @@
       "notices": {
         "title": "Avisos",
         "description": "Publica avisos para el grupo"
+      },
+      "csvImport": {
+        "title": "Importar CSV",
+        "description": "Importa artículos desde archivo CSV"
       },
       "settings": {
         "title": "Configuración",
@@ -168,7 +181,8 @@
     }
   },
   "sales": {
-    "title": "Gestión de Ventas",
+    "title": "Pedidos",
+    "subtitle": "Listado completo de todos los pedidos realizados",
     "tabs": {
       "unpaid": "No Pagadas",
       "partial": "Pago Parcial",
@@ -180,8 +194,10 @@
       "items": "Artículos",
       "total": "Total",
       "paid": "Pagado",
+      "pending": "Pendiente",
       "remaining": "Pendiente",
-      "status": "Estado"
+      "status": "Estado de pago",
+      "delivered": "Entregado"
     },
     "status": {
       "paid": "Pagado",
@@ -194,6 +210,22 @@
     "noUnpaidSales": "No hay ventas pendientes de pago",
     "noPartialSales": "No hay ventas con pago parcial",
     "noPaidSales": "No hay ventas pagadas",
+    "noOrders": "No hay pedidos",
+    "filters": {
+      "user": "Usuario",
+      "userPlaceholder": "Buscar usuario...",
+      "dateFrom": "Fecha desde",
+      "dateFromPlaceholder": "Seleccionar fecha",
+      "dateTo": "Fecha hasta",
+      "dateToPlaceholder": "Seleccionar fecha",
+      "delivered": "Estado de entrega",
+      "deliveredPlaceholder": "Seleccionar estado",
+      "options": {
+        "all": "Todas",
+        "delivered": "Entregadas",
+        "undelivered": "No entregadas"
+      }
+    },
     "payment": {
       "title": "Registrar Pago",
       "user": "Usuario",
@@ -214,6 +246,12 @@
       "totalThisPayment": "Total de este pago",
       "remainingAfter": "Pendiente después del pago"
     }
+  },
+  "basketPreparation": {
+    "title": "Preparación de Cestas",
+    "subtitle": "Agrupa los pedidos por período y artículo para preparar las cestas",
+    "noItems": "No hay artículos para preparar",
+    "finished": "Finalizado"
   },
   "catalog": {
     "title": "Catálogo",
@@ -239,10 +277,14 @@
     "table": {
       "name": "Nombre",
       "description": "Descripción",
+      "category": "Categoría",
+      "product": "Producto",
+      "variety": "Variedad",
       "producer": "Productor",
       "city": "Ciudad",
       "price": "Precio",
       "unit": "Unidad",
+      "eco": "Ecológico",
       "maxQuantity": "Cantidad Máx.",
       "seasonal": "Temporada",
       "seasonalYes": "De temporada",
@@ -257,6 +299,16 @@
       "create": "Nuevo Artículo",
       "addToShowcase": "Añadir al aparador",
       "removeFromShowcase": "Quitar del aparador"
+    },
+    "batch": {
+      "selected": "seleccionados",
+      "addToShowcase": "Añadir al aparador",
+      "removeFromShowcase": "Quitar del aparador",
+      "markSeasonal": "Marcar temporada",
+      "unmarkSeasonal": "Desmarcar temporada",
+      "markEco": "Marcar ecológico",
+      "unmarkEco": "Desmarcar ecológico",
+      "delete": "Eliminar"
     },
     "form": {
       "titleCreate": "Crear Nuevo Artículo",
@@ -456,6 +508,65 @@
       "bankAccountHint": "Cuenta bancaria para pagos",
       "notes": "Notas internas",
       "isActive": "Proveedor activo"
+    },
+    "periods": "Ver Períodos"
+  },
+  "periods": {
+    "title": "Gestión de Períodos",
+    "subtitle": "Gestiona períodos de pedido y precios por proveedor",
+    "create": "Nuevo Período",
+    "edit": "Editar Período",
+    "duplicate": "Duplicar Período",
+    "noPeriods": "No hay períodos registrados",
+    "articles": "artículos",
+    "viewPeriods": "Ver Períodos",
+    "table": {
+      "name": "Nombre",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "deliveryDate": "Fecha de entrega",
+      "recurrence": "Recurrencia",
+      "articles": "Artículos"
+    },
+    "form": {
+      "supplier": "Proveedor",
+      "selectSupplier": "Selecciona un proveedor",
+      "name": "Nombre del período",
+      "dateRange": "Rango de fechas (Inicio - Fin)",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "deliveryDate": "Fecha de entrega",
+      "recurrence": "Recurrencia",
+      "articles": "Artículos",
+      "article": "Artículo",
+      "unit": "Unidad",
+      "price": "Precio",
+      "searchArticle": "Buscar artículo...",
+      "addArticle": "Añadir Artículo",
+      "noArticles": "No hay artículos añadidos al período",
+      "deliveryDateAfterEnd": "La fecha de entrega debe ser posterior a la fecha de fin"
+    },
+    "table": {
+      "name": "Nombre",
+      "supplier": "Proveedor",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "deliveryDate": "Fecha de entrega",
+      "recurrence": "Recurrencia",
+      "articles": "Artículos"
+    },
+    "filterBySupplier": "Filtrar por proveedor",
+    "ordersSummary": {
+      "title": "Resumen de Pedidos del Período",
+      "totalOrders": "Total Pedidos",
+      "totalArticles": "Total Artículos",
+      "table": {
+        "article": "Artículo",
+        "quantity": "Cantidad Total",
+        "unit": "Unidad",
+        "orders": "Pedidos"
+      },
+      "noOrders": "No hay pedidos para este período"
     }
   },
   "admin": {

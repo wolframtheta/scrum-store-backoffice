@@ -1,0 +1,106 @@
+<div class="period-orders-summary-container">
+  <p-toast />
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-top">
+        <p-button
+          icon="pi pi-arrow-left"
+          [text]="true"
+          severity="secondary"
+          (onClick)="goBack()"
+          [pTooltip]="'common.back' | translate"
+        />
+        <h1>{{ 'periods.ordersSummary.title' | translate }}</h1>
+      </div>
+      @if (period()) {
+        <div class="period-info">
+          <h2>{{ period()?.name }}</h2>
+          <div class="period-details">
+            <span>
+              <strong>{{ 'periods.table.supplier' | translate }}:</strong>
+              {{ period()?.supplier?.name || '-' }}
+            </span>
+            <span>
+              <strong>{{ 'periods.table.startDate' | translate }}:</strong>
+              {{ formatDate(period()!.startDate) }}
+            </span>
+            <span>
+              <strong>{{ 'periods.table.endDate' | translate }}:</strong>
+              {{ formatDate(period()!.endDate) }}
+            </span>
+            <span>
+              <strong>{{ 'periods.table.deliveryDate' | translate }}:</strong>
+              {{ formatDate(period()!.deliveryDate) }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Resum -->
+  <div class="summary-section">
+    <div class="summary-card">
+      <div class="summary-item">
+        <span class="summary-label">{{ 'periods.ordersSummary.totalOrders' | translate }}</span>
+        <span class="summary-value">{{ totalOrders() }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{{ 'periods.ordersSummary.totalArticles' | translate }}</span>
+        <span class="summary-value">{{ articlesSummary().length }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Taula d'articles -->
+  <div class="table-container">
+    <p-table
+      [value]="articlesSummaryList()"
+      [loading]="isLoading()"
+      [paginator]="true"
+      [rows]="20"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'periods.ordersSummary.table.article' | translate }}</th>
+          <th>{{ 'periods.ordersSummary.table.quantity' | translate }}</th>
+          <th>{{ 'periods.ordersSummary.table.orders' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-article>
+        <tr>
+          <td>
+            <strong>{{ article.articleName }}</strong>
+          </td>
+          <td>
+            <span class="quantity-value">{{ article.totalQuantity }}</span>
+            @if (article.unitMeasure) {
+              <span class="quantity-unit">{{ article.unitMeasure }}</span>
+            }
+          </td>
+          <td>
+            <p-tag
+              [value]="article.ordersCount.toString()"
+              severity="info"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3" class="text-center">
+            {{ 'periods.ordersSummary.noOrders' | translate }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
