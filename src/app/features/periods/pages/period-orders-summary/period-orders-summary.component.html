@@ -1,5 +1,6 @@
 <div class="period-orders-summary-container">
   <p-toast />
+  <p-confirmDialog />
 
   <!-- Header -->
   <div class="header">
@@ -16,24 +17,54 @@
       </div>
       @if (period()) {
         <div class="period-info">
-          <h2>{{ period()?.name }}</h2>
-          <div class="period-details">
-            <span>
-              <strong>{{ 'periods.table.supplier' | translate }}:</strong>
-              {{ period()?.supplier?.name || '-' }}
-            </span>
-            <span>
-              <strong>{{ 'periods.table.startDate' | translate }}:</strong>
-              {{ formatDate(period()!.startDate) }}
-            </span>
-            <span>
-              <strong>{{ 'periods.table.endDate' | translate }}:</strong>
-              {{ formatDate(period()!.endDate) }}
-            </span>
-            <span>
-              <strong>{{ 'periods.table.deliveryDate' | translate }}:</strong>
-              {{ formatDate(period()!.deliveryDate) }}
-            </span>
+          <div class="period-header-row">
+            <div>
+              <h2>{{ period()?.name }}</h2>
+              <div class="period-details">
+                <span>
+                  <strong>{{ 'periods.table.supplier' | translate }}:</strong>
+                  {{ period()?.supplier?.name || '-' }}
+                </span>
+                <span>
+                  <strong>{{ 'periods.table.startDate' | translate }}:</strong>
+                  {{ formatDate(period()!.startDate) }}
+                </span>
+                <span>
+                  <strong>{{ 'periods.table.endDate' | translate }}:</strong>
+                  {{ formatDate(period()!.endDate) }}
+                </span>
+                <span>
+                  <strong>{{ 'periods.table.deliveryDate' | translate }}:</strong>
+                  {{ formatDate(period()!.deliveryDate) }}
+                </span>
+              </div>
+            </div>
+            <div class="period-actions">
+              <p-button
+                icon="pi pi-copy"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                (onClick)="duplicatePeriod()"
+                [pTooltip]="'periods.duplicate' | translate"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                (onClick)="openEditDialog()"
+                [pTooltip]="'common.edit' | translate"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                (onClick)="confirmDelete()"
+                [pTooltip]="'common.delete' | translate"
+              />
+            </div>
           </div>
         </div>
       }

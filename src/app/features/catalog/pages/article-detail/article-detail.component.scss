@@ -1,0 +1,79 @@
+.article-detail-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+
+    i {
+      color: var(--primary-color);
+    }
+
+    p {
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .detail-content {
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label {
+          font-weight: 600;
+          color: var(--text-color-secondary);
+          font-size: 0.9rem;
+        }
+
+        span {
+          color: var(--text-color);
+        }
+
+        &.full-width {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+
+    .chart-container {
+      height: 400px;
+      position: relative;
+    }
+
+    .text-secondary {
+      color: var(--text-color-secondary);
+      font-style: italic;
+    }
+
+    .eco-icon {
+      color: var(--green-500);
+      font-size: 1.25rem;
+    }
+  }
+}
+

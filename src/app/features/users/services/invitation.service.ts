@@ -6,6 +6,7 @@ export interface InvitationData {
   invitedEmail?: string;
   isManager?: boolean;
   isClient?: boolean;
+  isPreparer?: boolean;
   expirationDays?: number;
 }
 
@@ -17,6 +18,7 @@ export interface Invitation {
   invitedEmail?: string;
   isManager: boolean;
   isClient: boolean;
+  isPreparer: boolean;
   expiresAt?: Date;
   isUsed: boolean;
   usedBy?: string;
@@ -66,7 +68,7 @@ export class InvitationService {
 
   generateInvitationLink(token: string): string {
     const baseUrl = window.location.origin;
-    return `${baseUrl}/gestor/register?token=${token}`;
+    return `${baseUrl}/register?token=${token}`;
   }
 
   async copyToClipboard(text: string): Promise<void> {

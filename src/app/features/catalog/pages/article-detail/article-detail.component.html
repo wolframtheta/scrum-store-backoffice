@@ -1,0 +1,107 @@
+<div class="article-detail-container">
+  <p-toast />
+
+  <div class="header">
+    <p-button
+      icon="pi pi-arrow-left"
+      [text]="true"
+      [rounded]="true"
+      (onClick)="goBack()"
+      [label]="'common.back' | translate"
+    />
+    <h1>{{ 'catalog.detail.title' | translate }}</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <p>{{ 'common.loading' | translate }}</p>
+    </div>
+  } @else if (article()) {
+    <div class="detail-content">
+      <!-- Article Information Card -->
+      <p-card [header]="'catalog.detail.info' | translate">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>{{ 'catalog.table.category' | translate }}:</label>
+            <p-tag [value]="article()!.category" severity="info" />
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.product' | translate }}:</label>
+            <span><strong>{{ article()!.product }}</strong></span>
+          </div>
+          @if (article()!.variety) {
+            <div class="info-item">
+              <label>{{ 'catalog.table.variety' | translate }}:</label>
+              <p-tag [value]="article()!.variety" severity="secondary" />
+            </div>
+          }
+          @if (article()!.description) {
+            <div class="info-item full-width">
+              <label>{{ 'catalog.table.description' | translate }}:</label>
+              <span>{{ article()!.description }}</span>
+            </div>
+          }
+          <div class="info-item">
+            <label>{{ 'catalog.table.producer' | translate }}:</label>
+            <span>{{ article()!.producerName || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.city' | translate }}:</label>
+            <span>{{ article()!.city || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.unit' | translate }}:</label>
+            <p-tag [value]="article()!.unitMeasure" severity="secondary" />
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.price' | translate }}:</label>
+            <span><strong>{{ formatPrice(article()!.pricePerUnit) }}</strong></span>
+            @if (article()!.currentPeriodPrice !== undefined && article()!.currentPeriodPrice !== null) {
+              <small class="text-secondary" style="display: block; margin-top: 0.25rem;">
+                (Període actual: {{ formatPrice(article()!.currentPeriodPrice!) }})
+              </small>
+            }
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.eco' | translate }}:</label>
+            @if (article()!.isEco) {
+              <i class="fa fa-recycle eco-icon" title="Ecològic"></i>
+            } @else {
+              <span class="text-secondary">—</span>
+            }
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.seasonal' | translate }}:</label>
+            @if (article()!.isSeasonal) {
+              <p-tag value="🌱 {{ 'catalog.table.seasonalYes' | translate }}" severity="success" />
+            } @else {
+              <p-tag [value]="'catalog.table.seasonalNo' | translate" severity="secondary" />
+            }
+          </div>
+          <div class="info-item">
+            <label>{{ 'catalog.table.showcase' | translate }}:</label>
+            <p-tag
+              [value]="article()!.inShowcase ? ('catalog.status.inShowcase' | translate) : ('catalog.status.notInShowcase' | translate)"
+              [severity]="article()!.inShowcase ? 'success' : 'secondary'"
+            />
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Price History Chart Card -->
+      @if (chartData()) {
+        <p-card [header]="'catalog.detail.priceHistory' | translate" [style]="{ 'margin-top': '1.5rem' }">
+          <div class="chart-container">
+            <p-chart type="line" [data]="chartData()!" [options]="chartOptions()!" />
+          </div>
+        </p-card>
+      } @else if (priceHistory().length === 0) {
+        <p-card [header]="'catalog.detail.priceHistory' | translate" [style]="{ 'margin-top': '1.5rem' }">
+          <p class="text-secondary">{{ 'catalog.detail.noPriceHistory' | translate }}</p>
+        </p-card>
+      }
+    </div>
+  }
+</div>
+

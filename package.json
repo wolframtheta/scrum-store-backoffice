@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --watch --configuration development",
+    "start": "ng serve --watch --configuration development --port 4300",
     "start:prod": "ng serve --watch --configuration production",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
@@ -42,7 +42,7 @@
     "@primeuix/themes": "^1.2.5",
     "chart.js": "^4.5.1",
     "primeicons": "^7.0.0",
-    "primeng": "^20.3.0",
+    "primeng": "^20.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

@@ -70,6 +70,7 @@
               [inline]="true"
               dateFormat="dd/mm/yy"
               [showIcon]="false"
+              [firstDayOfWeek]="1"
               [class.ng-invalid]="(form.get('startDate')?.invalid || form.get('endDate')?.invalid) && (form.get('startDate')?.touched || form.get('endDate')?.touched)"
               [style]="{ width: '100%' }"
             />
@@ -89,6 +90,7 @@
               [showIcon]="true"
               dateFormat="dd/mm/yy"
               [minDate]="getMinDeliveryDate()"
+              [firstDayOfWeek]="1"
               [class.ng-invalid]="form.get('deliveryDate')?.invalid && form.get('deliveryDate')?.touched"
               [style]="{ width: '100%' }"
             />

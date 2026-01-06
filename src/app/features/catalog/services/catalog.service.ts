@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
-import { Article, UnitMeasure } from '../../../core/models/article.model';
+import { Article, UnitMeasure, PriceHistory } from '../../../core/models/article.model';
 
 export interface CreateArticleDto {
   category: string;
@@ -141,7 +141,9 @@ export class CatalogService {
     this._error.set(null);
 
     try {
-      const updatedArticle = await this.api.patch<Article>(`articles/${articleId}`, dto);
+      const groupId = this.groupService.selectedGroupId();
+      const params = groupId ? { groupId } : undefined;
+      const updatedArticle = await this.api.patch<Article>(`articles/${articleId}`, dto, params);
 
       // Actualitzar a la llista local
       this._articles.update(articles =>
@@ -362,6 +364,44 @@ export class CatalogService {
       return result;
     } catch (error: any) {
       this._error.set(error?.error?.message || 'Error canviant estat ecològic');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Obtenir article per ID
+   */
+  async getArticleById(articleId: string): Promise<Article> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const groupId = this.groupService.selectedGroupId();
+      const params = groupId ? { groupId } : undefined;
+      const article = await this.api.get<Article>(`articles/${articleId}`, params);
+      return article;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error carregant article');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Obtenir històric de preus d'un article
+   */
+  async getPriceHistory(articleId: string): Promise<PriceHistory[]> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const history = await this.api.get<PriceHistory[]>(`articles/${articleId}/price-history`);
+      return history;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error carregant històric de preus');
       throw error;
     } finally {
       this._isLoading.set(false);

@@ -1,8 +1,8 @@
 <p-dialog
   [header]="'users.addMemberTitle' | translate"
   [visible]="visible()"
-  (onHide)="onHide()"
   [modal]="true"
+  [closable]="true"
   [style]="{ width: '500px' }"
   [draggable]="false"
   [resizable]="false">
@@ -45,6 +45,18 @@
         <label for="isManager">{{ 'users.form.isManager' | translate }}</label>
       </div>
       <small class="field-help">{{ 'users.form.isManagerHelp' | translate }}</small>
+    </div>
+
+    <div class="form-field">
+      <div class="checkbox-field">
+        <p-checkbox
+          formControlName="isPreparer"
+          [binary]="true"
+          inputId="isPreparer"
+        />
+        <label for="isPreparer">{{ 'users.form.isPreparer' | translate }}</label>
+      </div>
+      <small class="field-help">{{ 'users.form.isPreparerHelp' | translate }}</small>
     </div>
   </form>
 

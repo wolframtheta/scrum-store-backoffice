@@ -58,6 +58,23 @@
     "passwordRequired": "La contraseña es obligatoria",
     "passwordMinLength": "Mínimo 6 caracteres"
   },
+  "resetPassword": {
+    "title": "Restablecer contraseña",
+    "subtitle": "Introduce tu correo y una nueva contraseña",
+    "email": "Correo electrónico",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "emailInvalid": "Introduce un correo válido",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMinLength": "Mínimo 6 caracteres",
+    "confirmPasswordRequired": "Debes confirmar la contraseña",
+    "passwordsNotMatch": "Las contraseñas no coinciden",
+    "submitButton": "Restablecer contraseña",
+    "backToLogin": "Volver al login",
+    "success": "Contraseña restablecida correctamente. Redirigiendo...",
+    "error": "Error al restablecer la contraseña"
+  },
   "register": {
     "title": "Crear Cuenta",
     "subtitle": "Únete a Scrum Store",
@@ -266,6 +283,12 @@
     "category": "Categoría",
     "inShowcase": "En Aparador",
     "priceHistory": "Histórico de Precios",
+    "detail": {
+      "title": "Detalle del Artículo",
+      "info": "Información del Artículo",
+      "priceHistory": "Histórico de Precios",
+      "noPriceHistory": "No hay histórico de precios disponible para este artículo"
+    },
     "filters": {
       "searchPlaceholder": "Buscar por nombre, descripción o productor...",
       "showcase": "Aparador",

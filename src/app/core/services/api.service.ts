@@ -44,9 +44,18 @@ export class ApiService {
   }
 
   // PATCH request
-  async patch<T>(endpoint: string, body?: unknown): Promise<T> {
+  async patch<T>(endpoint: string, body?: unknown, params?: Record<string, string | number | boolean>): Promise<T> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
+
     return firstValueFrom(
-      this.http.patch<T>(`${this.API_URL}/${endpoint}`, body)
+      this.http.patch<T>(`${this.API_URL}/${endpoint}`, body, { params: httpParams })
     );
   }
 

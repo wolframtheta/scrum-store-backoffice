@@ -25,6 +25,14 @@
     .period-info {
       margin-top: 1rem;
 
+      .period-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
       h2 {
         margin: 0 0 1rem 0;
         font-size: 1.5rem;
@@ -41,6 +49,12 @@
           display: flex;
           gap: 0.5rem;
         }
+      }
+
+      .period-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
       }
     }
   }

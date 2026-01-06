@@ -6,8 +6,9 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { PeriodsService } from '../../services/periods.service';
 import { SalesService } from '../../../sales/services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
@@ -32,9 +33,10 @@ interface ArticleSummary {
     ButtonModule,
     TagModule,
     ToastModule,
+    ConfirmDialogModule,
     TooltipModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './period-orders-summary.component.html',
   styleUrl: './period-orders-summary.component.scss',
 })
@@ -43,6 +45,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   private readonly salesService = inject(SalesService);
   private readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly route = inject(ActivatedRoute);
   protected readonly router = inject(Router);
 
@@ -174,5 +177,71 @@ export class PeriodOrdersSummaryComponent implements OnInit {
 
   protected goBack(): void {
     this.router.navigate(['/periods']);
+  }
+
+  protected duplicatePeriod(): void {
+    const period = this.period();
+    if (!period) return;
+
+    const params: any = {
+      duplicate: 'true',
+      name: period.name,
+      supplierId: period.supplierId,
+      startDate: typeof period.startDate === 'string' ? period.startDate : period.startDate.toISOString().split('T')[0],
+      endDate: typeof period.endDate === 'string' ? period.endDate : period.endDate.toISOString().split('T')[0],
+      deliveryDate: typeof period.deliveryDate === 'string' ? period.deliveryDate : period.deliveryDate.toISOString().split('T')[0],
+      recurrence: period.recurrence,
+    };
+    
+    if (period.periodArticles && period.periodArticles.length > 0) {
+      params.articles = JSON.stringify(period.periodArticles.map(pa => ({
+        articleId: pa.articleId,
+        pricePerUnit: pa.pricePerUnit,
+      })));
+    }
+    
+    this.router.navigate(['/periods/new'], { queryParams: params });
+  }
+
+  protected openEditDialog(): void {
+    const period = this.period();
+    if (!period) return;
+    this.router.navigate(['/periods/edit', period.id]);
+  }
+
+  protected confirmDelete(): void {
+    const period = this.period();
+    if (!period) return;
+
+    this.confirmationService.confirm({
+      message: `Estàs segur que vols eliminar el període "${period.name}"?`,
+      header: 'Confirmació d\'eliminació',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancel·lar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deletePeriod()
+    });
+  }
+
+  private async deletePeriod(): Promise<void> {
+    const period = this.period();
+    if (!period) return;
+
+    try {
+      await this.periodsService.deletePeriod(period.id, period.supplierId);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Període eliminat correctament'
+      });
+      this.router.navigate(['/periods']);
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No s\'ha pogut eliminar el període'
+      });
+    }
   }
 }

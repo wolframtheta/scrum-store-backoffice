@@ -16,6 +16,7 @@ export interface Article {
   image?: string;
   unitMeasure: UnitMeasure;
   pricePerUnit: number;
+  currentPeriodPrice?: number; // Preu del període actual
   city?: string;
   producerId?: string;
   producerName?: string;

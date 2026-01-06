@@ -47,7 +47,16 @@
         <td>{{ article.supplierName || '—' }}</td>
         <td>{{ article.city || '—' }}</td>
         <td>
-          <strong>{{ formatPrice(article) }}</strong>
+          @if (article.currentPeriodPrice !== undefined) {
+            <div>
+              <strong>{{ formatPriceNumber(article.currentPeriodPrice, article.unitMeasure) }}</strong>
+              <small class="text-secondary" style="display: block; font-size: 0.85rem;">
+                (Base: {{ formatPriceNumber(article.pricePerUnit, article.unitMeasure) }})
+              </small>
+            </div>
+          } @else {
+            <strong>{{ formatPrice(article) }}</strong>
+          }
         </td>
         <td>
           <div class="action-buttons">

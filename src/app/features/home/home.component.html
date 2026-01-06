@@ -1,4 +1,7 @@
 <div class="home-container">
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+  
   <!-- Header -->
   <div class="home-header">
     <div>
@@ -7,7 +10,18 @@
         <p class="home-subtitle">{{ groupService.selectedGroup()?.name }}</p>
       }
     </div>
-    <p-button icon="pi pi-sign-out" [label]="'auth.logout' | translate" severity="secondary" (click)="logout()" />
+    <div class="header-actions">
+      @if (canManageLogin()) {
+        <p-button 
+          [icon]="systemConfigService.loginEnabled() ? 'pi pi-lock-open' : 'pi pi-lock'"
+          [label]="systemConfigService.loginEnabled() ? ('home.systemConfig.loginEnabled' | translate) : ('home.systemConfig.loginDisabled' | translate)"
+          [severity]="systemConfigService.loginEnabled() ? 'success' : 'danger'"
+          [loading]="systemConfigService.isLoading()"
+          (click)="toggleLoginStatus()"
+          styleClass="login-toggle-btn" />
+      }
+      <p-button icon="pi pi-sign-out" [label]="'auth.logout' | translate" severity="secondary" (click)="logout()" />
+    </div>
   </div>
 
   <!-- Module Cards -->

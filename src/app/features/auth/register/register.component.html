@@ -126,12 +126,19 @@
       />
     </form>
 
-    <!-- Enllaç al login -->
+    <!-- Enllaç al login o invitation-success -->
     <div class="footer">
-      <p>
-        {{ 'register.alreadyHaveAccount' | translate }}
-        <a (click)="goToLogin()" class="link">{{ 'register.goToLogin' | translate }}</a>
-      </p>
+      @if (invitationToken() && tokenValid()) {
+        <p>
+          {{ 'register.alreadyHaveAccount' | translate }}
+          <a (click)="goToInvitationSuccess()" class="link">{{ 'register.goToLogin' | translate }}</a>
+        </p>
+      } @else {
+        <p>
+          {{ 'register.alreadyHaveAccount' | translate }}
+          <a (click)="goToLogin()" class="link">{{ 'register.goToLogin' | translate }}</a>
+        </p>
+      }
     </div>
   </div>
 </div>

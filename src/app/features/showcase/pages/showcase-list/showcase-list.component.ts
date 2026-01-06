@@ -95,6 +95,14 @@ export class ShowcaseListComponent implements OnInit {
     return formatted;
   }
 
+  protected formatPriceNumber(price: number, unit: string): string {
+    const formatted = new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+    return `${formatted}€/${unit}`;
+  }
+
   protected getArticleName(article: Article): string {
     const parts = [article.category, article.product, article.variety].filter(Boolean);
     return parts.join(' - ');

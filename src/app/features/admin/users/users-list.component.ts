@@ -202,6 +202,7 @@ export class UsersListComponent implements OnInit {
       [UserRole.SUPER_ADMIN]: 'danger',
       [UserRole.ADMIN]: 'warn',
       [UserRole.CLIENT]: 'info',
+      [UserRole.PREPARER]: 'info',
     };
     return severityMap[role] || 'info';
   }
@@ -211,6 +212,7 @@ export class UsersListComponent implements OnInit {
       [UserRole.SUPER_ADMIN]: 'admin.users.roles.superAdmin',
       [UserRole.ADMIN]: 'admin.users.roles.admin',
       [UserRole.CLIENT]: 'admin.users.roles.client',
+      [UserRole.PREPARER]: 'admin.users.roles.preparer',
     };
     return labelMap[role] || role;
   }

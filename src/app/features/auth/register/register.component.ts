@@ -98,21 +98,42 @@ export class RegisterComponent implements OnInit {
       const formValue = this.form.value;
 
       // Registrar usuari
-      const authResponse = await this.authService.register({
-        email: formValue.email,
-        password: formValue.password,
-        name: formValue.name,
-        surname: formValue.surname
-      });
+      try {
+        const authResponse = await this.authService.register({
+          email: formValue.email,
+          password: formValue.password,
+          name: formValue.name,
+          surname: formValue.surname
+        });
+      } catch (error: any) {
+        // Si l'usuari ja existeix, redirigir a invitation-success amb el token
+        if (error?.error?.statusCode === 409 || error?.error?.message?.includes('already exists')) {
+          const token = this.invitationToken();
+          if (token) {
+            await this.router.navigate(['/invitation-success'], {
+              queryParams: { token, email: formValue.email }
+            });
+            return;
+          }
+        }
+        throw error;
+      }
 
       // Si té token d'invitació, usar-lo per unir-se al grup
       const token = this.invitationToken();
       if (token && this.tokenValid()) {
         try {
+          // Esperar una mica per assegurar que l'usuari està guardat a la BD
+          await new Promise(resolve => setTimeout(resolve, 500));
           await this.groupService.useInvitationToken(token, formValue.email);
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error using invitation token:', error);
-          // No bloquejar el registre si falla la invitació
+          // Mostrar error però no bloquejar el registre
+          this.errorMessage.set(
+            error?.error?.message || 
+            this.translate.instant('register.errors.invitationFailed') ||
+            'Error al unir-se al grup. Pots intentar-ho més tard.'
+          );
         }
       }
 
@@ -159,6 +180,17 @@ export class RegisterComponent implements OnInit {
 
   protected goToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  protected goToInvitationSuccess(): void {
+    const token = this.invitationToken();
+    if (token) {
+      this.router.navigate(['/invitation-success'], {
+        queryParams: { token }
+      });
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 }
 

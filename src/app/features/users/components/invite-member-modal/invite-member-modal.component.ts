@@ -46,14 +46,16 @@ export class InviteMemberModalComponent {
   constructor() {
     this.form = this.fb.group({
       isManager: [false],
-      isClient: [true]
+      isClient: [true],
+      isPreparer: [false]
     });
   }
 
   protected onHide(): void {
     this.form.reset({
       isManager: false,
-      isClient: true
+      isClient: true,
+      isPreparer: false
     });
     this.invitation.set(null);
     this.invitationLink.set('');
@@ -70,6 +72,7 @@ export class InviteMemberModalComponent {
       const invitation = await this.invitationService.createInvitation(groupId, {
         isManager: formValue.isManager,
         isClient: formValue.isClient,
+        isPreparer: formValue.isPreparer,
         expirationDays: 0 // Sense expiració
       });
 

@@ -84,7 +84,7 @@ export class PeriodFormComponent implements OnInit {
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
       deliveryDate: [null, [Validators.required, this.deliveryDateAfterStartValidator.bind(this)]],
-      recurrence: [PeriodRecurrence.CUSTOM, Validators.required],
+      recurrence: [PeriodRecurrence.WEEKLY, Validators.required],
       articles: this.fb.array([]),
     });
 
@@ -131,7 +131,7 @@ export class PeriodFormComponent implements OnInit {
       } else {
         this.isEditMode.set(false);
         this.form.reset({
-          recurrence: PeriodRecurrence.CUSTOM,
+          recurrence: PeriodRecurrence.WEEKLY,
         });
         this.periodArticles.clear();
       }
@@ -270,7 +270,7 @@ export class PeriodFormComponent implements OnInit {
 
   protected onHide(): void {
     this.visibleChange.emit(false);
-    this.form.reset({ recurrence: PeriodRecurrence.CUSTOM });
+    this.form.reset({ recurrence: PeriodRecurrence.WEEKLY });
     this.periodArticles.clear();
     this.selectedArticle.set(null);
     this.articleSearchTerm.set('');

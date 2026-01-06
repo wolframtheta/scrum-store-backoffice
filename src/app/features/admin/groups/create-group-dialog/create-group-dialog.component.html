@@ -7,6 +7,7 @@
   [resizable]="false"
   styleClass="create-group-dialog"
   [style]="{ width: '600px' }"
+  (onHide)="onCancel()"
 >
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="create-group-form">
     <!-- Group Name -->

@@ -56,7 +56,39 @@
     "emailRequired": "El correu electrònic és obligatori",
     "emailInvalid": "Introdueix un correu vàlid",
     "passwordRequired": "La contrasenya és obligatòria",
-    "passwordMinLength": "Mínim 6 caràcters"
+    "passwordMinLength": "Mínim 6 caràcters",
+    "invitation": {
+      "validating": "Validant invitació...",
+      "processing": "Processant invitació...",
+      "pleaseWait": "Si us plau, espera...",
+      "success": "Invitació acceptada!",
+      "welcome": "Benvingut!",
+      "invitedToGroup": "Has estat convidat a unir-te al grup: {{groupName}}",
+      "loginToJoin": "Fes login per unir-te al grup",
+      "joinGroup": "Unir-me al grup",
+      "joinedGroup": "T'has unit al grup: {{groupName}}",
+      "joinedSuccessfully": "T'has unit correctament al grup de consum.",
+      "managerAccess": "Ara tens accés al gestor del grup.",
+      "useMobileApp": "Ara pots utilitzar l'aplicació mòbil per accedir al grup de consum i fer comandes.",
+      "goToBackoffice": "Anar al gestor"
+    }
+  },
+  "resetPassword": {
+    "title": "Restablir contrasenya",
+    "subtitle": "Introdueix el teu correu i una nova contrasenya",
+    "email": "Correu electrònic",
+    "newPassword": "Nova contrasenya",
+    "confirmPassword": "Confirmar contrasenya",
+    "emailRequired": "El correu electrònic és obligatori",
+    "emailInvalid": "Introdueix un correu vàlid",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "passwordMinLength": "Mínim 6 caràcters",
+    "confirmPasswordRequired": "Has de confirmar la contrasenya",
+    "passwordsNotMatch": "Les contrasenyes no coincideixen",
+    "submitButton": "Restablir contrasenya",
+    "backToLogin": "Tornar al login",
+    "success": "Contrasenya restablida correctament. Redirigint...",
+    "error": "Error en restablir la contrasenya"
   },
   "register": {
     "title": "Crear Compte",
@@ -178,6 +210,17 @@
         "title": "Usuaris Globals",
         "description": "Gestió d'usuaris de l'aplicació"
       }
+    },
+    "systemConfig": {
+      "loginEnabled": "Login habilitat",
+      "loginDisabled": "Login deshabilitat",
+      "enableLogin": "Habilitar login",
+      "disableLogin": "Deshabilitar login",
+      "loginStatus": "Estat del login",
+      "confirmDisable": "Estàs segur que vols deshabilitar el login? Això impedirà que tots els usuaris puguin iniciar sessió.",
+      "confirmEnable": "Estàs segur que vols habilitar el login? Això permetrà que tots els usuaris puguin iniciar sessió.",
+      "statusUpdated": "Estat del login actualitzat correctament",
+      "errorUpdating": "Error en actualitzar l'estat del login"
     }
   },
   "sales": {
@@ -266,6 +309,12 @@
     "category": "Categoria",
     "inShowcase": "A l'Aparador",
     "priceHistory": "Historial de Preus",
+    "detail": {
+      "title": "Detall de l'Article",
+      "info": "Informació de l'Article",
+      "priceHistory": "Historial de Preus",
+      "noPriceHistory": "No hi ha històric de preus disponible per aquest article"
+    },
     "filters": {
       "searchPlaceholder": "Cercar per nom, descripció o productor...",
       "showcase": "Aparador",
@@ -350,6 +399,7 @@
     "roles": {
       "client": "Client",
       "manager": "Gestor",
+      "preparer": "Preparador",
       "admin": "Administrador"
     },
     "actions": {
@@ -357,6 +407,8 @@
       "removeManager": "Treure gestor",
       "makeClient": "Fer client",
       "removeClient": "Treure client",
+      "makePreparer": "Fer preparador",
+      "removePreparer": "Treure preparador",
       "remove": "Eliminar membre"
     },
     "form": {
@@ -364,7 +416,9 @@
       "isClient": "És client (pot comprar)",
       "isClientHelp": "Els clients poden veure l'aparador i fer comandes",
       "isManager": "És gestor (pot administrar)",
-      "isManagerHelp": "Els gestors poden gestionar articles, membres i configuració"
+      "isManagerHelp": "Els gestors poden gestionar articles, membres i configuració",
+      "isPreparer": "És preparador",
+      "isPreparerHelp": "Els preparadors poden veure avisos, comandes i preparar cistelles"
     },
     "invitation": {
       "title": "Convidar Nou Membre",
@@ -681,7 +735,8 @@
       "roles": {
         "superAdmin": "Super Admin",
         "admin": "Administrador",
-        "client": "Client"
+        "client": "Client",
+        "preparer": "Preparador"
       },
       "status": {
         "active": "Actiu",

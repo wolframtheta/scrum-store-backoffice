@@ -18,6 +18,7 @@ export class ConsumerGroupService {
     return this.userGroups().find(g => g.id === groupId) || null;
   });
   readonly isManager = computed(() => this.selectedGroup()?.role?.isManager || false);
+  readonly isPreparer = computed(() => this.selectedGroup()?.role?.isPreparer || false);
   readonly isLoading = signal(false);
 
   async loadUserGroups(): Promise<void> {

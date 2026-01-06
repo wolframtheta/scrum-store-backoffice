@@ -77,7 +77,7 @@ export class UsersListComponent implements OnInit {
     this.showInviteModal.set(true);
   }
 
-  protected async onMemberAdded(data: { userEmail: string; isManager: boolean; isClient: boolean }): Promise<void> {
+  protected async onMemberAdded(data: { userEmail: string; isManager: boolean; isClient: boolean; isPreparer: boolean }): Promise<void> {
     const groupId = this.currentGroupId();
     if (!groupId) return;
 
@@ -108,7 +108,8 @@ export class UsersListComponent implements OnInit {
     try {
       await this.settingsService.updateMemberRole(groupId, member.userEmail, {
         isManager: !member.isManager,
-        isClient: member.isClient
+        isClient: member.isClient,
+        isPreparer: member.isPreparer
       });
       await this.loadMembers();
       this.messageService.add({
@@ -134,7 +135,35 @@ export class UsersListComponent implements OnInit {
     try {
       await this.settingsService.updateMemberRole(groupId, member.userEmail, {
         isManager: member.isManager,
-        isClient: !member.isClient
+        isClient: !member.isClient,
+        isPreparer: member.isPreparer
+      });
+      await this.loadMembers();
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('common.success'),
+        detail: this.translate.instant('users.roleUpdated')
+      });
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      const errorMessage = error?.error?.message || this.translate.instant('users.errors.updateRole');
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('common.error'),
+        detail: errorMessage
+      });
+    }
+  }
+
+  protected async togglePreparer(member: GroupMember): Promise<void> {
+    const groupId = this.currentGroupId();
+    if (!groupId) return;
+
+    try {
+      await this.settingsService.updateMemberRole(groupId, member.userEmail, {
+        isManager: member.isManager,
+        isClient: member.isClient,
+        isPreparer: !member.isPreparer
       });
       await this.loadMembers();
       this.messageService.add({

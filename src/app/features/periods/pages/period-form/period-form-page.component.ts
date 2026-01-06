@@ -97,7 +97,7 @@ export class PeriodFormPageComponent implements OnInit {
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
       deliveryDate: [null, [Validators.required, this.deliveryDateAfterEndValidator.bind(this)]],
-      recurrence: [PeriodRecurrence.CUSTOM, Validators.required],
+      recurrence: [PeriodRecurrence.WEEKLY, Validators.required],
       articles: this.fb.array([]),
     });
 
@@ -176,7 +176,7 @@ export class PeriodFormPageComponent implements OnInit {
       startDate,
       endDate,
       deliveryDate,
-      recurrence: recurrenceParam || PeriodRecurrence.CUSTOM,
+      recurrence: recurrenceParam || PeriodRecurrence.WEEKLY,
     });
 
     if (startDate && endDate) {

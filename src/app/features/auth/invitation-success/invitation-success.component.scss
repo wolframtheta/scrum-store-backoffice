@@ -1,0 +1,145 @@
+@use 'sass:color';
+@import '../../../../styles/variables';
+
+.invitation-success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -10%) 100%);
+}
+
+.invitation-success-card {
+  background: $white;
+  border-radius: 12px;
+  padding: 3rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.loading-section,
+.success-section,
+.error-section,
+.login-section {
+  text-align: center;
+}
+
+.login-section {
+  .header-section {
+    margin-bottom: 2rem;
+    
+    h2 {
+      color: $primary-color;
+      margin-bottom: 0.5rem;
+    }
+    
+    .group-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin-top: 0.5rem;
+    }
+    
+    p {
+      color: $gray;
+    }
+  }
+  
+  .field {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    
+    .label {
+      color: $tertiary-color;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .p-error {
+      color: $danger;
+      font-size: 0.875rem;
+    }
+  }
+  
+  ::ng-deep {
+    .login-button.p-button {
+      background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -5%) 100%);
+      border: none;
+      border-radius: 10px;
+      color: $white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(12, 117, 172, 0.3);
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.loading-section {
+  h2 {
+    margin-top: 1.5rem;
+    color: $primary-color;
+  }
+  
+  p {
+    color: $gray;
+    margin-top: 0.5rem;
+  }
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: $success;
+  margin-bottom: 1.5rem;
+  
+  i {
+    display: block;
+  }
+}
+
+.success-section {
+  h2 {
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+  
+  .group-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 1rem 0;
+  }
+  
+  .info-text {
+    color: $gray;
+    margin: 1.5rem 0;
+    line-height: 1.6;
+  }
+}
+
+.error-section {
+  h2 {
+    color: $danger;
+    margin-bottom: 1rem;
+  }
+}
+

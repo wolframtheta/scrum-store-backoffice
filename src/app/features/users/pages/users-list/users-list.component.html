@@ -77,6 +77,13 @@
                 icon="pi pi-shield"
               />
             }
+            @if (member.isPreparer) {
+              <p-tag
+                severity="info"
+                value="{{ 'users.roles.preparer' | translate }}"
+                icon="pi pi-shopping-bag"
+              />
+            }
             @if (member.isClient) {
               <p-tag
                 severity="success"
@@ -107,6 +114,15 @@
                 size="small"
                 (click)="toggleClient(member)"
                 [pTooltip]="member.isClient ? ('users.actions.removeClient' | translate) : ('users.actions.makeClient' | translate)"
+              />
+              <p-button
+                [icon]="member.isPreparer ? 'pi pi-shopping-bag' : 'pi pi-shopping-bag'"
+                [text]="true"
+                [rounded]="true"
+                [severity]="member.isPreparer ? 'info' : 'secondary'"
+                size="small"
+                (click)="togglePreparer(member)"
+                [pTooltip]="member.isPreparer ? ('users.actions.removePreparer' | translate) : ('users.actions.makePreparer' | translate)"
               />
               <p-button
                 icon="pi pi-trash"

@@ -196,7 +196,16 @@
         <td>{{ article.producerName || '—' }}</td>
         <td>{{ article.city || '—' }}</td>
         <td>
-          <strong>{{ formatPrice(article.pricePerUnit) }}</strong>
+          @if (article.currentPeriodPrice !== undefined) {
+            <div>
+              <strong>{{ formatPrice(article.currentPeriodPrice) }}</strong>
+              <small class="text-secondary" style="display: block; font-size: 0.85rem;">
+                (Base: {{ formatPrice(article.pricePerUnit) }})
+              </small>
+            </div>
+          } @else {
+            <strong>{{ formatPrice(article.pricePerUnit) }}</strong>
+          }
         </td>
         <td>
           <p-tag [value]="article.unitMeasure" severity="secondary"></p-tag>
@@ -251,6 +260,15 @@
                 pTooltip="{{ 'catalog.actions.addToShowcase' | translate }}"
               />
             }
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="info"
+              size="small"
+              [routerLink]="['/catalog', article.id]"
+              pTooltip="{{ 'common.view' | translate }}"
+            />
             <p-button
               icon="pi pi-pencil"
               [text]="true"

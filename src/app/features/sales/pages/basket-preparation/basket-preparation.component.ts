@@ -365,14 +365,27 @@ export class BasketPreparationComponent implements OnInit {
       // Ordenar articles per nom
       articleNodes.sort((a, b) => a.label!.localeCompare(b.label!));
 
+      // Formatear la data d'entrega
+      let deliveryDateStr = '';
+      if (periodBasket.period?.deliveryDate) {
+        const deliveryDate = new Date(periodBasket.period.deliveryDate);
+        deliveryDateStr = deliveryDate.toLocaleDateString('ca-ES', {
+          day: 'numeric',
+          month: 'short'
+        });
+      }
+
       const periodNode: TreeNode = {
         key: periodId,
-        label: `${periodBasket.periodName} (${articleNodes.length} articles)`,
+        label: deliveryDateStr 
+          ? `${periodBasket.periodName} - Entrega: ${deliveryDateStr} (${articleNodes.length} articles)`
+          : `${periodBasket.periodName} (${articleNodes.length} articles)`,
         data: {
           type: 'period',
           periodId: periodId,
           periodName: periodBasket.periodName,
-          isFinished: periodBasket.isFinished
+          isFinished: periodBasket.isFinished,
+          deliveryDate: periodBasket.period?.deliveryDate
         },
         children: articleNodes,
         expanded: true
@@ -497,7 +510,7 @@ export class BasketPreparationComponent implements OnInit {
     }
   }
 
-  protected async onArticlePreparedChange(node: TreeNode, checked: boolean): Promise<void> {
+  protected onArticlePreparedChange(node: TreeNode, checked: boolean): void {
     // Si la comanda està preparada, no permetre canvis
     if (this.isOrderPreparedForNode(node)) {
       return;
@@ -521,12 +534,6 @@ export class BasketPreparationComponent implements OnInit {
             }
           });
         }
-        
-        // Actualitzar l'estat abans de marcar les comandes
-        this.preparedItems.set(prepared);
-        
-        // Marcar totes les comandes del període com a preparades
-        await this.markAllOrdersAsPrepared(articleData.periodId);
       } else {
         // Deseleccionar l'article i tots els seus usuaris
         prepared.delete(articleKey);
@@ -540,9 +547,10 @@ export class BasketPreparationComponent implements OnInit {
             }
           });
         }
-        
-        this.preparedItems.set(prepared);
       }
+      
+      // Actualitzar l'estat (sense marcar comandes com a entregades)
+      this.preparedItems.set(prepared);
     }
   }
 
@@ -615,7 +623,8 @@ export class BasketPreparationComponent implements OnInit {
   protected isArticlePrepared(node: TreeNode): boolean {
     const articleData = node.data;
     if (articleData?.type === 'article' && articleData.periodId && articleData.articleId) {
-      return this.isArticlePreparedByKey(`${articleData.periodId}-${articleData.articleId}`);
+      // Verificar si tots els usuaris de l'article estan preparats
+      return this.areAllUsersPrepared(articleData.periodId, articleData.articleId);
     }
     return false;
   }

@@ -11,6 +11,17 @@
 
     <!-- Formulario de login -->
     <div class="login-body">
+      <!-- Mensaje de invitación si hay token -->
+      @if (tokenValid() && groupName()) {
+        <div class="mb-3">
+          <p-message
+            severity="info"
+            [text]="invitationMessage()"
+            styleClass="w-full"
+          ></p-message>
+        </div>
+      }
+      
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Campo Email -->
         <div class="field">
@@ -73,7 +84,7 @@
               severity="error"
               [text]="errorMessage() || ''"
               styleClass="w-full"
-            />
+            ></p-message>
           </div>
         }
 
@@ -91,7 +102,7 @@
 
         <!-- Links adicionales -->
         <div class="additional-links">
-          <a href="#">{{ 'auth.forgotPassword' | translate }}</a>
+          <a [routerLink]="['/reset-password']" [queryParams]="{ returnUrl: '/login' }">{{ 'auth.forgotPassword' | translate }}</a>
         </div>
       </form>
     </div>

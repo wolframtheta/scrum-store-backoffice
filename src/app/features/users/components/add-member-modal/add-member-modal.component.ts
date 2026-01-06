@@ -25,7 +25,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 export class AddMemberModalComponent {
   readonly visible = input.required<boolean>();
   readonly visibleChange = output<boolean>();
-  readonly confirm = output<{ userEmail: string; isManager: boolean; isClient: boolean }>();
+  readonly confirm = output<{ userEmail: string; isManager: boolean; isClient: boolean; isPreparer: boolean }>();
 
   protected readonly form: FormGroup;
 
@@ -33,7 +33,8 @@ export class AddMemberModalComponent {
     this.form = this.fb.group({
       userEmail: ['', [Validators.required, Validators.email]],
       isManager: [false],
-      isClient: [true]
+      isClient: [true],
+      isPreparer: [false]
     });
   }
 
@@ -41,7 +42,8 @@ export class AddMemberModalComponent {
     this.form.reset({
       userEmail: '',
       isManager: false,
-      isClient: true
+      isClient: true,
+      isPreparer: false
     });
     this.visibleChange.emit(false);
   }
@@ -56,7 +58,8 @@ export class AddMemberModalComponent {
     this.form.reset({
       userEmail: '',
       isManager: false,
-      isClient: true
+      isClient: true,
+      isPreparer: false
     });
   }
 

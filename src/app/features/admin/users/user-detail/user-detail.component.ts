@@ -76,7 +76,8 @@ export class UserDetailComponent implements OnInit {
   protected readonly availableRoles = [
     { value: UserRole.SUPER_ADMIN, label: 'admin.users.roles.superAdmin' },
     { value: UserRole.ADMIN, label: 'admin.users.roles.admin' },
-    { value: UserRole.CLIENT, label: 'admin.users.roles.client' }
+    { value: UserRole.CLIENT, label: 'admin.users.roles.client' },
+    { value: UserRole.PREPARER, label: 'admin.users.roles.preparer' }
   ];
 
   async ngOnInit(): Promise<void> {
@@ -161,6 +162,7 @@ export class UserDetailComponent implements OnInit {
       [UserRole.SUPER_ADMIN]: 'danger',
       [UserRole.ADMIN]: 'warn',
       [UserRole.CLIENT]: 'info',
+      [UserRole.PREPARER]: 'info',
     };
     return severityMap[role] || 'info';
   }
@@ -170,6 +172,7 @@ export class UserDetailComponent implements OnInit {
       [UserRole.SUPER_ADMIN]: 'admin.users.roles.superAdmin',
       [UserRole.ADMIN]: 'admin.users.roles.admin',
       [UserRole.CLIENT]: 'admin.users.roles.client',
+      [UserRole.PREPARER]: 'admin.users.roles.preparer',
     };
     return labelMap[role] || role;
   }

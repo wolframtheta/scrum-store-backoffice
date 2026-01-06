@@ -131,13 +131,18 @@ export class ArticleFormComponent {
             : null;
 
           // Usar setValue per assegurar que tots els valors s'actualitzen correctament
+          // Si hi ha preu del període actual, usar-lo en lloc del preu base
+          const priceToUse = article.currentPeriodPrice !== undefined && article.currentPeriodPrice !== null
+            ? article.currentPeriodPrice
+            : article.pricePerUnit || 0;
+
           this.form.setValue({
             category: article.category || '',
             product: article.product || '',
             variety: article.variety || '',
             description: article.description || '',
             unitMeasure: article.unitMeasure || UnitMeasure.KG,
-            pricePerUnit: article.pricePerUnit || 0,
+            pricePerUnit: priceToUse,
             city: article.city || '',
             producer: producer || null,
             isSeasonal: article.isSeasonal === true, // Comparació estricta

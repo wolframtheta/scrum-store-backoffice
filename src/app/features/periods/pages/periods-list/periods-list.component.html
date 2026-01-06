@@ -167,7 +167,6 @@
           <th>{{ 'periods.table.deliveryDate' | translate }}</th>
           <th>{{ 'periods.table.recurrence' | translate }}</th>
           <th>{{ 'periods.table.articles' | translate }}</th>
-          <th class="actions-column">{{ 'common.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -175,7 +174,6 @@
         <tr 
           [style.cursor]="'pointer'"
           (click)="openPeriodOrdersSummary(period)"
-          (click.stop)="true"
         >
           <td>
             <strong>{{ period.name }}</strong>
@@ -199,40 +197,12 @@
           <td>
             <span>{{ period.periodArticles?.length || 0 }} {{ 'periods.articles' | translate }}</span>
           </td>
-            <td class="actions-column">
-              <div class="action-buttons" (click.stop)="true">
-                <p-button
-                  icon="pi pi-copy"
-                  [rounded]="true"
-                  [text]="true"
-                  severity="secondary"
-                  (onClick)="duplicatePeriod(period)"
-                  [pTooltip]="'periods.duplicate' | translate"
-                />
-                <p-button
-                  icon="pi pi-pencil"
-                  [rounded]="true"
-                  [text]="true"
-                  severity="info"
-                  (onClick)="openEditDialog(period)"
-                  [pTooltip]="'common.edit' | translate"
-                />
-                <p-button
-                  icon="pi pi-trash"
-                  [rounded]="true"
-                  [text]="true"
-                  severity="danger"
-                  (onClick)="confirmDelete(period)"
-                  [pTooltip]="'common.delete' | translate"
-                />
-              </div>
-            </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8" class="text-center">
+          <td colspan="7" class="text-center">
             {{ 'periods.noPeriods' | translate }}
           </td>
         </tr>

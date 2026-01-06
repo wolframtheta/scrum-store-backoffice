@@ -1,0 +1,166 @@
+<div class="invitation-success-container">
+  <div class="invitation-success-card">
+    @if (isValidatingToken()) {
+      <div class="loading-section">
+        <p-progressSpinner />
+        <h2>{{ 'auth.invitation.validating' | translate }}</h2>
+        <p>{{ 'auth.invitation.pleaseWait' | translate }}</p>
+      </div>
+    } @else {
+      @if (errorMessage() && !showLoginForm()) {
+        <div class="error-section">
+          <div class="mb-3">
+            <p-message
+              severity="error"
+              [text]="errorMessage() || ''"
+              styleClass="w-full"
+            ></p-message>
+          </div>
+          <p-button
+            label="{{ 'common.back' | translate }}"
+            icon="pi pi-arrow-left"
+            (onClick)="goToLogin()"
+            styleClass="w-full"
+          />
+        </div>
+      } @else if (showLoginForm() && !isProcessing()) {
+        <div class="login-section">
+          <div class="header-section">
+            <h2>{{ 'auth.invitation.welcome' | translate }}</h2>
+            @if (groupName()) {
+              <p class="group-name">{{ 'auth.invitation.invitedToGroup' | translate: { groupName: groupName()! } }}</p>
+            } @else {
+              <p>{{ 'auth.invitation.loginToJoin' | translate }}</p>
+            }
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Campo Email -->
+            <div class="field">
+              <label class="label">{{ 'auth.email' | translate }}</label>
+              <p-inputgroup>
+                <p-inputgroup-addon>
+                  <i class="pi pi-envelope"></i>
+                </p-inputgroup-addon>
+                <input
+                  pInputText
+                  type="email"
+                  formControlName="email"
+                  placeholder="tu@email.com"
+                  [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                />
+              </p-inputgroup>
+              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                <small class="p-error block mt-1">
+                  @if (loginForm.get('email')?.errors?.['required']) {
+                    {{ 'auth.emailRequired' | translate }}
+                  }
+                  @if (loginForm.get('email')?.errors?.['email']) {
+                    {{ 'auth.emailInvalid' | translate }}
+                  }
+                </small>
+              }
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div class="field">
+              <label class="label">{{ 'auth.password' | translate }}</label>
+              <p-inputgroup>
+                <p-inputgroup-addon>
+                  <i class="pi pi-lock"></i>
+                </p-inputgroup-addon>
+                <p-password
+                  formControlName="password"
+                  placeholder="••••••••"
+                  [feedback]="false"
+                  [toggleMask]="true"
+                  [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                />
+              </p-inputgroup>
+              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                <small class="p-error block mt-1">
+                  @if (loginForm.get('password')?.errors?.['required']) {
+                    {{ 'auth.passwordRequired' | translate }}
+                  }
+                  @if (loginForm.get('password')?.errors?.['minlength']) {
+                    {{ 'auth.passwordMinLength' | translate }}
+                  }
+                </small>
+              }
+            </div>
+
+            <!-- Mensaje de error -->
+            @if (errorMessage()) {
+              <div class="mb-3">
+                <p-message
+                  severity="error"
+                  [text]="errorMessage() || ''"
+                  styleClass="w-full"
+                ></p-message>
+              </div>
+            }
+
+            <!-- Botón de login -->
+            <div class="field">
+              <p-button
+                type="submit"
+                label="{{ 'auth.invitation.joinGroup' | translate }}"
+                icon="pi pi-sign-in"
+                [disabled]="loginForm.invalid || isProcessing()"
+                [loading]="isProcessing()"
+                styleClass="w-full login-button"
+              />
+            </div>
+          </form>
+        </div>
+      } @else if (isProcessing()) {
+        <div class="loading-section">
+          <p-progressSpinner />
+          <h2>{{ 'auth.invitation.processing' | translate }}</h2>
+          <p>{{ 'auth.invitation.pleaseWait' | translate }}</p>
+        </div>
+      } @else {
+        @if (isManager()) {
+          <div class="success-section">
+            <div class="success-icon">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <h2>{{ 'auth.invitation.success' | translate }}</h2>
+            @if (groupName()) {
+              <p class="group-name">{{ 'auth.invitation.joinedGroup' | translate: { groupName: groupName()! } }}</p>
+            } @else {
+              <p>{{ 'auth.invitation.joinedSuccessfully' | translate }}</p>
+            }
+            <p class="info-text">{{ 'auth.invitation.managerAccess' | translate }}</p>
+            <p-button
+              label="{{ 'auth.invitation.goToBackoffice' | translate }}"
+              icon="pi pi-arrow-right"
+              (onClick)="goToHome()"
+              styleClass="w-full mt-3"
+            />
+          </div>
+        } @else {
+          <div class="success-section">
+            <div class="success-icon">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <h2>{{ 'auth.invitation.success' | translate }}</h2>
+            @if (groupName()) {
+              <p class="group-name">{{ 'auth.invitation.joinedGroup' | translate: { groupName: groupName()! } }}</p>
+            } @else {
+              <p>{{ 'auth.invitation.joinedSuccessfully' | translate }}</p>
+            }
+            <p class="info-text">{{ 'auth.invitation.useMobileApp' | translate }}</p>
+            <p-button
+              label="{{ 'common.back' | translate }}"
+              icon="pi pi-arrow-left"
+              (onClick)="goToLogin()"
+              styleClass="w-full mt-3"
+            />
+          </div>
+        }
+      }
+    }
+  </div>
+</div>
+

@@ -25,6 +25,7 @@ export interface DaySchedule {
 export interface UserConsumerGroupRole {
   isClient: boolean;
   isManager: boolean;
+  isPreparer: boolean;
   isDefault: boolean;
 }
 
