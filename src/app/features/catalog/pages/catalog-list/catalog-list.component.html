@@ -162,7 +162,9 @@
         <th>{{ 'catalog.table.variety' | translate }}</th>
         <th>{{ 'catalog.table.producer' | translate }}</th>
         <th>{{ 'catalog.table.city' | translate }}</th>
-        <th>{{ 'catalog.table.price' | translate }}</th>
+        <th>{{ 'catalog.table.priceWithoutTax' | translate }}</th>
+        <th>{{ 'catalog.table.taxRate' | translate }}</th>
+        <th>{{ 'catalog.table.priceWithTax' | translate }}</th>
         <th>{{ 'catalog.table.unit' | translate }}</th>
         <th>{{ 'catalog.table.eco' | translate }}</th>
         <th>{{ 'catalog.table.seasonal' | translate }}</th>
@@ -195,7 +197,7 @@
         </td>
         <td>{{ article.producerName || '—' }}</td>
         <td>{{ article.city || '—' }}</td>
-        <td>
+        <td class="text-right">
           @if (article.currentPeriodPrice !== undefined) {
             <div>
               <strong>{{ formatPrice(article.currentPeriodPrice) }}</strong>
@@ -205,6 +207,28 @@
             </div>
           } @else {
             <strong>{{ formatPrice(article.pricePerUnit) }}</strong>
+          }
+        </td>
+        <td class="text-right">
+          @if (article.taxRate) {
+            <span>{{ article.taxRate }}%</span>
+          } @else {
+            <span class="text-secondary">—</span>
+          }
+        </td>
+        <td class="text-right">
+          @if (article.taxRate) {
+            @if (article.currentPeriodPrice !== undefined) {
+              <strong>{{ formatPrice(article.currentPeriodPrice * (1 + article.taxRate / 100)) }}</strong>
+            } @else {
+              <strong>{{ formatPrice(article.pricePerUnit * (1 + article.taxRate / 100)) }}</strong>
+            }
+          } @else {
+            @if (article.currentPeriodPrice !== undefined) {
+              <strong>{{ formatPrice(article.currentPeriodPrice) }}</strong>
+            } @else {
+              <strong>{{ formatPrice(article.pricePerUnit) }}</strong>
+            }
           }
         </td>
         <td>

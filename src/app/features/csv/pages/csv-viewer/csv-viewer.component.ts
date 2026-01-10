@@ -38,6 +38,7 @@ import { CategoriesService } from '../../../catalog/services/categories.service'
 
 // Models
 import { UnitMeasure } from '../../../../core/models/article.model';
+import { Category } from '../../../../core/models/category.model';
 
 interface ColumnMapping {
   articleField: string;
@@ -813,58 +814,55 @@ export class CsvViewerComponent implements OnInit {
         }
       }
 
-      // Create categories, products and varieties
+      // Create categories, products and varieties in batch
       this.loadingMessage.set('Creant categories, productes i varietats...');
       
-      // Create categories that don't have products yet
-      // (Categories with products will be created when creating the product)
-      for (const category of categoriesToCreate) {
-        // Check if this category has products to create
-        const hasProducts = productsToCreate.has(category);
-        if (!hasProducts) {
-          // Create category with a placeholder product (will be updated when articles are created)
-          // Actually, we'll create it when we create the first product
-          // For now, skip standalone categories without products
-        }
-      }
+      // Collect all categories/products/varieties to create in a single batch
+      const categoriesToCreateBatch: Array<{
+        category: string;
+        product: string;
+        variety?: string;
+        consumerGroupId: string;
+      }> = [];
 
-      // Create products (categories are created automatically when creating products)
-      // Products without varieties are created here, products with varieties are created below
+      // Add products without varieties
       for (const [category, products] of productsToCreate) {
         for (const product of products) {
-          try {
-            // Check if this product has varieties
-            const productVarieties = varietiesToCreate.get(category)?.get(product);
-            const hasVarieties = productVarieties && productVarieties.size > 0;
-            if (!hasVarieties) {
-              // Create product without variety
-              await this.categoriesService.createCategory({
-                category,
-                product,
-                consumerGroupId: groupId,
-              });
-            }
-          } catch (error) {
-            console.error(`Error creating product ${product} in category ${category}:`, error);
+          // Check if this product has varieties
+          const productVarieties = varietiesToCreate.get(category)?.get(product);
+          const hasVarieties = productVarieties && productVarieties.size > 0;
+          if (!hasVarieties) {
+            // Create product without variety
+            categoriesToCreateBatch.push({
+              category,
+              product,
+              consumerGroupId: groupId,
+            });
           }
         }
       }
 
-      // Create varieties
+      // Add varieties (which include product and category)
       for (const [category, products] of varietiesToCreate) {
         for (const [product, varieties] of products) {
           for (const variety of varieties) {
-            try {
-              await this.categoriesService.createCategory({
-                category,
-                product,
-                variety,
-                consumerGroupId: groupId,
-              });
-            } catch (error) {
-              console.error(`Error creating variety ${variety} for product ${product} in category ${category}:`, error);
-            }
+            categoriesToCreateBatch.push({
+              category,
+              product,
+              variety,
+              consumerGroupId: groupId,
+            });
           }
+        }
+      }
+
+      // Create all in a single batch call
+      if (categoriesToCreateBatch.length > 0) {
+        try {
+          await this.categoriesService.createCategoriesBatch(categoriesToCreateBatch);
+        } catch (error) {
+          console.error('Error creating categories/products/varieties in batch:', error);
+          // Continue anyway - some might have been created
         }
       }
 
