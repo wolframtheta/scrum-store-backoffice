@@ -28,7 +28,10 @@
         <th>{{ 'showcase.table.producer' | translate }}</th>
         <th>{{ 'showcase.table.supplier' | translate }}</th>
         <th>{{ 'showcase.table.city' | translate }}</th>
-        <th>{{ 'showcase.table.price' | translate }}</th>
+        <th>{{ 'showcase.table.priceWithoutTax' | translate }}</th>
+        <th>{{ 'showcase.table.taxRate' | translate }}</th>
+        <th>{{ 'showcase.table.priceWithTax' | translate }}</th>
+        <th>{{ 'showcase.table.eco' | translate }}</th>
         <th style="width: 10rem">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
@@ -46,7 +49,7 @@
         <td>{{ article.producerName || '—' }}</td>
         <td>{{ article.supplierName || '—' }}</td>
         <td>{{ article.city || '—' }}</td>
-        <td>
+        <td class="text-right">
           @if (article.currentPeriodPrice !== undefined) {
             <div>
               <strong>{{ formatPriceNumber(article.currentPeriodPrice, article.unitMeasure) }}</strong>
@@ -56,6 +59,35 @@
             </div>
           } @else {
             <strong>{{ formatPrice(article) }}</strong>
+          }
+        </td>
+        <td class="text-right">
+          @if (article.taxRate) {
+            <span>{{ article.taxRate }}%</span>
+          } @else {
+            <span class="text-secondary">—</span>
+          }
+        </td>
+        <td class="text-right">
+          @if (article.taxRate) {
+            @if (article.currentPeriodPrice !== undefined) {
+              <strong>{{ formatPriceNumber(article.currentPeriodPrice * (1 + article.taxRate / 100), article.unitMeasure) }}</strong>
+            } @else {
+              <strong>{{ formatPriceNumber(article.pricePerUnit * (1 + article.taxRate / 100), article.unitMeasure) }}</strong>
+            }
+          } @else {
+            @if (article.currentPeriodPrice !== undefined) {
+              <strong>{{ formatPriceNumber(article.currentPeriodPrice, article.unitMeasure) }}</strong>
+            } @else {
+              <strong>{{ formatPrice(article) }}</strong>
+            }
+          }
+        </td>
+        <td>
+          @if (article.isEco) {
+            <i class="fa fa-recycle eco-icon" title="Ecològic"></i>
+          } @else {
+            <span class="text-secondary">—</span>
           }
         </td>
         <td>
@@ -76,7 +108,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center">
+        <td colspan="12" class="text-center">
           <div class="empty-state">
             <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
             <p>{{ 'showcase.empty' | translate }}</p>
