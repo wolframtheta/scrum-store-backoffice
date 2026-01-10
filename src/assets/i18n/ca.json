@@ -235,6 +235,8 @@
       "date": "Data",
       "user": "Usuari",
       "items": "Articles",
+      "subtotalWithoutTax": "Subtotal (sense IVA)",
+      "taxAmount": "IVA",
       "total": "Total",
       "paid": "Pagat",
       "pending": "Pendent",
@@ -288,6 +290,22 @@
       "payAll": "Pagar tot pendent",
       "totalThisPayment": "Total d'aquest pagament",
       "remainingAfter": "Pendent després del pagament"
+    },
+    "detail": {
+      "title": "Detall de la Comanda",
+      "orderInfo": "Informació de la Comanda",
+      "items": "Articles de la Comanda",
+      "article": "Article",
+      "category": "Categoria",
+      "quantity": "Quantitat",
+      "pricePerUnit": "Preu per unitat",
+      "taxRate": "IVA",
+      "itemSubtotal": "Subtotal (sense IVA)",
+      "itemTax": "IVA",
+      "itemTotal": "Total",
+      "itemPaid": "Pagat",
+      "itemRemaining": "Pendent",
+      "noItems": "No hi ha articles en aquesta comanda"
     }
   },
   "basketPreparation": {
@@ -332,6 +350,9 @@
       "producer": "Productor",
       "city": "Ciutat",
       "price": "Preu",
+      "priceWithoutTax": "Preu (sense IVA)",
+      "taxRate": "IVA (%)",
+      "priceWithTax": "Preu (amb IVA)",
       "unit": "Unitat",
       "eco": "Ecològic",
       "maxQuantity": "Quantitat Màx.",
@@ -489,8 +510,12 @@
       "supplier": "Proveïdor",
       "city": "Població",
       "price": "Preu",
+      "priceWithoutTax": "Preu (sense IVA)",
+      "taxRate": "IVA (%)",
+      "priceWithTax": "Preu (amb IVA)",
       "unit": "Unitat",
-      "maxQuantity": "Quantitat Màx."
+      "maxQuantity": "Quantitat Màx.",
+      "eco": "Ecològic"
     },
     "actions": {
       "remove": "Treure de l'aparador"
@@ -808,6 +833,8 @@
       "productName": "Nom del producte",
       "varietyName": "Nom de la varietat",
       "enterName": "Introdueix el nom",
+      "enterNames": "Introdueix els noms (separats per comes o línies)",
+      "namesHint": "Pots introduir múltiples noms separats per comes (,) o una línia per cada nom",
       "inCategory": "A la categoria: {{name}}",
       "inProduct": "Producte: {{product}} (Categoria: {{category}})",
       "emptyName": "El nom no pot estar buit",
@@ -815,6 +842,10 @@
       "categoryCreated": "Categoria creada correctament",
       "productCreated": "Producte creat correctament",
       "varietyCreated": "Varietat creada correctament",
+      "batchCreated": "{{count}} {{type}} creats correctament",
+      "categories": "categories",
+      "products": "productes",
+      "varieties": "varietats",
       "createError": "Error en crear l'element",
       "loadError": "Error en carregar les categories",
       "updateSuccess": "Element actualitzat correctament",

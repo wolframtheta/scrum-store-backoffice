@@ -209,6 +209,8 @@
       "date": "Fecha",
       "user": "Usuario",
       "items": "Artículos",
+      "subtotalWithoutTax": "Subtotal (sin IVA)",
+      "taxAmount": "IVA",
       "total": "Total",
       "paid": "Pagado",
       "pending": "Pendiente",
@@ -262,6 +264,22 @@
       "payAll": "Pagar todo pendiente",
       "totalThisPayment": "Total de este pago",
       "remainingAfter": "Pendiente después del pago"
+    },
+    "detail": {
+      "title": "Detalle del Pedido",
+      "orderInfo": "Información del Pedido",
+      "items": "Artículos del Pedido",
+      "article": "Artículo",
+      "category": "Categoría",
+      "quantity": "Cantidad",
+      "pricePerUnit": "Precio por unidad",
+      "taxRate": "IVA",
+      "itemSubtotal": "Subtotal (sin IVA)",
+      "itemTax": "IVA",
+      "itemTotal": "Total",
+      "itemPaid": "Pagado",
+      "itemRemaining": "Pendiente",
+      "noItems": "No hay artículos en este pedido"
     }
   },
   "basketPreparation": {
@@ -306,6 +324,9 @@
       "producer": "Productor",
       "city": "Ciudad",
       "price": "Precio",
+      "priceWithoutTax": "Precio (sin IVA)",
+      "taxRate": "IVA (%)",
+      "priceWithTax": "Precio (con IVA)",
       "unit": "Unidad",
       "eco": "Ecológico",
       "maxQuantity": "Cantidad Máx.",
@@ -458,8 +479,12 @@
       "supplier": "Proveedor",
       "city": "Población",
       "price": "Precio",
+      "priceWithoutTax": "Precio (sin IVA)",
+      "taxRate": "IVA (%)",
+      "priceWithTax": "Precio (con IVA)",
       "unit": "Unidad",
-      "maxQuantity": "Cantidad Máx."
+      "maxQuantity": "Cantidad Máx.",
+      "eco": "Ecológico"
     },
     "actions": {
       "remove": "Quitar del aparador"
@@ -776,6 +801,8 @@
       "productName": "Nombre del producto",
       "varietyName": "Nombre de la variedad",
       "enterName": "Introduce el nombre",
+      "enterNames": "Introduce los nombres (separados por comas o líneas)",
+      "namesHint": "Puedes introducir múltiples nombres separados por comas (,) o una línea por cada nombre",
       "inCategory": "En la categoría: {{name}}",
       "inProduct": "Producto: {{product}} (Categoría: {{category}})",
       "emptyName": "El nombre no puede estar vacío",
@@ -783,6 +810,10 @@
       "categoryCreated": "Categoría creada correctamente",
       "productCreated": "Producto creado correctamente",
       "varietyCreated": "Variedad creada correctamente",
+      "batchCreated": "{{count}} {{type}} creados correctamente",
+      "categories": "categorías",
+      "products": "productos",
+      "varieties": "variedades",
       "createError": "Error al crear el elemento",
       "loadError": "Error al cargar las categorías",
       "updateSuccess": "Elemento actualizado correctamente",

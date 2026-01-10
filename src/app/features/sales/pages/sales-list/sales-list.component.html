@@ -1,5 +1,6 @@
 <div class="sales-container">
   <p-toast />
+  <p-confirmDialog />
 
   <div class="header">
     <div>
@@ -125,6 +126,12 @@
         <th class="text-right" style="width: 6rem">
           {{ 'sales.table.items' | translate }}
         </th>
+        <th class="text-right" style="width: 8rem">
+          {{ 'sales.table.subtotalWithoutTax' | translate }}
+        </th>
+        <th class="text-right" style="width: 8rem">
+          {{ 'sales.table.taxAmount' | translate }}
+        </th>
         <th class="text-right" pSortableColumn="totalAmount" style="width: 8rem">
           {{ 'sales.table.total' | translate }}
           <p-sortIcon field="totalAmount" />
@@ -154,6 +161,8 @@
         <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ sale.userName || sale.userEmail }}</td>
         <td class="text-right">{{ sale.items.length }}</td>
+        <td class="text-right">{{ getSubtotalWithoutTax(sale) | number: '1.2-2' }} €</td>
+        <td class="text-right">{{ getTaxAmount(sale) | number: '1.2-2' }} €</td>
         <td class="text-right">{{ sale.totalAmount | number: '1.2-2' }} €</td>
         <td class="text-right">{{ sale.paidAmount | number: '1.2-2' }} €</td>
         <td class="text-right">{{ getRemainingAmount(sale) | number: '1.2-2' }} €</td>
@@ -190,6 +199,14 @@
                 (onClick)="openPaymentModal(sale)"
               />
             }
+            <p-button
+              icon="pi pi-trash"
+              [pTooltip]="'common.delete' | translate"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              (onClick)="deleteOrder(sale)"
+            />
           </div>
         </td>
       </tr>

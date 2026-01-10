@@ -15,7 +15,8 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SalesService } from '../../services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
@@ -34,6 +35,7 @@ import { PaymentModalComponent } from '../../components/payment-modal/payment-mo
     ToastModule,
     TooltipModule,
     CheckboxModule,
+    ConfirmDialogModule,
     AutoCompleteModule,
     DatePickerModule,
     SelectModule,
@@ -42,7 +44,7 @@ import { PaymentModalComponent } from '../../components/payment-modal/payment-mo
     InputGroupAddonModule,
     PaymentModalComponent
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './sales-list.component.html',
   styleUrl: './sales-list.component.scss',
 })
@@ -50,6 +52,7 @@ export class SalesListComponent implements OnInit {
   protected readonly salesService = inject(SalesService);
   protected readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
 
@@ -274,5 +277,46 @@ export class SalesListComponent implements OnInit {
 
   protected getRemainingAmount(sale: Sale): number {
     return (sale.totalAmount || 0) - (sale.paidAmount || 0);
+  }
+
+  protected getSubtotalWithoutTax(sale: Sale): number {
+    // totalAmount és sense IVA segons l'usuari
+    return sale.totalAmount || 0;
+  }
+
+  protected getTaxAmount(sale: Sale): number {
+    if (!sale.items || sale.items.length === 0) return 0;
+    return sale.items.reduce((sum, item) => {
+      const taxRate = item.article?.taxRate || 0;
+      const subtotal = item.totalPrice || 0;
+      return sum + (subtotal * (taxRate / 100));
+    }, 0);
+  }
+
+  protected deleteOrder(sale: Sale): void {
+    const userName = sale.userName || sale.userEmail || 'usuari desconegut';
+    
+    this.confirmationService.confirm({
+      message: `¿Segur que vols eliminar la comanda de ${userName} del ${new Date(sale.createdAt).toLocaleDateString('ca-ES')}? Aquesta acció no es pot desfer.`,
+      header: 'Confirmar eliminació',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: async () => {
+        try {
+          await this.salesService.deleteOrder(sale.id);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Èxit',
+            detail: 'Comanda eliminada correctament',
+          });
+        } catch (error: any) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.error?.message || 'Error eliminant comanda',
+          });
+        }
+      },
+    });
   }
 }

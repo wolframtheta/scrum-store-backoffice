@@ -116,6 +116,29 @@ export class SalesDetailComponent implements OnInit {
     const parts = [article.category, article.product, article.variety].filter(Boolean);
     return parts.length > 0 ? parts.join(' - ') : '-';
   }
+
+  protected getItemSubtotalWithoutTax(item: any): number {
+    // pricePerUnit i totalPrice són sense IVA segons l'usuari
+    return item.totalPrice || 0;
+  }
+
+  protected getItemTaxAmount(item: any): number {
+    const taxRate = item.article?.taxRate || 0;
+    const subtotal = this.getItemSubtotalWithoutTax(item);
+    return subtotal * (taxRate / 100);
+  }
+
+  protected getSubtotalWithoutTax(): number {
+    const sale = this.sale();
+    if (!sale) return 0;
+    return sale.items.reduce((sum, item) => sum + this.getItemSubtotalWithoutTax(item), 0);
+  }
+
+  protected getTotalTaxAmount(): number {
+    const sale = this.sale();
+    if (!sale) return 0;
+    return sale.items.reduce((sum, item) => sum + this.getItemTaxAmount(item), 0);
+  }
 }
 
 

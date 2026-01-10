@@ -48,6 +48,14 @@
 
         <div class="totals-grid">
           <div class="total-item">
+            <label>{{ 'sales.table.subtotalWithoutTax' | translate }}:</label>
+            <span class="amount">{{ formatPrice(getSubtotalWithoutTax()) }} €</span>
+          </div>
+          <div class="total-item">
+            <label>{{ 'sales.table.taxAmount' | translate }}:</label>
+            <span class="amount">{{ formatPrice(getTotalTaxAmount()) }} €</span>
+          </div>
+          <div class="total-item">
             <label>{{ 'sales.table.total' | translate }}:</label>
             <span class="amount">{{ formatPrice(sale()!.totalAmount) }} €</span>
           </div>
@@ -71,6 +79,9 @@
               <th>{{ 'sales.detail.category' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.quantity' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.pricePerUnit' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.taxRate' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.itemSubtotal' | translate }}</th>
+              <th class="text-right">{{ 'sales.detail.itemTax' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemTotal' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemPaid' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemRemaining' | translate }}</th>
@@ -94,6 +105,15 @@
                 {{ item.quantity }} {{ item.article?.unitMeasure || 'ud' }}
               </td>
               <td class="text-right">{{ formatPrice(item.pricePerUnit) }} €</td>
+              <td class="text-right">
+                @if (item.article?.taxRate) {
+                  <span>{{ item.article.taxRate }}%</span>
+                } @else {
+                  <span class="text-secondary">—</span>
+                }
+              </td>
+              <td class="text-right">{{ formatPrice(getItemSubtotalWithoutTax(item)) }} €</td>
+              <td class="text-right">{{ formatPrice(getItemTaxAmount(item)) }} €</td>
               <td class="text-right"><strong>{{ formatPrice(item.totalPrice) }} €</strong></td>
               <td class="text-right paid">{{ formatPrice(item.paidAmount || 0) }} €</td>
               <td class="text-right remaining">
@@ -104,7 +124,7 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="7" class="text-center">
+              <td colspan="10" class="text-center">
                 {{ 'sales.detail.noItems' | translate }}
               </td>
             </tr>
