@@ -120,6 +120,24 @@ export class SalesService {
     }
   }
 
+  async deleteOrder(orderId: string): Promise<void> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      await this.api.delete(`orders/${orderId}`);
+
+      // Remove from the local list
+      const currentSales = this.sales();
+      this.sales.set(currentSales.filter(s => s.id !== orderId));
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error eliminant comanda');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   clearError(): void {
     this.error.set(null);
   }
