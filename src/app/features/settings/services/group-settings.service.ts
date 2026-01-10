@@ -52,6 +52,19 @@ export class GroupSettingsService {
     }
   }
 
+  async createCategoriesBatch(data: CategoryTreeItem[]): Promise<{ created: number; categories: CategoryTreeItem[] }> {
+    this.isLoading.set(true);
+    this.error.set(null);
+    try {
+      return await this.api.post<{ created: number; categories: CategoryTreeItem[] }>('categories/batch', data);
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error creant categories');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   async updateCategoryName(groupId: string, oldName: string, newName: string): Promise<{ updated: number }> {
     this.isLoading.set(true);
     this.error.set(null);

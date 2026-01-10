@@ -314,32 +314,42 @@ export class CategoriesSettingsComponent implements OnInit {
     const data = this.modalData();
 
     try {
-      if (result.type === 'category') {
-        await this.settingsService.createCategory({
-          category: result.name,
-          consumerGroupId: this.groupId()
-        });
-      } else if (result.type === 'product') {
-        await this.settingsService.createCategory({
-          category: data.parentName!,
-          product: result.name,
-          consumerGroupId: this.groupId()
-        });
-      } else if (result.type === 'variety') {
-        await this.settingsService.createCategory({
-          category: data.grandparentName!,
-          product: data.parentName!,
-          variety: result.name,
-          consumerGroupId: this.groupId()
-        });
-      }
+      const itemsToCreate: CategoryTreeItem[] = result.names.map(name => {
+        if (result.type === 'category') {
+          return {
+            category: name,
+            consumerGroupId: this.groupId()
+          };
+        } else if (result.type === 'product') {
+          return {
+            category: data.parentName!,
+            product: name,
+            consumerGroupId: this.groupId()
+          };
+        } else {
+          return {
+            category: data.grandparentName!,
+            product: data.parentName!,
+            variety: name,
+            consumerGroupId: this.groupId()
+          };
+        }
+      });
+
+      const batchResult = await this.settingsService.createCategoriesBatch(itemsToCreate);
 
       await this.loadCategories();
 
+      const count = batchResult.created;
+      const typeKey = result.type === 'category' ? 'categories' : result.type === 'product' ? 'products' : 'varieties';
+      
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('common.success'),
-        detail: this.translate.instant(`settings.categories.${result.type}Created`)
+        detail: this.translate.instant('settings.categories.batchCreated', { 
+          count, 
+          type: this.translate.instant(`settings.categories.${typeKey}`) 
+        })
       });
 
       this.modalVisible.set(false);

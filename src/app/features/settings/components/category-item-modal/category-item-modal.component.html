@@ -17,20 +17,23 @@
     }
 
     <div class="field">
-      <label [for]="'name-' + data().type">
+      <label [for]="'names-' + data().type">
         {{ label }} <span class="required">*</span>
       </label>
-      <input
-        pInputText
-        [id]="'name-' + data().type"
-        formControlName="name"
-        [class.ng-invalid]="isFieldInvalid('name')"
-        [class.ng-dirty]="isFieldInvalid('name')"
-        [placeholder]="'settings.categories.enterName' | translate"
+      <textarea
+        pTextarea
+        [id]="'names-' + data().type"
+        formControlName="names"
+        [class.ng-invalid]="isFieldInvalid('names')"
+        [class.ng-dirty]="isFieldInvalid('names')"
+        [placeholder]="'settings.categories.enterNames' | translate"
+        rows="5"
         autofocus
-      />
-      @if (isFieldInvalid('name')) {
-        <small class="p-error">{{ getFieldError('name') | translate }}</small>
+        style="resize: vertical; min-height: 100px;"
+      ></textarea>
+      <small class="field-hint">{{ 'settings.categories.namesHint' | translate }}</small>
+      @if (isFieldInvalid('names')) {
+        <small class="p-error">{{ getFieldError('names') | translate }}</small>
       }
     </div>
   </form>

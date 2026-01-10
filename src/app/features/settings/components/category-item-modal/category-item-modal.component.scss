@@ -26,8 +26,17 @@
     }
   }
 
-  input {
+  input,
+  textarea {
     width: 100%;
+  }
+
+  .field-hint {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: $dark-gray;
+    opacity: 0.7;
   }
 
   small.p-error {

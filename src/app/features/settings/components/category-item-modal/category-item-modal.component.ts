@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 
 export interface CategoryItemModalData {
@@ -15,7 +16,7 @@ export interface CategoryItemModalData {
 }
 
 export interface CategoryItemResult {
-  name: string;
+  names: string[];
   type: 'category' | 'product' | 'variety';
 }
 
@@ -27,6 +28,7 @@ export interface CategoryItemResult {
     TranslateModule,
     DialogModule,
     InputTextModule,
+    TextareaModule,
     ButtonModule
   ],
   templateUrl: './category-item-modal.component.html',
@@ -47,13 +49,13 @@ export class CategoryItemModalComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(255)]]
+      names: ['', [Validators.required]]
     });
   }
 
   ngOnInit(): void {
     if (this.data().editMode && this.data().currentName) {
-      this.form.patchValue({ name: this.data().currentName });
+      this.form.patchValue({ names: this.data().currentName });
     }
   }
 
@@ -96,8 +98,25 @@ export class CategoryItemModalComponent implements OnInit {
       return;
     }
 
+    const input = this.form.value.names.trim();
+    if (!input) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    // Parsear múltiples noms separats per comes o línies
+    const names = input
+      .split(/[,\n]/)
+      .map((name: string) => name.trim())
+      .filter((name: string) => name.length > 0);
+
+    if (names.length === 0) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.confirm.emit({
-      name: this.form.value.name.trim(),
+      names,
       type: this.data().type
     });
 
@@ -113,7 +132,6 @@ export class CategoryItemModalComponent implements OnInit {
   protected getFieldError(fieldName: string): string {
     const field = this.form.get(fieldName);
     if (field?.hasError('required')) return 'validation.required';
-    if (field?.hasError('maxlength')) return 'validation.maxLength';
     return '';
   }
 
