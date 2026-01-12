@@ -148,8 +148,8 @@ if [ -d ".git" ]; then
   # Añadir package.json y version.json al staging
   git add package.json version.json
   
-  # Commit con todos los cambios
-  git commit -m "chore: bump version to ${VERSION} (${VERSION_TYPE})" || {
+  # Commit con todos los cambios (usando major.minor)
+  git commit -m "chore: bump version to ${GIT_TAG} (${VERSION_TYPE})" || {
     echo "⚠️  Warning: No hay cambios para commitear"
   }
 
@@ -160,7 +160,7 @@ if [ -d ".git" ]; then
   fi
   
   echo "🏷️  Creating git tag: ${GIT_TAG}"
-  git tag -a "${GIT_TAG}" -m "Release ${VERSION} - ${TIMESTAMP}"
+  git tag -a "${GIT_TAG}" -m "Release ${GIT_TAG} - ${TIMESTAMP}"
   
   # Hacer push del commit y tag al remoto
   echo "⬆️  Pushing commit and tag to remote..."
