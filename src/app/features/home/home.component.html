@@ -9,6 +9,7 @@
       @if (groupService.selectedGroup()) {
         <p class="home-subtitle">{{ groupService.selectedGroup()?.name }}</p>
       }
+      <p class="version-info">v{{ versionService.getVersion() }}</p>
     </div>
     <div class="header-actions">
       @if (canManageLogin()) {

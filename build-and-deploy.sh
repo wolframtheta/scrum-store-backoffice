@@ -32,6 +32,35 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 BUILD_TAG="${VERSION}-${TIMESTAMP}"
 GIT_TAG="backoffice-${BUILD_TAG}"
 
+# Leer versión de la app si existe version.json en la raíz
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+VERSION_FILE="$ROOT_DIR/version.json"
+
+if [ -f "$VERSION_FILE" ]; then
+  APP_VERSION=$(node -p "require('$VERSION_FILE').app.version" 2>/dev/null || echo "")
+  APP_BUILD_TAG=$(node -p "require('$VERSION_FILE').app.buildTag" 2>/dev/null || echo "")
+else
+  APP_VERSION=""
+  APP_BUILD_TAG=""
+fi
+
+# Crear o actualizar version.json
+cat > "$VERSION_FILE" <<EOF
+{
+  "app": {
+    "version": "${APP_VERSION:-0.0.1}",
+    "buildTag": "${APP_BUILD_TAG:-unknown}",
+    "timestamp": "${TIMESTAMP}"
+  },
+  "backoffice": {
+    "version": "${VERSION}",
+    "buildTag": "${BUILD_TAG}",
+    "timestamp": "${TIMESTAMP}"
+  }
+}
+EOF
+
 echo "📦 Building scrum-store-backoffice..."
 echo "📋 Version: ${VERSION}"
 echo "🏷️  Build tag: ${BUILD_TAG}"
@@ -68,9 +97,18 @@ if [ ! -d "$BUILD_DIR" ]; then
   exit 1
 fi
 
+# Copiar version.json a assets si existe
+if [ -f "$VERSION_FILE" ]; then
+  cp "$VERSION_FILE" src/assets/version.json
+  echo "📋 Copied version.json to assets"
+fi
+
 # Crear archivo de versión en el build
 echo "${BUILD_TAG}" > ${BUILD_DIR}/.version
 echo "Version: ${BUILD_TAG}" > ${BUILD_DIR}/VERSION.txt
+if [ -f "$VERSION_FILE" ]; then
+  cp "$VERSION_FILE" ${BUILD_DIR}/assets/version.json 2>/dev/null || true
+fi
 
 echo "📤 Deploying to ${DEPLOY_HOST}:${DEPLOY_PATH}..."
 rsync -avz --delete ${BUILD_DIR}/ ${DEPLOY_HOST}:${DEPLOY_PATH}/

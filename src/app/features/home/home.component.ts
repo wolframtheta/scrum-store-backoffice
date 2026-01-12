@@ -5,6 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { SystemConfigService } from '../../core/services/system-config.service';
+import { VersionService } from '../../core/services/version.service';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit {
   protected readonly authService = inject(AuthService);
   protected readonly groupService = inject(ConsumerGroupService);
   protected readonly systemConfigService = inject(SystemConfigService);
+  protected readonly versionService = inject(VersionService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -252,6 +254,7 @@ export class HomeComponent implements OnInit {
     if (this.canManageLogin()) {
       await this.systemConfigService.loadLoginEnabled();
     }
+    await this.versionService.loadVersion();
   }
 
   protected onModuleClick(route: string): void {
