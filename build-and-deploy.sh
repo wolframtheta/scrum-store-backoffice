@@ -134,6 +134,12 @@ echo "✅ Deploy completed!"
 echo "📋 Version deployed: ${BUILD_TAG}"
 echo "🌐 Backoffice available at: http://46.62.250.143/scrum-store-backoffice/"
 
+# Eliminar version.json de assets (ya está en el build)
+if [ -f "src/assets/version.json" ]; then
+  rm src/assets/version.json
+  echo "🧹 Cleaned up src/assets/version.json"
+fi
+
 # Commit, tag y push al final (solo si todo fue bien)
 echo ""
 echo "📝 Committing changes (package.json + version.json)..."
