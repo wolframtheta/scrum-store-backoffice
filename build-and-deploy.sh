@@ -22,9 +22,9 @@ fi
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 echo "📋 Current version: ${CURRENT_VERSION}"
 
-# Incrementar versión automáticamente (patch por defecto)
+# Incrementar versión automáticamente (minor por defecto)
 # Acepta parámetro opcional: patch, minor, major
-VERSION_TYPE="${1:-patch}"
+VERSION_TYPE="${1:-minor}"
 
 # Función para incrementar versión
 increment_version() {
