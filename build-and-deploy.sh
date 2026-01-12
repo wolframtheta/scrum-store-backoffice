@@ -63,7 +63,46 @@ cat > "$VERSION_FILE" <<EOF
 }
 EOF
 
-# Commit y tag del version.json
+# Copiar version.json a assets antes del build
+if [ -f "$VERSION_FILE" ]; then
+  mkdir -p src/assets
+  cp "$VERSION_FILE" src/assets/version.json
+  echo "📋 Copied version.json to assets"
+fi
+
+# Instalar dependencias si es necesario
+if [ ! -d "node_modules" ]; then
+  echo "📥 Installing dependencies..."
+  npm install
+fi
+
+# Build de producción
+echo "🔨 Building for production..."
+npm run build
+
+# Verificar que el build se completó
+BUILD_DIR="dist/scrum-store-backoffice/browser"
+if [ ! -d "$BUILD_DIR" ]; then
+  echo "❌ Error: Build directory '$BUILD_DIR' not found!"
+  exit 1
+fi
+
+# Crear archivo de versión en el build
+echo "${BUILD_TAG}" > ${BUILD_DIR}/.version
+echo "Version: ${BUILD_TAG}" > ${BUILD_DIR}/VERSION.txt
+if [ -f "$VERSION_FILE" ]; then
+  cp "$VERSION_FILE" ${BUILD_DIR}/assets/version.json 2>/dev/null || true
+fi
+
+echo "📤 Deploying to ${DEPLOY_HOST}:${DEPLOY_PATH}..."
+rsync -avz --delete ${BUILD_DIR}/ ${DEPLOY_HOST}:${DEPLOY_PATH}/
+
+echo "✅ Deploy completed!"
+echo "📋 Version deployed: ${BUILD_TAG}"
+echo "🌐 Backoffice available at: http://46.62.250.143/scrum-store-backoffice/"
+
+# Commit y tag del version.json al final (solo si todo fue bien)
+echo ""
 echo "📝 Committing version.json..."
 # Copiar version.json al proyecto para commitearlo
 cp "$VERSION_FILE" "$SCRIPT_DIR/version.json"
@@ -86,69 +125,13 @@ if [ -d ".git" ]; then
     # Hacer push del commit y tag al remoto
     echo "⬆️  Pushing commit and tag to remote..."
     git push origin HEAD || {
-      echo "⚠️  Warning: No se pudo hacer push del commit. Continuando con el build..."
+      echo "⚠️  Warning: No se pudo hacer push del commit."
     }
     git push origin "${GIT_TAG}" || {
-      echo "⚠️  Warning: No se pudo hacer push del tag. Continuando con el build..."
+      echo "⚠️  Warning: No se pudo hacer push del tag."
     }
   fi
 else
   echo "⚠️  Warning: No se encontró repositorio git en el proyecto"
 fi
-
-echo "📦 Building scrum-store-backoffice..."
-echo "📋 Version: ${VERSION}"
-echo "🏷️  Build tag: ${BUILD_TAG}"
-echo "🌿 Current branch: ${CURRENT_BRANCH}"
-
-# Crear tag en git
-if git rev-parse "$GIT_TAG" >/dev/null 2>&1; then
-  echo "⚠️  Warning: El tag ${GIT_TAG} ya existe. Usando tag existente."
-else
-  echo "🏷️  Creating git tag: ${GIT_TAG}"
-  git tag -a "${GIT_TAG}" -m "Backoffice deployment ${BUILD_TAG}"
-  
-  # Hacer push del tag al remoto
-  echo "⬆️  Pushing tag to remote..."
-  git push origin "${GIT_TAG}" || {
-    echo "⚠️  Warning: No se pudo hacer push del tag. Continuando con el build..."
-  }
-fi
-
-# Instalar dependencias si es necesario
-if [ ! -d "node_modules" ]; then
-  echo "📥 Installing dependencies..."
-  npm install
-fi
-
-# Build de producción
-echo "🔨 Building for production..."
-npm run build
-
-# Verificar que el build se completó
-BUILD_DIR="dist/scrum-store-backoffice/browser"
-if [ ! -d "$BUILD_DIR" ]; then
-  echo "❌ Error: Build directory '$BUILD_DIR' not found!"
-  exit 1
-fi
-
-# Copiar version.json a assets si existe
-if [ -f "$VERSION_FILE" ]; then
-  cp "$VERSION_FILE" src/assets/version.json
-  echo "📋 Copied version.json to assets"
-fi
-
-# Crear archivo de versión en el build
-echo "${BUILD_TAG}" > ${BUILD_DIR}/.version
-echo "Version: ${BUILD_TAG}" > ${BUILD_DIR}/VERSION.txt
-if [ -f "$VERSION_FILE" ]; then
-  cp "$VERSION_FILE" ${BUILD_DIR}/assets/version.json 2>/dev/null || true
-fi
-
-echo "📤 Deploying to ${DEPLOY_HOST}:${DEPLOY_PATH}..."
-rsync -avz --delete ${BUILD_DIR}/ ${DEPLOY_HOST}:${DEPLOY_PATH}/
-
-echo "✅ Deploy completed!"
-echo "📋 Version deployed: ${BUILD_TAG}"
-echo "🌐 Backoffice available at: http://46.62.250.143/scrum-store-backoffice/"
 
