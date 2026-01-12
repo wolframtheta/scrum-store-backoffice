@@ -1,12 +1,12 @@
 {
   "app": {
-    "version": "0.0.1",
-    "buildTag": "0.0.1-20260112-175100",
-    "timestamp": "20260112-175139"
+    "version": "1.0.0",
+    "buildTag": "1.0.0-unknown",
+    "timestamp": "20260112-175918"
   },
   "backoffice": {
-    "version": "0.0.0",
-    "buildTag": "0.0.0-20260112-175139",
-    "timestamp": "20260112-175139"
+    "version": "1.0.0",
+    "buildTag": "1.0.0-20260112-175918",
+    "timestamp": "20260112-175918"
   }
 }
