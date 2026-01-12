@@ -83,32 +83,16 @@ fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
 "
 echo "✅ package.json updated to version ${VERSION}"
 
-# Leer versión de la app si existe version.json en la raíz
+# Usar version.json local del proyecto
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-VERSION_FILE="$ROOT_DIR/version.json"
+VERSION_FILE="$SCRIPT_DIR/version.json"
 
-if [ -f "$VERSION_FILE" ]; then
-  APP_VERSION=$(node -p "require('$VERSION_FILE').app.version" 2>/dev/null || echo "1.0.0")
-  APP_BUILD_TAG=$(node -p "require('$VERSION_FILE').app.buildTag" 2>/dev/null || echo "")
-else
-  APP_VERSION="1.0.0"
-  APP_BUILD_TAG=""
-fi
-
-# Crear o actualizar version.json
+# Crear o actualizar version.json local
 cat > "$VERSION_FILE" <<EOF
 {
-  "app": {
-    "version": "${APP_VERSION}",
-    "buildTag": "${APP_BUILD_TAG:-${APP_VERSION}-${TIMESTAMP}}",
-    "timestamp": "${TIMESTAMP}"
-  },
-  "backoffice": {
-    "version": "${VERSION}",
-    "buildTag": "${BUILD_TAG}",
-    "timestamp": "${TIMESTAMP}"
-  }
+  "version": "${VERSION}",
+  "buildTag": "${BUILD_TAG}",
+  "timestamp": "${TIMESTAMP}"
 }
 EOF
 
@@ -153,10 +137,6 @@ echo "🌐 Backoffice available at: http://46.62.250.143/scrum-store-backoffice/
 # Commit, tag y push al final (solo si todo fue bien)
 echo ""
 echo "📝 Committing changes (package.json + version.json)..."
-# Copiar version.json al proyecto para commitearlo
-cp "$VERSION_FILE" "$SCRIPT_DIR/version.json"
-
-# Hacer commit en el repositorio del proyecto
 cd "$SCRIPT_DIR"
 if [ -d ".git" ]; then
   # Añadir package.json y version.json al staging
