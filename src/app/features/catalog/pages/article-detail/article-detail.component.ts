@@ -134,8 +134,8 @@ export class ArticleDetailComponent implements OnInit {
       return startDateA.getTime() - startDateB.getTime();
     });
 
-    // Agrupar per recurrència
-    const groupedByRecurrence = new Map<PeriodRecurrence, { date: Date; price: number }[]>();
+    // Agrupar per recurrència i mantenir info del període
+    const groupedByRecurrence = new Map<PeriodRecurrence, { periodName: string; periodId: string; price: number; startDate: Date }[]>();
     
     sortedPeriods.forEach(period => {
       const startDate = typeof period.startDate === 'string' ? new Date(period.startDate) : period.startDate;
@@ -151,28 +151,17 @@ export class ArticleDetailComponent implements OnInit {
         groupedByRecurrence.set(recurrence, []);
       }
       groupedByRecurrence.get(recurrence)!.push({ 
-        date: startDate, 
-        price: Number(periodArticle.pricePerUnit) 
+        periodName: period.name,
+        periodId: period.id,
+        price: Number(periodArticle.pricePerUnit),
+        startDate
       });
     });
 
-    // Crear labels úniques (totes les dates d'inici de període ordenades)
-    const allDates = sortedPeriods.map(p => {
-      const startDate = typeof p.startDate === 'string' ? new Date(p.startDate) : p.startDate;
-      startDate.setHours(0, 0, 0, 0);
-      return startDate;
-    });
-    const uniqueDates = Array.from(new Set(allDates.map(d => d.getTime())))
-      .map(time => new Date(time))
-      .sort((a, b) => a.getTime() - b.getTime());
-
-    const labels = uniqueDates.map(date => 
-      date.toLocaleDateString('ca-ES', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-      })
-    );
+    // Crear labels úniques amb noms de períodes (ordenats per data d'inici)
+    const labels = sortedPeriods
+      .filter(p => p.periodArticles?.some(pa => pa.articleId === articleId))
+      .map(p => p.name);
 
     // Colors per cada recurrència
     const recurrenceColors: Record<PeriodRecurrence, { border: string; background: string }> = {
@@ -198,10 +187,8 @@ export class ArticleDetailComponent implements OnInit {
     // Crear datasets per cada recurrència
     const datasets = Array.from(groupedByRecurrence.entries()).map(([recurrence, data]) => {
       // Crear array de preus per cada label (null si no hi ha dada)
-      const prices = uniqueDates.map(date => {
-        const dataPoint = data.find(d => 
-          d.date.getTime() === date.getTime()
-        );
+      const prices = labels.map(periodName => {
+        const dataPoint = data.find(d => d.periodName === periodName);
         return dataPoint ? dataPoint.price : null;
       });
 
@@ -233,6 +220,10 @@ export class ArticleDetailComponent implements OnInit {
         },
         tooltip: {
           callbacks: {
+            title: (tooltipItems: any) => {
+              // Mostrar el nom del període com a títol
+              return tooltipItems[0]?.label || '';
+            },
             label: (context: any) => {
               if (context.parsed.y === null) return '';
               return `${context.dataset.label}: ${context.parsed.y.toFixed(2)} €`;

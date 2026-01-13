@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -54,6 +54,7 @@ export class CatalogListComponent implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly fb = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
+  private readonly router = inject(Router);
 
   // Form
   protected readonly filtersForm: FormGroup;
@@ -391,6 +392,10 @@ export class CatalogListComponent implements OnInit {
         detail: error?.error?.message || `Error ${action} ecològic`,
       });
     }
+  }
+
+  protected goToDetail(article: Article): void {
+    this.router.navigate(['/catalog', article.id]);
   }
 }
 

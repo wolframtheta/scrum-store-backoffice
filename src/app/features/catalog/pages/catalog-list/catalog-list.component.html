@@ -174,8 +174,8 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-article>
-      <tr>
-        <td>
+      <tr (click)="goToDetail(article)" style="cursor: pointer;">
+        <td (click)="$event.stopPropagation()">
           <p-tableCheckbox [value]="article"></p-tableCheckbox>
         </td>
         <td>
@@ -261,7 +261,7 @@
             [severity]="getShowcaseSeverity(article.inShowcase)">
           </p-tag>
         </td>
-        <td>
+        <td (click)="$event.stopPropagation()">
           <div class="action-buttons">
             @if (article.inShowcase) {
               <p-button

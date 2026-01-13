@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { ButtonModule } from 'primeng/button';
@@ -34,6 +35,7 @@ export class ShowcaseListComponent implements OnInit {
   protected readonly showcaseService = inject(ShowcaseService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
+  private readonly router = inject(Router);
 
   async ngOnInit() {
     await this.loadArticles();
@@ -106,6 +108,10 @@ export class ShowcaseListComponent implements OnInit {
   protected getArticleName(article: Article): string {
     const parts = [article.category, article.product, article.variety].filter(Boolean);
     return parts.join(' - ');
+  }
+
+  protected goToDetail(article: Article): void {
+    this.router.navigate(['/catalog', article.id]);
   }
 }
 

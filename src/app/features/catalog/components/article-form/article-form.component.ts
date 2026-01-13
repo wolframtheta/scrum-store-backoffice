@@ -88,7 +88,7 @@ export class ArticleFormComponent {
       product: ['', Validators.required],
       variety: [''],
       description: [''],
-      unitMeasure: [UnitMeasure.KG, Validators.required],
+      unitMeasure: [this.unitMeasureOptions[1], Validators.required], // Default a kg (objecte complet)
       pricePerUnit: [0, [Validators.required, Validators.min(0)]],
       city: [''],
       producer: [null],
@@ -121,10 +121,23 @@ export class ArticleFormComponent {
       if (!visible) return;
 
       // Utilitzar untracked per evitar que l'effect es dispari quan canvien altres signals
-      untracked(() => {
+      untracked(async () => {
         if (article) {
           console.log('[effect article] Edit mode - loading article data');
           this.isEditMode.set(true);
+
+          // Carregar productes i varietats per la categoria i producte de l'article
+          if (article.category) {
+            const products = await this.categoriesService.getProductsByCategory(article.category);
+            this.products.set(products);
+            this.filteredProducts.set(products);
+
+            if (article.product) {
+              const varieties = await this.categoriesService.getVarietiesByProduct(article.category, article.product);
+              this.varieties.set(varieties);
+              this.filteredVarieties.set(varieties);
+            }
+          }
 
           // Trobar el producer complet per l'ID
           const producer = article.producerId
@@ -137,25 +150,39 @@ export class ArticleFormComponent {
             ? article.currentPeriodPrice
             : article.pricePerUnit || 0;
 
+          // Trobar l'objecte complet de unitMeasure per l'AutoComplete
+          const unitMeasureObj = this.unitMeasureOptions.find(
+            option => option.value === article.unitMeasure
+          ) || this.unitMeasureOptions[1]; // Default a kg
+
           this.form.setValue({
             category: article.category || '',
             product: article.product || '',
             variety: article.variety || '',
             description: article.description || '',
-            unitMeasure: article.unitMeasure || UnitMeasure.KG,
+            unitMeasure: unitMeasureObj,
             pricePerUnit: priceToUse,
             city: article.city || '',
             producer: producer || null,
             isSeasonal: article.isSeasonal === true, // Comparació estricta
           }, { emitEvent: false }); // No emetre events per evitar loops
+
+          // Forçar detecció de canvis per OnPush
+          this.cdr.markForCheck();
         } else {
           console.log('[effect article] Create mode - resetting form');
           this.isEditMode.set(false);
           this.form.reset({
-            unitMeasure: UnitMeasure.KG,
+            unitMeasure: this.unitMeasureOptions[1], // kg
             pricePerUnit: 0,
             isSeasonal: false,
           }, { emitEvent: false });
+
+          // Netejar també les llistes de productes i varietats
+          this.products.set([]);
+          this.filteredProducts.set([]);
+          this.varieties.set([]);
+          this.filteredVarieties.set([]);
         }
       });
     });
@@ -209,7 +236,7 @@ export class ArticleFormComponent {
   protected onHide(): void {
     this.visibleChange.emit(false);
     this.form.reset({
-      unitMeasure: UnitMeasure.KG,
+      unitMeasure: this.unitMeasureOptions[1], // kg
       pricePerUnit: 0,
       isSeasonal: false,
     });
@@ -234,7 +261,7 @@ export class ArticleFormComponent {
       product: formValue.product,
       variety: formValue.variety,
       description: formValue.description,
-      unitMeasure: formValue.unitMeasure,
+      unitMeasure: formValue.unitMeasure?.value || formValue.unitMeasure,
       pricePerUnit: Number(formValue.pricePerUnit),
       city: formValue.city,
       producerId: formValue.producer?.id || null,

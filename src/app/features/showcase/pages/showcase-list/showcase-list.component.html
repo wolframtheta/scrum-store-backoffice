@@ -37,7 +37,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-article>
-      <tr>
+      <tr (click)="goToDetail(article)" style="cursor: pointer;">
         <td>{{ article.category || '—' }}</td>
         <td>{{ article.product || '—' }}</td>
         <td>{{ article.variety || '—' }}</td>
@@ -90,7 +90,7 @@
             <span class="text-secondary">—</span>
           }
         </td>
-        <td>
+        <td (click)="$event.stopPropagation()">
           <div class="action-buttons">
             <p-button
               icon="pi pi-times"
