@@ -5,6 +5,7 @@ export enum UnitMeasure {
   CL = 'cl',
   L = 'l',
   UNIT = 'unit',
+  MANAT = 'manat',
 }
 
 export interface Article {

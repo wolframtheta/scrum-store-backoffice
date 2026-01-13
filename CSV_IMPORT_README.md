@@ -35,6 +35,7 @@ El sistema normaliza automáticamente las siguientes unidades:
 - `ml`, `millilitre`, `millilitres` → ml
 - `cl`, `centilitre`, `centilitres` → cl
 - `unit`, `unitat`, `unidad`, `u` → unit
+- `manat`, `manats`, `bunch`, `bunches`, `manojo`, `manojos` → manat
 
 ### 3. Vista Previa e Importación
 - Revisa los artículos que se van a importar

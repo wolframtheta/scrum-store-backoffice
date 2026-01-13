@@ -610,6 +610,12 @@ export class CsvViewerComponent implements OnInit {
       unitat: UnitMeasure.UNIT,
       unidad: UnitMeasure.UNIT,
       u: UnitMeasure.UNIT,
+      manat: UnitMeasure.MANAT,
+      manats: UnitMeasure.MANAT,
+      bunch: UnitMeasure.MANAT,
+      bunches: UnitMeasure.MANAT,
+      manojo: UnitMeasure.MANAT,
+      manojos: UnitMeasure.MANAT,
     };
 
     return mapping[normalized];

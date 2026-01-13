@@ -63,6 +63,7 @@ export class ArticleFormComponent {
     { label: 'cl', value: UnitMeasure.CL },
     { label: 'l', value: UnitMeasure.L },
     { label: 'unitat', value: UnitMeasure.UNIT },
+    { label: 'manat', value: UnitMeasure.MANAT },
   ];
   protected readonly filteredUnitMeasures = signal(this.unitMeasureOptions);
 
