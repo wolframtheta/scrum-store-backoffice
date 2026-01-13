@@ -54,7 +54,7 @@ export class SuppliersListComponent implements OnInit {
     return suppliers.filter(supplier => {
       const matchesSearch = !search || 
         supplier.name.toLowerCase().includes(search) ||
-        supplier.taxId?.toLowerCase().includes(search) ||
+        supplier.cif?.toLowerCase().includes(search) ||
         supplier.email?.toLowerCase().includes(search) ||
         supplier.city?.toLowerCase().includes(search);
       

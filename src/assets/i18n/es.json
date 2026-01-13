@@ -538,7 +538,7 @@
     "noContact": "Sin contacto",
     "table": {
       "name": "Nombre",
-      "taxId": "CIF/NIF",
+      "cif": "CIF/NIF",
       "contact": "Contacto",
       "location": "Ubicación",
       "status": "Estado"
@@ -546,7 +546,7 @@
     "form": {
       "name": "Nombre del proveedor",
       "taxId": "CIF / NIF",
-      "taxIdHint": "Identificador fiscal de la empresa",
+      "cifHint": "Identificador fiscal de la empresa",
       "email": "Email",
       "phone": "Teléfono",
       "city": "Ciudad",

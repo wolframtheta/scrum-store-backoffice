@@ -1,7 +1,7 @@
 export interface Supplier {
   id: string;
   name: string;
-  taxId?: string;
+  cif?: string;
   email?: string;
   phone?: string;
   city?: string;

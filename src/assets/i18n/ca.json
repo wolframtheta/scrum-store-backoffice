@@ -569,7 +569,7 @@
     "noContact": "Sense contacte",
     "table": {
       "name": "Nom",
-      "taxId": "CIF/NIF",
+      "cif": "CIF/NIF",
       "contact": "Contacte",
       "location": "Ubicació",
       "status": "Estat"
@@ -577,7 +577,7 @@
     "form": {
       "name": "Nom del proveïdor",
       "taxId": "CIF / NIF",
-      "taxIdHint": "Identificador fiscal de l'empresa",
+      "cifHint": "Identificador fiscal de l'empresa",
       "email": "Email",
       "phone": "Telèfon",
       "city": "Ciutat",

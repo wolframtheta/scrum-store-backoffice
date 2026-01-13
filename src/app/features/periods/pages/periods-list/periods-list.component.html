@@ -72,7 +72,7 @@
         <ng-template pTemplate="header">
           <tr>
             <th>{{ 'suppliers.table.name' | translate }}</th>
-            <th>{{ 'suppliers.table.taxId' | translate }}</th>
+            <th>{{ 'suppliers.table.cif' | translate }}</th>
             <th>{{ 'suppliers.table.contact' | translate }}</th>
             <th>{{ 'suppliers.table.location' | translate }}</th>
             <th class="actions-column">{{ 'common.actions' | translate }}</th>
@@ -85,8 +85,8 @@
               <strong>{{ supplier.name }}</strong>
             </td>
             <td>
-              @if (supplier.taxId) {
-                <span>{{ supplier.taxId }}</span>
+              @if (supplier.cif) {
+                <span>{{ supplier.cif }}</span>
               } @else {
                 <span class="text-muted">-</span>
               }

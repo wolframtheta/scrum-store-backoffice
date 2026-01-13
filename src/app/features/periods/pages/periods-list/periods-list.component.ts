@@ -72,7 +72,7 @@ export class PeriodsListComponent implements OnInit {
     return suppliersList.filter(supplier => {
       const matchesSearch = !search ||
         supplier.name.toLowerCase().includes(search) ||
-        supplier.taxId?.toLowerCase().includes(search) ||
+        supplier.cif?.toLowerCase().includes(search) ||
         supplier.email?.toLowerCase().includes(search);
 
       return matchesSearch && supplier.isActive;

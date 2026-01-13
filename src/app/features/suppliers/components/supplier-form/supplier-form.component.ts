@@ -61,7 +61,7 @@ export class SupplierFormComponent {
   constructor() {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(255)]],
-      taxId: ['', Validators.maxLength(50)],
+      cif: ['', Validators.maxLength(50)],
       email: ['', [this.emailValidator.bind(this), Validators.maxLength(255)]],
       phone: [''],
       city: ['', Validators.maxLength(255)],
@@ -79,7 +79,7 @@ export class SupplierFormComponent {
         this.isEditMode.set(true);
         this.form.patchValue({
           name: supplier.name,
-          taxId: supplier.taxId || '',
+          cif: supplier.cif || '',
           email: supplier.email || '',
           phone: supplier.phone || '',
           city: supplier.city || '',
