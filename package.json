@@ -1,6 +1,6 @@
 {
   "name": "scrum-store-backoffice",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --watch --configuration development --port 4300",
