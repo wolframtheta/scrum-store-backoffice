@@ -87,18 +87,28 @@ export class SalesDetailComponent implements OnInit {
 
   protected getTotalPaid(): number {
     const sale = this.sale();
-    return sale?.paidAmount || 0;
+    const paidAmount = sale?.paidAmount || 0;
+    return typeof paidAmount === 'string' ? parseFloat(paidAmount) : paidAmount;
   }
 
   protected getTotalRemaining(): number {
-    const sale = this.sale();
-    if (!sale) return 0;
-    return (sale.totalAmount || 0) - (sale.paidAmount || 0);
+    const totalWithTax = this.getTotalWithTax();
+    const paidAmount = this.getTotalPaid();
+    return totalWithTax - paidAmount;
   }
 
-  protected formatPrice(price: number | undefined | null): string {
-    if (price === undefined || price === null) return '0,00';
-    return price.toFixed(2).replace('.', ',');
+  protected formatPrice(price: number | string | undefined | null): string {
+    if (price === undefined || price === null || price === '') return '0,00';
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    if (isNaN(numPrice)) return '0,00';
+    return numPrice.toFixed(2).replace('.', ',');
+  }
+
+  protected formatQuantity(quantity: number | string | undefined | null): string {
+    if (quantity === undefined || quantity === null || quantity === '') return '0,00';
+    const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+    if (isNaN(numQuantity)) return '0,00';
+    return numQuantity.toFixed(2).replace('.', ',');
   }
 
   protected formatDate(date: Date): string {
@@ -119,13 +129,15 @@ export class SalesDetailComponent implements OnInit {
 
   protected getItemSubtotalWithoutTax(item: any): number {
     // pricePerUnit i totalPrice són sense IVA segons l'usuari
-    return item.totalPrice || 0;
+    const totalPrice = item.totalPrice || 0;
+    return typeof totalPrice === 'string' ? parseFloat(totalPrice) : totalPrice;
   }
 
   protected getItemTaxAmount(item: any): number {
     const taxRate = item.article?.taxRate || 0;
+    const numTaxRate = typeof taxRate === 'string' ? parseFloat(taxRate) : taxRate;
     const subtotal = this.getItemSubtotalWithoutTax(item);
-    return subtotal * (taxRate / 100);
+    return subtotal * (numTaxRate / 100);
   }
 
   protected getSubtotalWithoutTax(): number {
@@ -138,6 +150,20 @@ export class SalesDetailComponent implements OnInit {
     const sale = this.sale();
     if (!sale) return 0;
     return sale.items.reduce((sum, item) => sum + this.getItemTaxAmount(item), 0);
+  }
+
+  protected getTotalWithTax(): number {
+    return this.getSubtotalWithoutTax() + this.getTotalTaxAmount();
+  }
+
+  protected getItemTotalWithTax(item: any): number {
+    return this.getItemSubtotalWithoutTax(item) + this.getItemTaxAmount(item);
+  }
+
+  protected getItemRemaining(item: any): number {
+    const totalWithTax = this.getItemTotalWithTax(item);
+    const paidAmount = typeof item.paidAmount === 'string' ? parseFloat(item.paidAmount || '0') : (item.paidAmount || 0);
+    return totalWithTax - paidAmount;
   }
 }
 

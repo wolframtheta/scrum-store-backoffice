@@ -57,7 +57,7 @@
           </div>
           <div class="total-item">
             <label>{{ 'sales.table.total' | translate }}:</label>
-            <span class="amount">{{ formatPrice(sale()!.totalAmount) }} €</span>
+            <span class="amount"><strong>{{ formatPrice(getTotalWithTax()) }} €</strong></span>
           </div>
           <div class="total-item">
             <label>{{ 'sales.table.paid' | translate }}:</label>
@@ -102,7 +102,7 @@
                 <span class="category-badge">{{ item.article?.category || '-' }}</span>
               </td>
               <td class="text-right">
-                {{ item.quantity }} {{ item.article?.unitMeasure || 'ud' }}
+                {{ formatQuantity(item.quantity) }} {{ item.article?.unitMeasure || 'ud' }}
               </td>
               <td class="text-right">{{ formatPrice(item.pricePerUnit) }} €</td>
               <td class="text-right">
@@ -114,10 +114,10 @@
               </td>
               <td class="text-right">{{ formatPrice(getItemSubtotalWithoutTax(item)) }} €</td>
               <td class="text-right">{{ formatPrice(getItemTaxAmount(item)) }} €</td>
-              <td class="text-right"><strong>{{ formatPrice(item.totalPrice) }} €</strong></td>
+              <td class="text-right"><strong>{{ formatPrice(getItemTotalWithTax(item)) }} €</strong></td>
               <td class="text-right paid">{{ formatPrice(item.paidAmount || 0) }} €</td>
               <td class="text-right remaining">
-                {{ formatPrice((item.totalPrice || 0) - (item.paidAmount || 0)) }} €
+                {{ formatPrice(getItemRemaining(item)) }} €
               </td>
             </tr>
           </ng-template>
