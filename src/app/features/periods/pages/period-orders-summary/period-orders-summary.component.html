@@ -82,6 +82,15 @@
         <span class="summary-label">{{ 'periods.ordersSummary.totalArticles' | translate }}</span>
         <span class="summary-value">{{ articlesSummary().length }}</span>
       </div>
+      <div class="summary-actions">
+        <p-button
+          icon="pi pi-download"
+          label="Exportar i enviar per correu"
+          severity="primary"
+          (onClick)="exportToVcfAndEmail()"
+          [disabled]="articlesSummary().length === 0"
+        />
+      </div>
     </div>
   </div>
 

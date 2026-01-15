@@ -244,4 +244,42 @@ export class PeriodOrdersSummaryComponent implements OnInit {
       });
     }
   }
+
+  protected exportToVcfAndEmail(): void {
+    const period = this.period();
+    if (!period) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No hi ha dades del període'
+      });
+      return;
+    }
+
+    // Generar contenido con solo los artículos
+    const content = this.generateArticlesContent();
+
+    // Crear y descargar archivo
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'comandes.vcf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  private generateArticlesContent(): string {
+    const lines: string[] = [];
+    
+    // Solo los artículos, uno por línea
+    this.articlesSummaryList().forEach(article => {
+      const unit = article.unitMeasure ? ` ${article.unitMeasure}` : '';
+      lines.push(`${article.articleName}: ${article.totalQuantity}${unit}`);
+    });
+    
+    return lines.join('\n');
+  }
 }
