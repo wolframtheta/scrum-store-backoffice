@@ -52,6 +52,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/sales/pages/sales-list/sales-list.component').then(m => m.SalesListComponent)
       },
       {
+        path: 'sales/:id',
+        canActivate: [preparerGuard],
+        loadComponent: () => import('./features/sales/pages/sales-detail/sales-detail.component').then(m => m.SalesDetailComponent)
+      },
+      {
         path: 'basket-preparation',
         canActivate: [preparerGuard],
         loadComponent: () => import('./features/sales/pages/basket-preparation/basket-preparation.component').then(m => m.BasketPreparationComponent)
