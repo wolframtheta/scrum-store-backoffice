@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subject, takeUntil } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -36,7 +37,6 @@ import { PaymentModalComponent } from '../../components/payment-modal/payment-mo
     TooltipModule,
     CheckboxModule,
     ConfirmDialogModule,
-    AutoCompleteModule,
     DatePickerModule,
     SelectModule,
     InputTextModule,
@@ -48,13 +48,16 @@ import { PaymentModalComponent } from '../../components/payment-modal/payment-mo
   templateUrl: './sales-list.component.html',
   styleUrl: './sales-list.component.scss',
 })
-export class SalesListComponent implements OnInit {
+export class SalesListComponent implements OnInit, OnDestroy {
   protected readonly salesService = inject(SalesService);
   protected readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
+  
+  private readonly destroy$ = new Subject<void>();
+  private readonly userSearchSubject = new Subject<string>();
 
   protected readonly selectedSale = signal<Sale | null>(null);
   protected readonly showPaymentModal = signal<boolean>(false);
@@ -62,11 +65,12 @@ export class SalesListComponent implements OnInit {
 
   // Filtres
   protected readonly filterUserId = signal<string | null>(null);
+  protected readonly filterUserText = signal<string>('');
   protected readonly filterDateFrom = signal<Date | null>(null);
   protected readonly filterDateTo = signal<Date | null>(null);
   protected readonly filterDelivered = signal<'all' | 'delivered' | 'undelivered'>('all');
 
-  // Llista d'usuaris únics per al filtre
+  // Llista d'usuaris únics de les comandes carregades
   protected readonly uniqueUsers = computed(() => {
     const sales = this.salesService.sales();
     const userMap = new Map<string, { userId: string; userName: string }>();
@@ -96,10 +100,19 @@ export class SalesListComponent implements OnInit {
     
     // Filtrar per usuari
     const userIdFilter = this.filterUserId();
+    const userTextFilter = this.filterUserText().trim().toLowerCase();
+    
     if (userIdFilter) {
       sales = sales.filter(sale => 
         (sale.userId || sale.userEmail) === userIdFilter
       );
+    } else if (userTextFilter) {
+      // Filtrar per text del nom d'usuari o email
+      sales = sales.filter(sale => {
+        const userName = (sale.userName || sale.userEmail || '').toLowerCase();
+        const userEmail = (sale.userEmail || '').toLowerCase();
+        return userName.includes(userTextFilter) || userEmail.includes(userTextFilter);
+      });
     }
     
     // Filtrar per data
@@ -129,9 +142,6 @@ export class SalesListComponent implements OnInit {
     return sales;
   });
 
-  protected selectedUser: { userId: string; userName: string } | null = null;
-  protected userSuggestions: { userId: string; userName: string }[] = [];
-
   protected readonly deliveredOptions = computed(() => [
     { label: this.translate.instant('sales.filters.options.all'), value: 'all' },
     { label: this.translate.instant('sales.filters.options.delivered'), value: 'delivered' },
@@ -160,35 +170,55 @@ export class SalesListComponent implements OnInit {
     this.filterDelivered.set(value);
   }
 
-  protected onUserSearch(event: any): void {
-    const query = event.query.toLowerCase();
-    this.userSuggestions = this.uniqueUsers().filter(user =>
-      user.userName.toLowerCase().includes(query)
-    );
+  get filterUserTextValue(): string {
+    return this.filterUserText();
+  }
+  set filterUserTextValue(value: string) {
+    this.filterUserText.set(value);
   }
 
-  protected onUserSelect(event: any): void {
-    const user = event.value || event;
-    if (user && user.userId) {
-      this.filterUserId.set(user.userId);
+  protected onUserSearch(): void {
+    const searchText = this.filterUserText().trim();
+    
+    if (!searchText) {
+      this.filterUserId.set(null);
+      return;
+    }
+    
+    // Buscar l'usuari que coincideixi amb el text
+    const matchingUser = this.uniqueUsers().find(user =>
+      user.userName.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.userId.toLowerCase().includes(searchText.toLowerCase())
+    );
+    
+    if (matchingUser) {
+      this.filterUserId.set(matchingUser.userId);
+    } else {
+      // Si no hi ha coincidència exacta, només filtrar per text
+      this.filterUserId.set(null);
     }
   }
 
   protected onUserClear(): void {
-    this.selectedUser = null;
+    this.filterUserText.set('');
     this.filterUserId.set(null);
   }
 
   protected clearFilters(): void {
     this.filterUserId.set(null);
+    this.filterUserText.set('');
     this.filterDateFrom.set(null);
     this.filterDateTo.set(null);
     this.filterDelivered.set('all');
-    this.selectedUser = null;
   }
 
   async ngOnInit() {
     await this.loadSales();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private async loadSales() {
@@ -276,21 +306,28 @@ export class SalesListComponent implements OnInit {
   }
 
   protected getRemainingAmount(sale: Sale): number {
-    return (sale.totalAmount || 0) - (sale.paidAmount || 0);
+    const totalWithTax = this.getTotalWithTax(sale);
+    const paid = typeof sale.paidAmount === 'string' ? parseFloat(sale.paidAmount) : (sale.paidAmount || 0);
+    return totalWithTax - paid;
   }
 
   protected getSubtotalWithoutTax(sale: Sale): number {
     // totalAmount és sense IVA segons l'usuari
-    return sale.totalAmount || 0;
+    const total = sale.totalAmount || 0;
+    return typeof total === 'string' ? parseFloat(total) : total;
   }
 
   protected getTaxAmount(sale: Sale): number {
     if (!sale.items || sale.items.length === 0) return 0;
     return sale.items.reduce((sum, item) => {
-      const taxRate = item.article?.taxRate || 0;
-      const subtotal = item.totalPrice || 0;
+      const taxRate = typeof item.article?.taxRate === 'string' ? parseFloat(item.article.taxRate) : (item.article?.taxRate || 0);
+      const subtotal = typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : (item.totalPrice || 0);
       return sum + (subtotal * (taxRate / 100));
     }, 0);
+  }
+
+  protected getTotalWithTax(sale: Sale): number {
+    return this.getSubtotalWithoutTax(sale) + this.getTaxAmount(sale);
   }
 
   protected deleteOrder(sale: Sale): void {

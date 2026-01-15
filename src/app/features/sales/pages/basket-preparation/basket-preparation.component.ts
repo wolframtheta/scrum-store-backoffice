@@ -53,7 +53,6 @@ interface PeriodBasket {
     TagModule,
     ToastModule,
     ButtonModule,
-    AutoCompleteModule,
     DatePickerModule,
     SelectModule,
     InputTextModule,
@@ -79,6 +78,8 @@ export class BasketPreparationComponent implements OnInit {
 
   // Filtres
   protected readonly filterUserId = signal<string | null>(null);
+  protected readonly filterUserText = signal<string>('');
+  protected readonly filterArticleText = signal<string>('');
   protected readonly filterDateFrom = signal<Date | null>(null);
   protected readonly filterDateTo = signal<Date | null>(null);
   protected readonly filterDelivered = signal<'all' | 'delivered' | 'undelivered'>('undelivered');
@@ -99,8 +100,6 @@ export class BasketPreparationComponent implements OnInit {
     return Array.from(userMap.values()).sort((a, b) => a.userName.localeCompare(b.userName));
   });
 
-  protected selectedUser: { userId: string; userName: string } | null = null;
-  protected userSuggestions: { userId: string; userName: string }[] = [];
 
   protected readonly deliveredOptions = computed(() => [
     { label: this.translate.instant('sales.filters.options.all'), value: 'all' },
@@ -130,31 +129,54 @@ export class BasketPreparationComponent implements OnInit {
     this.filterDelivered.set(value);
   }
 
-  protected onUserSearch(event: any): void {
-    const query = event.query.toLowerCase();
-    this.userSuggestions = this.uniqueUsers().filter(user =>
-      user.userName.toLowerCase().includes(query)
-    );
+  get filterUserTextValue(): string {
+    return this.filterUserText();
+  }
+  set filterUserTextValue(value: string) {
+    this.filterUserText.set(value);
   }
 
-  protected onUserSelect(event: any): void {
-    const user = event.value || event;
-    if (user && user.userId) {
-      this.filterUserId.set(user.userId);
+  get filterArticleTextValue(): string {
+    return this.filterArticleText();
+  }
+  set filterArticleTextValue(value: string) {
+    this.filterArticleText.set(value);
+  }
+
+  protected onUserSearch(): void {
+    const searchText = this.filterUserText().trim();
+    
+    if (!searchText) {
+      this.filterUserId.set(null);
+      return;
+    }
+    
+    // Buscar l'usuari que coincideixi amb el text
+    const matchingUser = this.uniqueUsers().find(user =>
+      user.userName.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.userId.toLowerCase().includes(searchText.toLowerCase())
+    );
+    
+    if (matchingUser) {
+      this.filterUserId.set(matchingUser.userId);
+    } else {
+      // Si no hi ha coincidència exacta, només filtrar per text
+      this.filterUserId.set(null);
     }
   }
 
   protected onUserClear(): void {
-    this.selectedUser = null;
+    this.filterUserText.set('');
     this.filterUserId.set(null);
   }
 
   protected clearFilters(): void {
     this.filterUserId.set(null);
+    this.filterUserText.set('');
+    this.filterArticleText.set('');
     this.filterDateFrom.set(null);
     this.filterDateTo.set(null);
     this.filterDelivered.set('undelivered');
-    this.selectedUser = null;
   }
 
   protected readonly basketTree = computed<TreeNode[]>(() => {
@@ -176,10 +198,19 @@ export class BasketPreparationComponent implements OnInit {
     
     // Filtrar per usuari
     const userIdFilter = this.filterUserId();
+    const userTextFilter = this.filterUserText().trim().toLowerCase();
+    
     if (userIdFilter) {
       filteredSales = filteredSales.filter(sale => 
         (sale.userId || sale.userEmail) === userIdFilter
       );
+    } else if (userTextFilter) {
+      // Filtrar per text del nom d'usuari o email
+      filteredSales = filteredSales.filter(sale => {
+        const userName = (sale.userName || sale.userEmail || '').toLowerCase();
+        const userEmail = (sale.userEmail || '').toLowerCase();
+        return userName.includes(userTextFilter) || userEmail.includes(userTextFilter);
+      });
     }
     
     // Filtrar per data
@@ -324,7 +355,15 @@ export class BasketPreparationComponent implements OnInit {
 
       const articleNodes: TreeNode[] = [];
 
+      // Filtrar articles per text de cerca
+      const articleTextFilter = this.filterArticleText().trim().toLowerCase();
+      
       periodBasket.articles.forEach((basketItem, articleId) => {
+        // Filtrar per nom d'article si hi ha filtre actiu
+        if (articleTextFilter && !basketItem.articleName.toLowerCase().includes(articleTextFilter)) {
+          return;
+        }
+        
         const userNodes: TreeNode[] = basketItem.users.map(user => {
           const userKey = `${periodId}-${articleId}-${user.userId}`;
           return {

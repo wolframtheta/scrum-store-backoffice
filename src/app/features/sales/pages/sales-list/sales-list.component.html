@@ -14,21 +14,17 @@
     <div class="filters-row">
       <div class="filter-item">
         <label for="filter-user">{{ 'sales.filters.user' | translate }}</label>
-        <p-inputGroup>
+        <p-inputGroup class="search-input">
           <p-inputGroupAddon>
             <i class="pi pi-search"></i>
           </p-inputGroupAddon>
-          <p-autoComplete
+          <input
+            type="text"
             id="filter-user"
-            [suggestions]="userSuggestions"
-            [(ngModel)]="selectedUser"
-            (completeMethod)="onUserSearch($event)"
-            (onSelect)="onUserSelect($event)"
-            (onClear)="onUserClear()"
-            [optionLabel]="'userName'"
+            pInputText
+            [(ngModel)]="filterUserTextValue"
             [placeholder]="'sales.filters.userPlaceholder' | translate"
-            [showClear]="true"
-            [style]="{ width: '100%', border: 'none' }"
+            (keyup.enter)="onUserSearch()"
           />
         </p-inputGroup>
       </div>
@@ -157,13 +153,13 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-sale>
-      <tr>
+      <tr class="clickable-row" (click)="viewDetail(sale)">
         <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ sale.userName || sale.userEmail }}</td>
         <td class="text-right">{{ sale.items.length }}</td>
         <td class="text-right">{{ getSubtotalWithoutTax(sale) | number: '1.2-2' }} €</td>
         <td class="text-right">{{ getTaxAmount(sale) | number: '1.2-2' }} €</td>
-        <td class="text-right">{{ sale.totalAmount | number: '1.2-2' }} €</td>
+        <td class="text-right"><strong>{{ getTotalWithTax(sale) | number: '1.2-2' }} €</strong></td>
         <td class="text-right">{{ sale.paidAmount | number: '1.2-2' }} €</td>
         <td class="text-right">{{ getRemainingAmount(sale) | number: '1.2-2' }} €</td>
         <td>
@@ -172,14 +168,14 @@
             [severity]="getStatusSeverity(sale.paymentStatus)"
           />
         </td>
-        <td class="text-center">
+        <td class="text-center" (click)="$event.stopPropagation()">
           <p-checkbox
             [(ngModel)]="sale.isDelivered"
             [binary]="true"
             (onChange)="toggleDelivered(sale)"
           />
         </td>
-        <td class="text-center">
+        <td class="text-center" (click)="$event.stopPropagation()">
           <div class="action-buttons">
             <p-button
               icon="pi pi-eye"

@@ -13,21 +13,33 @@
     <div class="filters-row">
       <div class="filter-item">
         <label for="filter-user">{{ 'sales.filters.user' | translate }}</label>
-        <p-inputGroup>
+        <p-inputGroup class="search-input">
           <p-inputGroupAddon>
             <i class="pi pi-search"></i>
           </p-inputGroupAddon>
-          <p-autoComplete
+          <input
+            type="text"
             id="filter-user"
-            [suggestions]="userSuggestions"
-            [(ngModel)]="selectedUser"
-            (completeMethod)="onUserSearch($event)"
-            (onSelect)="onUserSelect($event)"
-            (onClear)="onUserClear()"
-            [optionLabel]="'userName'"
+            pInputText
+            [(ngModel)]="filterUserTextValue"
             [placeholder]="'sales.filters.userPlaceholder' | translate"
-            [showClear]="true"
-            [style]="{ width: '100%', border: 'none' }"
+            (keyup.enter)="onUserSearch()"
+          />
+        </p-inputGroup>
+      </div>
+
+      <div class="filter-item">
+        <label for="filter-article">{{ 'sales.filters.article' | translate }}</label>
+        <p-inputGroup class="search-input">
+          <p-inputGroupAddon>
+            <i class="pi pi-box"></i>
+          </p-inputGroupAddon>
+          <input
+            type="text"
+            id="filter-article"
+            pInputText
+            [(ngModel)]="filterArticleTextValue"
+            [placeholder]="'sales.filters.articlePlaceholder' | translate"
           />
         </p-inputGroup>
       </div>

@@ -86,6 +86,15 @@
       .p-datatable-tbody > tr > td {
         padding: 1rem;
       }
+
+      .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: var(--surface-hover) !important;
+        }
+      }
     }
   }
 }
