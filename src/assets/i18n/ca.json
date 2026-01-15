@@ -259,6 +259,8 @@
     "filters": {
       "user": "Usuari",
       "userPlaceholder": "Cercar usuari...",
+      "article": "Article",
+      "articlePlaceholder": "Cercar per nom de producte...",
       "dateFrom": "Data des de",
       "dateFromPlaceholder": "Seleccionar data",
       "dateTo": "Data fins a",
@@ -335,11 +337,18 @@
     },
     "filters": {
       "searchPlaceholder": "Cercar per nom, descripció o productor...",
+      "productSearchPlaceholder": "Cercar per nom de producte...",
       "showcase": "Aparador",
       "category": "Categoria",
       "all": "Tots",
       "inShowcase": "A l'aparador",
-      "notInShowcase": "Fora de l'aparador"
+      "notInShowcase": "Fora de l'aparador",
+      "eco": "Ecològic",
+      "ecoYes": "Només ecològic",
+      "ecoNo": "Només no ecològic",
+      "seasonal": "De temporada",
+      "seasonalYes": "Només de temporada",
+      "seasonalNo": "Només no de temporada"
     },
     "table": {
       "name": "Nom",

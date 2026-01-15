@@ -44,14 +44,22 @@ export class CatalogService {
 
   // Filters
   private readonly _searchTerm = signal<string>('');
+  private readonly _productSearchTerm = signal<string>('');
   private readonly _showcaseFilter = signal<boolean | null>(null);
+  private readonly _ecoFilter = signal<boolean | null>(null);
+  private readonly _seasonalFilter = signal<boolean | null>(null);
+  private readonly _categoryFilter = signal<string[]>([]);
 
   // Public readonly signals
   public readonly articles = this._articles.asReadonly();
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly error = this._error.asReadonly();
   public readonly searchTerm = this._searchTerm.asReadonly();
+  public readonly productSearchTerm = this._productSearchTerm.asReadonly();
   public readonly showcaseFilter = this._showcaseFilter.asReadonly();
+  public readonly ecoFilter = this._ecoFilter.asReadonly();
+  public readonly seasonalFilter = this._seasonalFilter.asReadonly();
+  public readonly categoryFilter = this._categoryFilter.asReadonly();
 
   /**
    * Carregar tots els articles del grup
@@ -73,8 +81,24 @@ export class CatalogService {
         params.search = this._searchTerm();
       }
 
+      if (this._productSearchTerm()) {
+        params.productSearch = this._productSearchTerm();
+      }
+
       if (this._showcaseFilter() !== null) {
         params.inShowcase = this._showcaseFilter();
+      }
+
+      if (this._ecoFilter() !== null) {
+        params.isEco = this._ecoFilter();
+      }
+
+      if (this._seasonalFilter() !== null) {
+        params.isSeasonal = this._seasonalFilter();
+      }
+
+      if (this._categoryFilter().length > 0) {
+        params.categories = this._categoryFilter().join(',');
       }
 
       const articles = await this.api.get<Article[]>('articles', params);
@@ -242,6 +266,13 @@ export class CatalogService {
   }
 
   /**
+   * Establir filtre de cerca per article
+   */
+  setProductSearchTerm(term: string): void {
+    this._productSearchTerm.set(term);
+  }
+
+  /**
    * Establir filtre d'aparador
    */
   setShowcaseFilter(inShowcase: boolean | null): void {
@@ -249,11 +280,36 @@ export class CatalogService {
   }
 
   /**
+   * Establir filtre ecològic
+   */
+  setEcoFilter(isEco: boolean | null): void {
+    this._ecoFilter.set(isEco);
+  }
+
+  /**
+   * Establir filtre de temporada
+   */
+  setSeasonalFilter(isSeasonal: boolean | null): void {
+    this._seasonalFilter.set(isSeasonal);
+  }
+
+  /**
+   * Establir filtre de categories
+   */
+  setCategoryFilter(categories: string[]): void {
+    this._categoryFilter.set(categories);
+  }
+
+  /**
    * Netejar filtres
    */
   clearFilters(): void {
     this._searchTerm.set('');
+    this._productSearchTerm.set('');
     this._showcaseFilter.set(null);
+    this._ecoFilter.set(null);
+    this._seasonalFilter.set(null);
+    this._categoryFilter.set([]);
   }
 
   /**

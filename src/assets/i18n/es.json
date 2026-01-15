@@ -233,6 +233,8 @@
     "filters": {
       "user": "Usuario",
       "userPlaceholder": "Buscar usuario...",
+      "article": "Artículo",
+      "articlePlaceholder": "Buscar por nombre de producto...",
       "dateFrom": "Fecha desde",
       "dateFromPlaceholder": "Seleccionar fecha",
       "dateTo": "Fecha hasta",
@@ -309,11 +311,18 @@
     },
     "filters": {
       "searchPlaceholder": "Buscar por nombre, descripción o productor...",
+      "productSearchPlaceholder": "Buscar por nombre de producto...",
       "showcase": "Aparador",
       "category": "Categoría",
       "all": "Todos",
       "inShowcase": "En aparador",
-      "notInShowcase": "Fuera del aparador"
+      "notInShowcase": "Fuera del aparador",
+      "eco": "Ecológico",
+      "ecoYes": "Solo ecológico",
+      "ecoNo": "Solo no ecológico",
+      "seasonal": "De temporada",
+      "seasonalYes": "Solo de temporada",
+      "seasonalNo": "Solo no de temporada"
     },
     "table": {
       "name": "Nombre",

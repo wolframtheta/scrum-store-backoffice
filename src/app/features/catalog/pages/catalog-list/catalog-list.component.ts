@@ -60,19 +60,19 @@ export class CatalogListComponent implements OnInit {
   protected readonly filtersForm: FormGroup;
 
   // Local state
-  protected readonly showcaseFilterOptions = [
-    { label: this.translate.instant('catalog.filters.inShowcase'), value: true },
-    { label: this.translate.instant('catalog.filters.notInShowcase'), value: false },
-  ];
   protected readonly categories = signal<string[]>([]);
   protected readonly showFormDialog = signal<boolean>(false);
   protected readonly editingArticle = signal<Article | null>(null);
   protected readonly selectedArticles = signal<Article[]>([]);
 
+  protected readonly showcaseFilterState = signal<'all' | 'in' | 'out'>('all');
+  protected readonly ecoFilterState = signal<'all' | 'yes' | 'no'>('all');
+  protected readonly seasonalFilterState = signal<'all' | 'yes' | 'no'>('all');
+
   constructor() {
     this.filtersForm = this.fb.group({
       search: [''],
-      showcaseFilter: [[]],
+      productSearch: [''],
       categoryFilter: [[]]
     });
   }
@@ -105,29 +105,192 @@ export class CatalogListComponent implements OnInit {
     await this.loadArticles();
   }
 
-  protected async onShowcaseFilterChange() {
-    const selectedFilters = this.filtersForm.get('showcaseFilter')?.value || [];
+  protected async onProductSearch() {
+    const productSearchValue = this.filtersForm.get('productSearch')?.value || '';
+    this.catalogService.setProductSearchTerm(productSearchValue);
+    await this.loadArticles();
+  }
 
-    // Si no hi ha cap filtre seleccionat, mostrem tots
-    if (selectedFilters.length === 0) {
-      this.catalogService.setShowcaseFilter(null);
-    } else if (selectedFilters.length === 2) {
-      // Si estan tots seleccionats, també mostrem tots
-      this.catalogService.setShowcaseFilter(null);
+  protected async toggleShowcaseFilter() {
+    const currentState = this.showcaseFilterState();
+    let nextState: 'all' | 'in' | 'out';
+    let filterValue: boolean | null;
+
+    // Rotar entre els tres estats: all -> in -> out -> all
+    if (currentState === 'all') {
+      nextState = 'in';
+      filterValue = true;
+    } else if (currentState === 'in') {
+      nextState = 'out';
+      filterValue = false;
     } else {
-      // Si només n'hi ha un seleccionat, apliquem aquest filtre
-      this.catalogService.setShowcaseFilter(selectedFilters[0].value);
+      nextState = 'all';
+      filterValue = null;
     }
 
+    this.showcaseFilterState.set(nextState);
+    this.catalogService.setShowcaseFilter(filterValue);
+    await this.loadArticles();
+  }
+
+  protected getShowcaseFilterLabel(): string {
+    const state = this.showcaseFilterState();
+    if (state === 'in') {
+      return this.translate.instant('catalog.filters.inShowcase');
+    } else if (state === 'out') {
+      return this.translate.instant('catalog.filters.notInShowcase');
+    } else {
+      return this.translate.instant('catalog.filters.showcase');
+    }
+  }
+
+  protected getShowcaseFilterIcon(): string {
+    const state = this.showcaseFilterState();
+    if (state === 'in') {
+      return 'pi pi-eye';
+    } else if (state === 'out') {
+      return 'pi pi-eye-slash';
+    } else {
+      return 'pi pi-filter';
+    }
+  }
+
+  protected getShowcaseFilterSeverity(): 'success' | 'warn' | 'secondary' {
+    const state = this.showcaseFilterState();
+    if (state === 'in') {
+      return 'success';
+    } else if (state === 'out') {
+      return 'warn';
+    } else {
+      return 'secondary';
+    }
+  }
+
+  protected async toggleEcoFilter() {
+    const currentState = this.ecoFilterState();
+    let nextState: 'all' | 'yes' | 'no';
+    let filterValue: boolean | null;
+
+    // Rotar entre els tres estats: all -> yes -> no -> all
+    if (currentState === 'all') {
+      nextState = 'yes';
+      filterValue = true;
+    } else if (currentState === 'yes') {
+      nextState = 'no';
+      filterValue = false;
+    } else {
+      nextState = 'all';
+      filterValue = null;
+    }
+
+    this.ecoFilterState.set(nextState);
+    this.catalogService.setEcoFilter(filterValue);
+    await this.loadArticles();
+  }
+
+  protected getEcoFilterLabel(): string {
+    const state = this.ecoFilterState();
+    if (state === 'yes') {
+      return this.translate.instant('catalog.filters.ecoYes');
+    } else if (state === 'no') {
+      return this.translate.instant('catalog.filters.ecoNo');
+    } else {
+      return this.translate.instant('catalog.filters.eco');
+    }
+  }
+
+  protected getEcoFilterIcon(): string {
+    const state = this.ecoFilterState();
+    if (state === 'yes') {
+      return 'pi pi-check-circle';
+    } else if (state === 'no') {
+      return 'pi pi-times-circle';
+    } else {
+      return 'pi pi-filter';
+    }
+  }
+
+  protected getEcoFilterSeverity(): 'success' | 'danger' | 'secondary' {
+    const state = this.ecoFilterState();
+    if (state === 'yes') {
+      return 'success';
+    } else if (state === 'no') {
+      return 'danger';
+    } else {
+      return 'secondary';
+    }
+  }
+
+  protected async toggleSeasonalFilter() {
+    const currentState = this.seasonalFilterState();
+    let nextState: 'all' | 'yes' | 'no';
+    let filterValue: boolean | null;
+
+    // Rotar entre els tres estats: all -> yes -> no -> all
+    if (currentState === 'all') {
+      nextState = 'yes';
+      filterValue = true;
+    } else if (currentState === 'yes') {
+      nextState = 'no';
+      filterValue = false;
+    } else {
+      nextState = 'all';
+      filterValue = null;
+    }
+
+    this.seasonalFilterState.set(nextState);
+    this.catalogService.setSeasonalFilter(filterValue);
+    await this.loadArticles();
+  }
+
+  protected getSeasonalFilterLabel(): string {
+    const state = this.seasonalFilterState();
+    if (state === 'yes') {
+      return this.translate.instant('catalog.filters.seasonalYes');
+    } else if (state === 'no') {
+      return this.translate.instant('catalog.filters.seasonalNo');
+    } else {
+      return this.translate.instant('catalog.filters.seasonal');
+    }
+  }
+
+  protected getSeasonalFilterIcon(): string {
+    const state = this.seasonalFilterState();
+    if (state === 'yes') {
+      return 'pi pi-leaf';
+    } else if (state === 'no') {
+      return 'pi pi-times';
+    } else {
+      return 'pi pi-filter';
+    }
+  }
+
+  protected getSeasonalFilterSeverity(): 'success' | 'danger' | 'secondary' {
+    const state = this.seasonalFilterState();
+    if (state === 'yes') {
+      return 'success';
+    } else if (state === 'no') {
+      return 'danger';
+    } else {
+      return 'secondary';
+    }
+  }
+
+  protected async onCategoryFilterChange() {
+    const selectedCategories = this.filtersForm.get('categoryFilter')?.value || [];
+    this.catalogService.setCategoryFilter(selectedCategories);
     await this.loadArticles();
   }
 
   protected async clearFilters() {
     this.filtersForm.patchValue({
       search: '',
-      showcaseFilter: [],
+      productSearch: '',
       categoryFilter: []
     });
+    this.showcaseFilterState.set('all');
+    this.ecoFilterState.set('all');
+    this.seasonalFilterState.set('all');
     this.catalogService.clearFilters();
     await this.loadArticles();
   }
