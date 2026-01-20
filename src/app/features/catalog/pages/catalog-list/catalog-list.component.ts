@@ -15,12 +15,15 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ImageModule } from 'primeng/image';
 
 import { CatalogService } from '../../services/catalog.service';
 import { Article } from '../../../../core/models/article.model';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ArticleFormComponent } from '../../components/article-form/article-form.component';
 import { CategoriesService } from '../../services/categories.service';
+import { ProducersService } from '../../../producers/services/producers.service';
+import { SuppliersService } from '../../../suppliers/services/suppliers.service';
 
 @Component({
   selector: 'app-catalog-list',
@@ -41,6 +44,7 @@ import { CategoriesService } from '../../services/categories.service';
     TagModule,
     TooltipModule,
     CheckboxModule,
+    ImageModule,
     ArticleFormComponent,
   ],
   providers: [MessageService, ConfirmationService],
@@ -50,6 +54,8 @@ import { CategoriesService } from '../../services/categories.service';
 export class CatalogListComponent implements OnInit {
   protected readonly catalogService = inject(CatalogService);
   protected readonly categoriesService = inject(CategoriesService);
+  protected readonly producersService = inject(ProducersService);
+  protected readonly suppliersService = inject(SuppliersService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly fb = inject(FormBuilder);
@@ -61,6 +67,8 @@ export class CatalogListComponent implements OnInit {
 
   // Local state
   protected readonly categories = signal<string[]>([]);
+  protected readonly producers = signal<{ id: string; name: string }[]>([]);
+  protected readonly suppliers = signal<{ id: string; name: string }[]>([]);
   protected readonly showFormDialog = signal<boolean>(false);
   protected readonly editingArticle = signal<Article | null>(null);
   protected readonly selectedArticles = signal<Article[]>([]);
@@ -73,18 +81,48 @@ export class CatalogListComponent implements OnInit {
     this.filtersForm = this.fb.group({
       search: [''],
       productSearch: [''],
-      categoryFilter: [[]]
+      categoryFilter: [[]],
+      producerFilter: [[]],
+      supplierFilter: [[]]
     });
   }
 
   async ngOnInit() {
     await this.loadArticles();
     await this.loadCategories();
+    await this.loadProducers();
+    await this.loadSuppliers();
   }
 
   private async loadCategories() {
     const categories = await this.categoriesService.getUniqueCategories();
     this.categories.set(categories);
+  }
+
+  private async loadProducers() {
+    try {
+      await this.producersService.loadProducers(true);
+      const producers = this.producersService.producers().map(p => ({
+        id: p.id,
+        name: p.name
+      }));
+      this.producers.set(producers);
+    } catch (error) {
+      console.error('Error loading producers:', error);
+    }
+  }
+
+  private async loadSuppliers() {
+    try {
+      await this.suppliersService.loadSuppliers(true);
+      const suppliers = this.suppliersService.suppliers().map(s => ({
+        id: s.id,
+        name: s.name
+      }));
+      this.suppliers.set(suppliers);
+    } catch (error) {
+      console.error('Error loading suppliers:', error);
+    }
   }
 
   protected async loadArticles() {
@@ -282,11 +320,25 @@ export class CatalogListComponent implements OnInit {
     await this.loadArticles();
   }
 
+  protected async onProducerFilterChange() {
+    const selectedProducers = this.filtersForm.get('producerFilter')?.value || [];
+    this.catalogService.setProducerFilter(selectedProducers);
+    await this.loadArticles();
+  }
+
+  protected async onSupplierFilterChange() {
+    const selectedSuppliers = this.filtersForm.get('supplierFilter')?.value || [];
+    this.catalogService.setSupplierFilter(selectedSuppliers);
+    await this.loadArticles();
+  }
+
   protected async clearFilters() {
     this.filtersForm.patchValue({
       search: '',
       productSearch: '',
-      categoryFilter: []
+      categoryFilter: [],
+      producerFilter: [],
+      supplierFilter: []
     });
     this.showcaseFilterState.set('all');
     this.ecoFilterState.set('all');
@@ -559,6 +611,51 @@ export class CatalogListComponent implements OnInit {
 
   protected goToDetail(article: Article): void {
     this.router.navigate(['/catalog', article.id]);
+  }
+
+  protected async searchImage(article: Article): Promise<void> {
+    try {
+      await this.catalogService.searchImage(article.id);
+      await this.loadArticles(); // Recarregar articles per actualitzar la imatge
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Imatge buscada i actualitzada correctament',
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.error?.message || 'Error cercant imatge',
+      });
+    }
+  }
+
+  protected async batchSearchImages(): Promise<void> {
+    const selected = this.selectedArticles();
+    if (selected.length === 0) return;
+
+    try {
+      const result = await this.catalogService.batchSearchImages(selected.map(a => a.id));
+      this.selectedArticles.set([]);
+      
+      let message = `${result.updated} imatge${result.updated !== 1 ? 's' : ''} buscada${result.updated !== 1 ? 's' : ''} i actualitzada${result.updated !== 1 ? 's' : ''} correctament`;
+      if (result.failed > 0) {
+        message += `. ${result.failed} article${result.failed !== 1 ? 's' : ''} no s'ha${result.failed !== 1 ? 'n' : ''} pogut actualitzar`;
+      }
+      
+      this.messageService.add({
+        severity: result.failed > 0 ? 'warn' : 'success',
+        summary: 'Búsqueda d\'imatges',
+        detail: message,
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.error?.message || 'Error cercant imatges',
+      });
+    }
   }
 }
 

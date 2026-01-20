@@ -49,6 +49,8 @@ export class CatalogService {
   private readonly _ecoFilter = signal<boolean | null>(null);
   private readonly _seasonalFilter = signal<boolean | null>(null);
   private readonly _categoryFilter = signal<string[]>([]);
+  private readonly _producerFilter = signal<string[]>([]);
+  private readonly _supplierFilter = signal<string[]>([]);
 
   // Public readonly signals
   public readonly articles = this._articles.asReadonly();
@@ -60,6 +62,8 @@ export class CatalogService {
   public readonly ecoFilter = this._ecoFilter.asReadonly();
   public readonly seasonalFilter = this._seasonalFilter.asReadonly();
   public readonly categoryFilter = this._categoryFilter.asReadonly();
+  public readonly producerFilter = this._producerFilter.asReadonly();
+  public readonly supplierFilter = this._supplierFilter.asReadonly();
 
   /**
    * Carregar tots els articles del grup
@@ -99,6 +103,14 @@ export class CatalogService {
 
       if (this._categoryFilter().length > 0) {
         params.categories = this._categoryFilter().join(',');
+      }
+
+      if (this._producerFilter().length > 0) {
+        params.producerIds = this._producerFilter().join(',');
+      }
+
+      if (this._supplierFilter().length > 0) {
+        params.supplierIds = this._supplierFilter().join(',');
       }
 
       const articles = await this.api.get<Article[]>('articles', params);
@@ -301,6 +313,20 @@ export class CatalogService {
   }
 
   /**
+   * Establir filtre de productors
+   */
+  setProducerFilter(producerIds: string[]): void {
+    this._producerFilter.set(producerIds);
+  }
+
+  /**
+   * Establir filtre de proveïdors
+   */
+  setSupplierFilter(supplierIds: string[]): void {
+    this._supplierFilter.set(supplierIds);
+  }
+
+  /**
    * Netejar filtres
    */
   clearFilters(): void {
@@ -310,6 +336,8 @@ export class CatalogService {
     this._ecoFilter.set(null);
     this._seasonalFilter.set(null);
     this._categoryFilter.set([]);
+    this._producerFilter.set([]);
+    this._supplierFilter.set([]);
   }
 
   /**
@@ -458,6 +486,54 @@ export class CatalogService {
       return history;
     } catch (error: any) {
       this._error.set(error?.error?.message || 'Error carregant històric de preus');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Buscar i actualitzar imatge d'un article automàticament
+   */
+  async searchImage(articleId: string): Promise<Article> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const updatedArticle = await this.api.post<Article>(`articles/${articleId}/search-image`, {});
+
+      // Actualitzar a la llista local
+      this._articles.update(articles =>
+        articles.map(a => a.id === articleId ? updatedArticle : a)
+      );
+
+      return updatedArticle;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error cercant imatge');
+      throw error;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Buscar imatges de múltiples articles en batch
+   */
+  async batchSearchImages(articleIds: string[]): Promise<{ updated: number; failed: number }> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.api.post<{ updated: number; failed: number }>('articles/batch/search-images', {
+        articleIds,
+      });
+
+      // Recarregar articles per actualitzar les imatges
+      await this.loadArticles();
+
+      return result;
+    } catch (error: any) {
+      this._error.set(error?.error?.message || 'Error cercant imatges');
       throw error;
     } finally {
       this._isLoading.set(false);

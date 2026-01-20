@@ -340,6 +340,8 @@
       "productSearchPlaceholder": "Cercar per nom de producte...",
       "showcase": "Aparador",
       "category": "Categoria",
+      "producer": "Productor",
+      "supplier": "Proveïdor",
       "all": "Tots",
       "inShowcase": "A l'aparador",
       "notInShowcase": "Fora de l'aparador",
@@ -351,6 +353,7 @@
       "seasonalNo": "Només no de temporada"
     },
     "table": {
+      "image": "Imatge",
       "name": "Nom",
       "description": "Descripció",
       "category": "Categoria",
@@ -377,7 +380,8 @@
     "actions": {
       "create": "Nou Article",
       "addToShowcase": "Afegir a l'aparador",
-      "removeFromShowcase": "Treure de l'aparador"
+      "removeFromShowcase": "Treure de l'aparador",
+      "searchImage": "Cercar imatge"
     },
     "batch": {
       "selected": "seleccionats",
@@ -387,6 +391,7 @@
       "unmarkSeasonal": "Desmarcar temporada",
       "markEco": "Marcar ecològic",
       "unmarkEco": "Desmarcar ecològic",
+      "searchImages": "Cercar imatges",
       "delete": "Eliminar"
     },
     "form": {

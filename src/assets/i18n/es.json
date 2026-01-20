@@ -314,6 +314,8 @@
       "productSearchPlaceholder": "Buscar por nombre de producto...",
       "showcase": "Aparador",
       "category": "Categoría",
+      "producer": "Productor",
+      "supplier": "Proveedor",
       "all": "Todos",
       "inShowcase": "En aparador",
       "notInShowcase": "Fuera del aparador",
@@ -325,6 +327,7 @@
       "seasonalNo": "Solo no de temporada"
     },
     "table": {
+      "image": "Imagen",
       "name": "Nombre",
       "description": "Descripción",
       "category": "Categoría",
@@ -351,7 +354,8 @@
     "actions": {
       "create": "Nuevo Artículo",
       "addToShowcase": "Añadir al aparador",
-      "removeFromShowcase": "Quitar del aparador"
+      "removeFromShowcase": "Quitar del aparador",
+      "searchImage": "Buscar imagen"
     },
     "batch": {
       "selected": "seleccionados",
@@ -361,6 +365,7 @@
       "unmarkSeasonal": "Desmarcar temporada",
       "markEco": "Marcar ecológico",
       "unmarkEco": "Desmarcar ecológico",
+      "searchImages": "Buscar imágenes",
       "delete": "Eliminar"
     },
     "form": {
