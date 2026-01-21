@@ -1,5 +1,6 @@
 <div class="sales-detail-container">
   <p-toast />
+  <p-confirmDialog />
 
   <div class="header">
     <p-button
@@ -51,7 +52,7 @@
             <label>{{ 'sales.table.subtotalWithoutTax' | translate }}:</label>
             <span class="amount">{{ formatPrice(getSubtotalWithoutTax()) }} €</span>
           </div>
-          <div class="total-item">
+          <div class="total-item" *ngIf="getTotalTaxAmount() > 0">
             <label>{{ 'sales.table.taxAmount' | translate }}:</label>
             <span class="amount">{{ formatPrice(getTotalTaxAmount()) }} €</span>
           </div>
@@ -85,6 +86,9 @@
               <th class="text-right">{{ 'sales.detail.itemTotal' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemPaid' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemRemaining' | translate }}</th>
+              @if (canDeleteItem(sale())) {
+                <th class="text-center">{{ 'common.actions' | translate }}</th>
+              }
             </tr>
           </ng-template>
 
@@ -106,25 +110,44 @@
               </td>
               <td class="text-right">{{ formatPrice(item.pricePerUnit) }} €</td>
               <td class="text-right">
-                @if (item.article?.taxRate) {
+                @if (item.article?.taxRate && item.article.taxRate > 0) {
                   <span>{{ item.article.taxRate }}%</span>
                 } @else {
                   <span class="text-secondary">—</span>
                 }
               </td>
               <td class="text-right">{{ formatPrice(getItemSubtotalWithoutTax(item)) }} €</td>
-              <td class="text-right">{{ formatPrice(getItemTaxAmount(item)) }} €</td>
+              <td class="text-right">
+                @if (getItemTaxAmount(item) > 0) {
+                  {{ formatPrice(getItemTaxAmount(item)) }} €
+                } @else {
+                  <span class="text-secondary">—</span>
+                }
+              </td>
               <td class="text-right"><strong>{{ formatPrice(getItemTotalWithTax(item)) }} €</strong></td>
               <td class="text-right paid">{{ formatPrice(item.paidAmount || 0) }} €</td>
               <td class="text-right remaining">
                 {{ formatPrice(getItemRemaining(item)) }} €
               </td>
+              @if (canDeleteItem(sale())) {
+                <td class="text-center">
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    severity="danger"
+                    size="small"
+                    [rounded]="true"
+                    (onClick)="deleteOrderItem(item)"
+                    pTooltip="Eliminar article (no ha arribat)"
+                  />
+                </td>
+              }
             </tr>
           </ng-template>
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="10" class="text-center">
+              <td [attr.colspan]="canDeleteItem(sale()) ? 11 : 10" class="text-center">
                 {{ 'sales.detail.noItems' | translate }}
               </td>
             </tr>

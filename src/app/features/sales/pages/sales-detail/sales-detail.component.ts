@@ -7,8 +7,10 @@ import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { SalesService } from '../../services/sales.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
 
@@ -23,9 +25,11 @@ import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
     TableModule,
     TagModule,
     DividerModule,
-    ToastModule
+    ToastModule,
+    ConfirmDialogModule,
+    TooltipModule
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './sales-detail.component.html',
   styleUrl: './sales-detail.component.scss'
 })
@@ -34,6 +38,7 @@ export class SalesDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly salesService = inject(SalesService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   protected readonly sale = signal<Sale | null>(null);
   protected readonly isLoading = signal<boolean>(true);
@@ -164,6 +169,58 @@ export class SalesDetailComponent implements OnInit {
     const totalWithTax = this.getItemTotalWithTax(item);
     const paidAmount = typeof item.paidAmount === 'string' ? parseFloat(item.paidAmount || '0') : (item.paidAmount || 0);
     return totalWithTax - paidAmount;
+  }
+
+  protected async deleteOrderItem(item: any): Promise<void> {
+    const sale = this.sale();
+    if (!sale || !item.id) {
+      return;
+    }
+
+    const articleName = this.getArticleName(item.article);
+
+    this.confirmationService.confirm({
+      message: `Estàs segur que vols eliminar "${articleName}" d'aquesta comanda? Aquesta acció no es pot desfer.`,
+      header: 'Confirmar eliminació',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancel·lar',
+      accept: async () => {
+        try {
+          const updatedOrder = await this.salesService.deleteOrderItem(sale.id, item.id);
+          
+          // Si la comanda queda buida, tornar a la llista
+          if (updatedOrder.items && updatedOrder.items.length === 0) {
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Informació',
+              detail: 'Comanda eliminada (no quedaven articles)'
+            });
+            this.goBack();
+          } else {
+            // Actualitzar la comanda mostrada
+            this.sale.set(updatedOrder);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Èxit',
+              detail: 'Article eliminat de la comanda correctament'
+            });
+          }
+        } catch (error: any) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.error?.message || 'Error eliminant article de la comanda'
+          });
+        }
+      }
+    });
+  }
+
+  protected canDeleteItem(sale: Sale | null): boolean {
+    // Només permetre eliminar si la comanda no està entregada
+    return sale ? !sale.isDelivered : false;
   }
 }
 

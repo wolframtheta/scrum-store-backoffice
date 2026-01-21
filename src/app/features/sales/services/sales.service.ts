@@ -138,6 +138,36 @@ export class SalesService {
     }
   }
 
+  async deleteOrderItem(orderId: string, itemId: string): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const updatedOrder = await this.api.delete<Sale>(`orders/${orderId}/items/${itemId}`);
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === orderId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        // If order has no items left, remove it from the list
+        if (updatedOrder.items && updatedOrder.items.length === 0) {
+          updatedSales.splice(index, 1);
+        } else {
+          updatedSales[index] = updatedOrder;
+        }
+        this.sales.set(updatedSales);
+      }
+
+      return updatedOrder;
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error eliminant article de la comanda');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   clearError(): void {
     this.error.set(null);
   }
