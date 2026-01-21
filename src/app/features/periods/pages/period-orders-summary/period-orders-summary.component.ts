@@ -259,12 +259,13 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     // Generar contenido con solo los artículos
     const content = this.generateArticlesContent();
 
-    // Crear y descargar archivo
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    // Crear y descargar archivo con UTF-8 BOM para preservar acentos
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'comandes.vcf';
+    link.download = 'comandes.txt';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
