@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, computed, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -75,6 +75,7 @@ export class BasketPreparationComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translate = inject(TranslateService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Estat dels checkboxes (clau: periodId-articleId o periodId-articleId-userId)
   protected readonly preparedItems = signal<Set<string>>(new Set());
@@ -935,6 +936,8 @@ export class BasketPreparationComponent implements OnInit {
           await this.salesService.deleteOrderItem(userData.orderId, userData.itemId);
           // Recarregar les comandes per actualitzar la vista
           await this.loadSales();
+          // Forçar detecció de canvis amb OnPush
+          this.cdr.markForCheck();
           this.messageService.add({
             severity: 'success',
             summary: 'Èxit',
