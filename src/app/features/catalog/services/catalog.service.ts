@@ -148,12 +148,12 @@ export class CatalogService {
   /**
    * Crear múltiples articles en batch
    */
-  async createArticlesBatch(dtos: CreateArticleDto[]): Promise<{ created: number; failed: number; articles: Article[] }> {
+  async createArticlesBatch(dtos: CreateArticleDto[]): Promise<{ created: number; updated: number; failed: number; articles: Article[] }> {
     this._isLoading.set(true);
     this._error.set(null);
 
     try {
-      const result = await this.api.post<{ created: number; failed: number; articles: Article[] }>('articles/batch', dtos);
+      const result = await this.api.post<{ created: number; updated: number; failed: number; articles: Article[] }>('articles/batch', dtos);
 
       // Afegir els articles nous a la llista local
       if (result.articles.length > 0) {

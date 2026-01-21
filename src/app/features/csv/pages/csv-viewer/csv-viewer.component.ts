@@ -60,6 +60,7 @@ interface ParsedArticle {
   isValid: boolean;
   errors: string[];
   selected: boolean;
+  articleStatus?: 'new' | 'updated' | 'unknown'; // Estado del artículo: nuevo, actualizado, o desconocido
 }
 
 interface OrderPeriod {
@@ -129,8 +130,21 @@ export class CsvViewerComponent implements OnInit {
   selectedPeriodId: string | null = null;
   readonly availablePeriods = signal<OrderPeriod[]>([]);
   
-  // Watch for supplier changes to reload periods
+  // Watch for supplier changes to reload periods and check articles
   private readonly supplierWatcher = computed(() => this.selectedSupplierId);
+  
+  constructor() {
+    // Efecto para verificar artículos cuando se selecciona un proveedor
+    effect(() => {
+      const supplierId = this.supplierWatcher();
+      if (supplierId && this.parsedArticles().length > 0) {
+        // Fire and forget - no esperamos el resultado
+        this.checkArticlesStatus().catch(err => {
+          console.error('Error checking articles status:', err);
+        });
+      }
+    });
+  }
 
   // Column mappings
   readonly columnMappings: ColumnMapping[] = [
@@ -150,7 +164,6 @@ export class CsvViewerComponent implements OnInit {
 
   // Parsed articles
   readonly parsedArticles = signal<ParsedArticle[]>([]);
-  readonly selectionState = new Map<number, boolean>();
 
   // Computed values
   readonly selectedArticles = computed(() => {
@@ -319,7 +332,7 @@ export class CsvViewerComponent implements OnInit {
     // Try to auto-map columns if CSV is already loaded
     if (this.csvData()) {
       this.autoMapColumns();
-      this.parseArticles();
+      await this.parseArticles();
     }
   }
 
@@ -424,7 +437,7 @@ export class CsvViewerComponent implements OnInit {
       this.csvData.set(data);
       this.fileName.set(file.name);
       this.autoMapColumns();
-      this.parseArticles();
+      await this.parseArticles();
     } catch (error: any) {
       this.messageService.add({
         severity: 'error',
@@ -441,7 +454,6 @@ export class CsvViewerComponent implements OnInit {
     this.csvData.set(null);
     this.fileName.set('');
     this.parsedArticles.set([]);
-    this.selectionState.clear();
     this.selectedSupplierId = null;
     this.selectedPeriodId = null;
     this.mappingForm.reset();
@@ -498,12 +510,12 @@ export class CsvViewerComponent implements OnInit {
     }));
   }
 
-  refreshPreview(): void {
-    this.parseArticles();
+  async refreshPreview(): Promise<void> {
+    await this.parseArticles();
   }
 
   // Article parsing and validation
-  private parseArticles(): void {
+  private async parseArticles(): Promise<void> {
     if (!this.csvData()) return;
 
     const articles: ParsedArticle[] = [];
@@ -584,6 +596,102 @@ export class CsvViewerComponent implements OnInit {
     });
 
     this.parsedArticles.set(articles);
+    
+    // Verificar artículos existentes si hay proveedor seleccionado
+    if (this.selectedSupplierId) {
+      await this.checkArticlesStatus();
+    }
+  }
+
+  /**
+   * Verifica qué artículos ya existen en la base de datos
+   */
+  private async checkArticlesStatus(): Promise<void> {
+    const groupId = this.groupService.selectedGroupId();
+    if (!groupId || !this.selectedSupplierId) {
+      return;
+    }
+
+    const articles = this.parsedArticles();
+    const validArticles = articles.filter(a => a.isValid);
+    
+    if (validArticles.length === 0) {
+      return;
+    }
+
+    try {
+      // Cargar productores para obtener IDs
+      await this.producersService.loadProducers();
+      const producers = this.producersService.producers();
+
+      // Convertir a DTOs para verificación
+      const dtos: CreateArticleDto[] = [];
+      const articleIndexMap = new Map<number, number>(); // índice en dtos -> índice en parsedArticles
+
+      validArticles.forEach((article, index) => {
+        // Buscar productor por nombre
+        let producerId: string | undefined;
+        if (article.producer) {
+          const existingProducer = producers.find(
+            p => p.name?.toLowerCase() === article.producer?.toLowerCase()
+          );
+          producerId = existingProducer?.id;
+        }
+
+        const dto: CreateArticleDto = {
+          category: article.category || 'Sense categoria',
+          product: article.product!,
+          variety: article.variety,
+          unitMeasure: article.unitMeasure!,
+          pricePerUnit: article.pricePerUnit!,
+          city: article.city,
+          producerId,
+          isEco: article.isEco,
+          taxRate: article.taxRate,
+          consumerGroupId: groupId,
+        };
+
+        const dtoIndex = dtos.length;
+        dtos.push(dto);
+        articleIndexMap.set(dtoIndex, index);
+      });
+
+      if (dtos.length === 0) {
+        return;
+      }
+
+      // Llamar al endpoint de verificación
+      const statusResults = await this.api.post<Array<{ index: number; exists: boolean }>>(
+        'articles/batch/check',
+        dtos
+      );
+
+      // Crear un mapa de índice de artículo válido -> estado
+      const statusByValidIndex = new Map<number, 'new' | 'updated'>();
+      statusResults.forEach(({ index, exists }) => {
+        statusByValidIndex.set(index, exists ? 'updated' : 'new');
+      });
+
+      // Actualizar estado de los artículos
+      const validArticlesList = articles.filter(a => a.isValid);
+      this.parsedArticles.update(allArticles => {
+        let validIndex = 0;
+        return allArticles.map(article => {
+          if (!article.isValid) {
+            return article;
+          }
+          const status = statusByValidIndex.get(validIndex);
+          validIndex++;
+          return {
+            ...article,
+            articleStatus: status || 'unknown',
+          };
+        });
+      });
+    } catch (error) {
+      console.error('Error checking articles status:', error);
+      // No es crítico, continuar sin estado
+    }
   }
 
   private normalizeUnitMeasure(value: string): UnitMeasure | undefined {
@@ -643,6 +751,28 @@ export class CsvViewerComponent implements OnInit {
         selected: article.isValid ? checked : false,
       }))
     );
+  }
+
+  toggleArticleSelection(index: number, checked: boolean): void {
+    this.parsedArticles.update(articles => {
+      const updated = [...articles];
+      if (updated[index] && updated[index].isValid) {
+        updated[index] = {
+          ...updated[index],
+          selected: checked,
+        };
+      }
+      return updated;
+    });
+  }
+
+  // Supplier change handler
+  async onSupplierChange(): Promise<void> {
+    await this.loadPeriods();
+    // Verificar artículos después de seleccionar proveedor
+    if (this.selectedSupplierId && this.parsedArticles().length > 0) {
+      await this.checkArticlesStatus();
+    }
   }
 
   // Period handling
@@ -984,10 +1114,22 @@ export class CsvViewerComponent implements OnInit {
         }
       }
 
+      // Actualizar estado de los artículos importados basándose en el resultado
+      const importedArticleIds = new Set(result.articles.map(a => a.id));
+      const articleHashes = new Map<string, ParsedArticle>();
+      
+      // Crear un mapa temporal para rastrear qué artículos fueron nuevos vs actualizados
+      // Esto es aproximado ya que no tenemos el hash exacto en el frontend
+      // pero podemos usar el resultado de la importación
+      
+      const updatedText = result.updated > 0 ? `, ${result.updated} actualitzats` : '';
+      const createdText = result.created > 0 ? `${result.created} nous` : '';
+      const summaryText = [createdText, updatedText].filter(Boolean).join('');
+      
       this.messageService.add({
         severity: 'success',
         summary: 'Importació completada',
-        detail: `${result.created} articles importats correctament${result.failed > 0 ? `. ${result.failed} han fallat` : ''}${this.selectedPeriodId ? ' i associats al període seleccionat' : ''}`,
+        detail: `${summaryText} articles processats correctament${result.failed > 0 ? `. ${result.failed} han fallat` : ''}${this.selectedPeriodId ? ' i associats al període seleccionat' : ''}`,
       });
 
       // Clear data after successful import
