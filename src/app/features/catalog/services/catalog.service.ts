@@ -492,52 +492,5 @@ export class CatalogService {
     }
   }
 
-  /**
-   * Buscar i actualitzar imatge d'un article automàticament
-   */
-  async searchImage(articleId: string): Promise<Article> {
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    try {
-      const updatedArticle = await this.api.post<Article>(`articles/${articleId}/search-image`, {});
-
-      // Actualitzar a la llista local
-      this._articles.update(articles =>
-        articles.map(a => a.id === articleId ? updatedArticle : a)
-      );
-
-      return updatedArticle;
-    } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error cercant imatge');
-      throw error;
-    } finally {
-      this._isLoading.set(false);
-    }
-  }
-
-  /**
-   * Buscar imatges de múltiples articles en batch
-   */
-  async batchSearchImages(articleIds: string[]): Promise<{ updated: number; failed: number }> {
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    try {
-      const result = await this.api.post<{ updated: number; failed: number }>('articles/batch/search-images', {
-        articleIds,
-      });
-
-      // Recarregar articles per actualitzar les imatges
-      await this.loadArticles();
-
-      return result;
-    } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error cercant imatges');
-      throw error;
-    } finally {
-      this._isLoading.set(false);
-    }
-  }
 }
 

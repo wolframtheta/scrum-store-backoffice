@@ -168,13 +168,6 @@
         (click)="batchToggleEco(false)"
       />
       <p-button
-        icon="pi pi-image"
-        [label]="'catalog.batch.searchImages' | translate"
-        severity="info"
-        size="small"
-        (click)="batchSearchImages()"
-      />
-      <p-button
         icon="pi pi-trash"
         [label]="'catalog.batch.delete' | translate"
         severity="danger"
@@ -203,7 +196,6 @@
         <th style="width: 3rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th style="width: 80px">{{ 'catalog.table.image' | translate }}</th>
         <th>{{ 'catalog.table.category' | translate }}</th>
         <th>{{ 'catalog.table.product' | translate }}</th>
         <th>{{ 'catalog.table.variety' | translate }}</th>
@@ -224,22 +216,6 @@
       <tr (click)="goToDetail(article)" style="cursor: pointer;">
         <td (click)="$event.stopPropagation()">
           <p-tableCheckbox [value]="article"></p-tableCheckbox>
-        </td>
-        <td>
-          @if (article.image) {
-            <p-image
-              [src]="article.image"
-              [alt]="article.product"
-              width="60"
-              height="60"
-              [preview]="true"
-              [style]="{ 'object-fit': 'cover', 'border-radius': '4px' }"
-            />
-          } @else {
-            <div class="image-placeholder">
-              <i class="pi pi-image" style="font-size: 1.5rem; color: var(--text-color-secondary)"></i>
-            </div>
-          }
         </td>
         <td>
           <p-tag [value]="article.category" severity="info" />
@@ -348,15 +324,6 @@
               />
             }
             <p-button
-              icon="pi pi-image"
-              [text]="true"
-              [rounded]="true"
-              severity="info"
-              size="small"
-              (click)="searchImage(article)"
-              pTooltip="{{ 'catalog.actions.searchImage' | translate }}"
-            />
-            <p-button
               icon="pi pi-eye"
               [text]="true"
               [rounded]="true"
@@ -390,7 +357,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="12" class="text-center">
+        <td colspan="11" class="text-center">
           <div class="empty-state">
             <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
             <p>{{ 'catalog.empty' | translate }}</p>

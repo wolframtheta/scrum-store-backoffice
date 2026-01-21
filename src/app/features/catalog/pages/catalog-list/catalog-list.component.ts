@@ -15,7 +15,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ImageModule } from 'primeng/image';
 
 import { CatalogService } from '../../services/catalog.service';
 import { Article } from '../../../../core/models/article.model';
@@ -44,7 +43,6 @@ import { SuppliersService } from '../../../suppliers/services/suppliers.service'
     TagModule,
     TooltipModule,
     CheckboxModule,
-    ImageModule,
     ArticleFormComponent,
   ],
   providers: [MessageService, ConfirmationService],
@@ -611,51 +609,6 @@ export class CatalogListComponent implements OnInit {
 
   protected goToDetail(article: Article): void {
     this.router.navigate(['/catalog', article.id]);
-  }
-
-  protected async searchImage(article: Article): Promise<void> {
-    try {
-      await this.catalogService.searchImage(article.id);
-      await this.loadArticles(); // Recarregar articles per actualitzar la imatge
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Èxit',
-        detail: 'Imatge buscada i actualitzada correctament',
-      });
-    } catch (error: any) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error?.error?.message || 'Error cercant imatge',
-      });
-    }
-  }
-
-  protected async batchSearchImages(): Promise<void> {
-    const selected = this.selectedArticles();
-    if (selected.length === 0) return;
-
-    try {
-      const result = await this.catalogService.batchSearchImages(selected.map(a => a.id));
-      this.selectedArticles.set([]);
-      
-      let message = `${result.updated} imatge${result.updated !== 1 ? 's' : ''} buscada${result.updated !== 1 ? 's' : ''} i actualitzada${result.updated !== 1 ? 's' : ''} correctament`;
-      if (result.failed > 0) {
-        message += `. ${result.failed} article${result.failed !== 1 ? 's' : ''} no s'ha${result.failed !== 1 ? 'n' : ''} pogut actualitzar`;
-      }
-      
-      this.messageService.add({
-        severity: result.failed > 0 ? 'warn' : 'success',
-        summary: 'Búsqueda d\'imatges',
-        detail: message,
-      });
-    } catch (error: any) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error?.error?.message || 'Error cercant imatges',
-      });
-    }
   }
 }
 
