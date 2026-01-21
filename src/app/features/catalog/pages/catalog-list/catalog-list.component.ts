@@ -23,6 +23,8 @@ import { ArticleFormComponent } from '../../components/article-form/article-form
 import { CategoriesService } from '../../services/categories.service';
 import { ProducersService } from '../../../producers/services/producers.service';
 import { SuppliersService } from '../../../suppliers/services/suppliers.service';
+import { PeriodsService } from '../../../periods/services/periods.service';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-catalog-list',
@@ -44,6 +46,7 @@ import { SuppliersService } from '../../../suppliers/services/suppliers.service'
     TooltipModule,
     CheckboxModule,
     ArticleFormComponent,
+    SelectModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './catalog-list.component.html',
@@ -54,6 +57,7 @@ export class CatalogListComponent implements OnInit {
   protected readonly categoriesService = inject(CategoriesService);
   protected readonly producersService = inject(ProducersService);
   protected readonly suppliersService = inject(SuppliersService);
+  protected readonly periodsService = inject(PeriodsService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly fb = inject(FormBuilder);
@@ -81,7 +85,8 @@ export class CatalogListComponent implements OnInit {
       productSearch: [''],
       categoryFilter: [[]],
       producerFilter: [[]],
-      supplierFilter: [[]]
+      supplierFilter: [[]],
+      periodFilter: [null]
     });
   }
 
@@ -90,6 +95,7 @@ export class CatalogListComponent implements OnInit {
     await this.loadCategories();
     await this.loadProducers();
     await this.loadSuppliers();
+    await this.loadPeriods();
   }
 
   private async loadCategories() {
@@ -120,6 +126,14 @@ export class CatalogListComponent implements OnInit {
       this.suppliers.set(suppliers);
     } catch (error) {
       console.error('Error loading suppliers:', error);
+    }
+  }
+
+  private async loadPeriods() {
+    try {
+      await this.periodsService.loadPeriods();
+    } catch (error) {
+      console.error('Error loading periods:', error);
     }
   }
 
@@ -330,13 +344,20 @@ export class CatalogListComponent implements OnInit {
     await this.loadArticles();
   }
 
+  protected async onPeriodFilterChange() {
+    const selectedPeriod = this.filtersForm.get('periodFilter')?.value;
+    this.catalogService.setPeriodFilter(selectedPeriod);
+    await this.loadArticles();
+  }
+
   protected async clearFilters() {
     this.filtersForm.patchValue({
       search: '',
       productSearch: '',
       categoryFilter: [],
       producerFilter: [],
-      supplierFilter: []
+      supplierFilter: [],
+      periodFilter: null
     });
     this.showcaseFilterState.set('all');
     this.ecoFilterState.set('all');

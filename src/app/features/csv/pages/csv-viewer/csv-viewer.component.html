@@ -124,13 +124,19 @@
           [options]="availablePeriods()"
           [(ngModel)]="selectedPeriodId"
           optionValue="id"
-          placeholder="Selecciona un període (opcional)"
+          [placeholder]="selectedSupplierId ? 'Selecciona un període (opcional)' : 'Selecciona primer un proveïdor'"
           [showClear]="true"
+          [disabled]="!selectedSupplierId"
           styleClass="w-full"
         >
           <ng-template #selectedItem let-period>
             <div class="period-item">
-              <strong>{{ getPeriodName(period) }}</strong>
+              <div class="flex align-items-center gap-2">
+                <strong>{{ getPeriodName(period) }}</strong>
+                @if (period?.supplier?.name) {
+                  <span class="text-secondary">- {{ period.supplier.name }}</span>
+                }
+              </div>
               @if (period?.deliveryDate) {
                 <small> - Entrega: {{ formatPeriodDate(period.deliveryDate) }}</small>
               }
@@ -139,10 +145,15 @@
           <ng-template #item let-period>
             <div class="period-item">
               <div>
-                <strong>{{ getPeriodName(period) }}</strong>
-                @if (period.status) {
-                  <p-tag [value]="'periods.status.' + period.status.toLowerCase() | translate" [severity]="getPeriodSeverity(period.status)" class="ml-2"></p-tag>
-                }
+                <div class="flex align-items-center gap-2">
+                  <strong>{{ getPeriodName(period) }}</strong>
+                  @if (period?.supplier?.name) {
+                    <span class="text-secondary">- {{ period.supplier.name }}</span>
+                  }
+                  @if (period.status) {
+                    <p-tag [value]="'periods.status.' + period.status.toLowerCase() | translate" [severity]="getPeriodSeverity(period.status)" class="ml-2"></p-tag>
+                  }
+                </div>
               </div>
               <small>
                 Inici: {{ formatPeriodDate(period.startDate) }} - Fi: {{ formatPeriodDate(period.endDate) }}
@@ -153,10 +164,15 @@
             </div>
           </ng-template>
         </p-select>
-        @if (availablePeriods().length === 0) {
+        @if (!selectedSupplierId) {
           <small class="text-color-secondary mt-2">
             <i class="pi pi-info-circle"></i>
-            No hi ha períodes oberts disponibles. Pots crear-ne un des de la secció "Períodes de Comanda".
+            Selecciona primer un proveïdor per veure els seus períodes disponibles.
+          </small>
+        } @else if (availablePeriods().length === 0) {
+          <small class="text-color-secondary mt-2">
+            <i class="pi pi-info-circle"></i>
+            No hi ha períodes disponibles per aquest proveïdor. Pots crear-ne un des de la secció "Períodes de Comanda".
           </small>
         }
       </div>

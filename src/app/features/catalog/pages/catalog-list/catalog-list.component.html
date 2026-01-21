@@ -113,6 +113,43 @@
       </p-multiSelect>
     </p-inputGroup>
 
+    <p-inputGroup class="filter-group">
+      <p-inputGroupAddon>
+        <i class="pi pi-calendar"></i>
+      </p-inputGroupAddon>
+      <p-select
+        formControlName="periodFilter"
+        [options]="periodsService.periods()"
+        optionLabel="name"
+        optionValue="id"
+        [placeholder]="'catalog.filters.period' | translate"
+        (onChange)="onPeriodFilterChange()"
+        [showClear]="true"
+        [style]="{ width: '100%' }">
+        <ng-template let-period pTemplate="item">
+          <div class="flex flex-column gap-1">
+            <div class="flex align-items-center gap-2">
+              <span>{{ period.name }}</span>
+              @if (period.supplier?.name) {
+                <span class="text-secondary">- {{ period.supplier.name }}</span>
+              }
+            </div>
+            <small class="text-secondary">
+              {{ period.startDate | date:'dd/MM/yyyy' }} - {{ period.endDate | date:'dd/MM/yyyy' }}
+            </small>
+          </div>
+        </ng-template>
+        <ng-template let-period pTemplate="selectedItem">
+          <div class="flex align-items-center gap-2">
+            <span>{{ period.name }}</span>
+            @if (period.supplier?.name) {
+              <span class="text-secondary">- {{ period.supplier.name }}</span>
+            }
+          </div>
+        </ng-template>
+      </p-select>
+    </p-inputGroup>
+
     <p-button
       icon="pi pi-filter-slash"
       [label]="'common.clear' | translate"

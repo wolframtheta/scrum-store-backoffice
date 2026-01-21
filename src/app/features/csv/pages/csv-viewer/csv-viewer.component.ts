@@ -35,6 +35,7 @@ import { ProducersService } from '../../../producers/services/producers.service'
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { ApiService } from '../../../../core/services/api.service';
 import { CategoriesService } from '../../../catalog/services/categories.service';
+import { PeriodsService } from '../../../periods/services/periods.service';
 
 // Models
 import { UnitMeasure } from '../../../../core/models/article.model';
@@ -73,6 +74,10 @@ interface OrderPeriod {
   endDate: Date | string;
   deliveryDate?: Date | string;
   status?: string;
+  supplier?: {
+    id: string;
+    name: string;
+  };
 }
 
 
@@ -110,6 +115,7 @@ export class CsvViewerComponent implements OnInit {
   private readonly groupService = inject(ConsumerGroupService);
   private readonly api = inject(ApiService);
   private readonly categoriesService = inject(CategoriesService);
+  private readonly periodsService = inject(PeriodsService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly fb = inject(FormBuilder);
@@ -323,8 +329,8 @@ export class CsvViewerComponent implements OnInit {
     // Load suppliers
     await this.suppliersService.loadSuppliers();
     
-    // Load periods (all available periods, not just open)
-    await this.loadPeriods();
+    // Don't load periods until a supplier is selected
+    // await this.loadPeriods();
 
     // Load existing categories to filter new ones
     await this.loadExistingCategories();
@@ -456,6 +462,7 @@ export class CsvViewerComponent implements OnInit {
     this.parsedArticles.set([]);
     this.selectedSupplierId = null;
     this.selectedPeriodId = null;
+    this.availablePeriods.set([]);
     this.mappingForm.reset();
   }
 
@@ -768,6 +775,9 @@ export class CsvViewerComponent implements OnInit {
 
   // Supplier change handler
   async onSupplierChange(): Promise<void> {
+    // Reset selected period when supplier changes
+    this.selectedPeriodId = null;
+    // Load periods for the selected supplier
     await this.loadPeriods();
     // Verificar artículos después de seleccionar proveedor
     if (this.selectedSupplierId && this.parsedArticles().length > 0) {
@@ -783,28 +793,31 @@ export class CsvViewerComponent implements OnInit {
       return;
     }
 
+    // If no supplier is selected, don't load periods
+    if (!this.selectedSupplierId) {
+      this.availablePeriods.set([]);
+      return;
+    }
+
     try {
-      // Try to load all periods (open and closed)
-      const periods = await this.api.get<OrderPeriod[]>(
-        `consumer-groups/${groupId}/supply-schedules/periods/all`
-      );
+      // Load periods for the selected supplier using PeriodsService
+      await this.periodsService.loadPeriods(this.selectedSupplierId);
       
-      // Show all periods, but prioritize open ones
-      // You can filter to only open if needed: periods.filter(p => p.status === 'open')
+      // Convert Period[] to OrderPeriod[] format
+      const periods: OrderPeriod[] = this.periodsService.periods().map(period => ({
+        id: period.id,
+        name: period.name,
+        startDate: period.startDate,
+        endDate: period.endDate,
+        deliveryDate: period.deliveryDate,
+        supplier: period.supplier,
+        // Note: OrderPeriod doesn't have status, but we can add it if needed
+      }));
+      
       this.availablePeriods.set(periods);
     } catch (error) {
       console.error('Error loading periods:', error);
-      // If endpoint doesn't exist yet, try alternative endpoint
-      try {
-        // Try alternative endpoint structure
-        const periods = await this.api.get<OrderPeriod[]>(
-          `consumer-groups/${groupId}/supply-schedules/periods`
-        );
-        this.availablePeriods.set(periods);
-      } catch (altError) {
-        console.error('Error loading periods from alternative endpoint:', altError);
-        this.availablePeriods.set([]);
-      }
+      this.availablePeriods.set([]);
     }
   }
 

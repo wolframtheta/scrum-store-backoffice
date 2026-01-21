@@ -51,6 +51,7 @@ export class CatalogService {
   private readonly _categoryFilter = signal<string[]>([]);
   private readonly _producerFilter = signal<string[]>([]);
   private readonly _supplierFilter = signal<string[]>([]);
+  private readonly _periodFilter = signal<string | null>(null);
 
   // Public readonly signals
   public readonly articles = this._articles.asReadonly();
@@ -64,6 +65,7 @@ export class CatalogService {
   public readonly categoryFilter = this._categoryFilter.asReadonly();
   public readonly producerFilter = this._producerFilter.asReadonly();
   public readonly supplierFilter = this._supplierFilter.asReadonly();
+  public readonly periodFilter = this._periodFilter.asReadonly();
 
   /**
    * Carregar tots els articles del grup
@@ -111,6 +113,10 @@ export class CatalogService {
 
       if (this._supplierFilter().length > 0) {
         params.supplierIds = this._supplierFilter().join(',');
+      }
+
+      if (this._periodFilter()) {
+        params.periodId = this._periodFilter();
       }
 
       const articles = await this.api.get<Article[]>('articles', params);
@@ -327,6 +333,13 @@ export class CatalogService {
   }
 
   /**
+   * Establir filtre de període
+   */
+  setPeriodFilter(periodId: string | null): void {
+    this._periodFilter.set(periodId);
+  }
+
+  /**
    * Netejar filtres
    */
   clearFilters(): void {
@@ -338,6 +351,7 @@ export class CatalogService {
     this._categoryFilter.set([]);
     this._producerFilter.set([]);
     this._supplierFilter.set([]);
+    this._periodFilter.set(null);
   }
 
   /**
