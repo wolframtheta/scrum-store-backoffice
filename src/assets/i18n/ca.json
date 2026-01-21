@@ -380,8 +380,7 @@
     "actions": {
       "create": "Nou Article",
       "addToShowcase": "Afegir a l'aparador",
-      "removeFromShowcase": "Treure de l'aparador",
-      "searchImage": "Cercar imatge"
+      "removeFromShowcase": "Treure de l'aparador"
     },
     "batch": {
       "selected": "seleccionats",
@@ -391,7 +390,6 @@
       "unmarkSeasonal": "Desmarcar temporada",
       "markEco": "Marcar ecològic",
       "unmarkEco": "Desmarcar ecològic",
-      "searchImages": "Cercar imatges",
       "delete": "Eliminar"
     },
     "form": {

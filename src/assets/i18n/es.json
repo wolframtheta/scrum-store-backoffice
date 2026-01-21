@@ -354,8 +354,7 @@
     "actions": {
       "create": "Nuevo Artículo",
       "addToShowcase": "Añadir al aparador",
-      "removeFromShowcase": "Quitar del aparador",
-      "searchImage": "Buscar imagen"
+      "removeFromShowcase": "Quitar del aparador"
     },
     "batch": {
       "selected": "seleccionados",
@@ -365,7 +364,6 @@
       "unmarkSeasonal": "Desmarcar temporada",
       "markEco": "Marcar ecológico",
       "unmarkEco": "Desmarcar ecológico",
-      "searchImages": "Buscar imágenes",
       "delete": "Eliminar"
     },
     "form": {
