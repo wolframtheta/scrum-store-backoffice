@@ -12,13 +12,15 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { SalesService } from '../../services/sales.service';
 import { PeriodsService } from '../../../periods/services/periods.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Sale } from '../../../../core/models/sale.model';
 import { Period } from '../../../../core/models/period.model';
 import { TreeNode } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface BasketItem {
   articleId: string;
@@ -31,6 +33,7 @@ interface BasketItem {
     userName: string;
     quantity: number;
     orderId: string;
+    itemId: string;
   }>;
 }
 
@@ -58,8 +61,10 @@ interface PeriodBasket {
     InputTextModule,
     InputGroupModule,
     InputGroupAddonModule,
+    ConfirmDialogModule,
+    TooltipModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './basket-preparation.component.html',
   styleUrl: './basket-preparation.component.scss',
 })
@@ -68,6 +73,7 @@ export class BasketPreparationComponent implements OnInit {
   protected readonly periodsService = inject(PeriodsService);
   protected readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly translate = inject(TranslateService);
 
   // Estat dels checkboxes (clau: periodId-articleId o periodId-articleId-userId)
@@ -334,13 +340,15 @@ export class BasketPreparationComponent implements OnInit {
           existingUser.quantity += quantity;
           // Actualitzar l'orderId a l'última comanda
           existingUser.orderId = sale.id;
+          // Mantenir el primer itemId (no actualitzar-lo)
         } else {
           // Si l'usuari no existeix (nou client), afegir-lo a l'array
           basketItem.users.push({
             userId: userIdentifier,
             userName: sale.userName || userIdentifier,
             quantity: quantity,
-            orderId: sale.id
+            orderId: sale.id,
+            itemId: item.id
           });
         }
       });
@@ -376,6 +384,7 @@ export class BasketPreparationComponent implements OnInit {
               quantity: user.quantity,
               unitMeasure: basketItem.unitMeasure,
               orderId: user.orderId,
+              itemId: user.itemId,
               periodId: periodId,
               articleId: articleId,
               totalUsers: basketItem.users.length
@@ -903,5 +912,58 @@ export class BasketPreparationComponent implements OnInit {
         detail: 'Error al marcar les comandes com a preparades'
       });
     }
+  }
+
+  protected async deleteOrderItem(node: TreeNode): Promise<void> {
+    const userData = node.data;
+    if (!userData?.orderId || !userData?.itemId) {
+      return;
+    }
+
+    const articleName = this.findArticleName(userData.periodId, userData.articleId);
+    const userName = userData.userName || 'usuari';
+
+    this.confirmationService.confirm({
+      message: `Estàs segur que vols eliminar "${articleName}" de la comanda de ${userName}? Aquesta acció no es pot desfer.`,
+      header: 'Confirmar eliminació',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancel·lar',
+      accept: async () => {
+        try {
+          await this.salesService.deleteOrderItem(userData.orderId, userData.itemId);
+          // Recarregar les comandes per actualitzar la vista
+          await this.loadSales();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Èxit',
+            detail: 'Article eliminat de la comanda correctament'
+          });
+        } catch (error: any) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.error?.message || 'Error eliminant article de la comanda'
+          });
+        }
+      }
+    });
+  }
+
+  private findArticleName(periodId: string, articleId: string): string {
+    const basketTree = this.basketTree();
+    
+    for (const periodNode of basketTree) {
+      if (periodNode.data?.periodId === periodId && periodNode.children) {
+        for (const articleNode of periodNode.children) {
+          if (articleNode.data?.articleId === articleId) {
+            return articleNode.data.articleName || `Article ${articleId}`;
+          }
+        }
+      }
+    }
+    
+    return `Article ${articleId}`;
   }
 }

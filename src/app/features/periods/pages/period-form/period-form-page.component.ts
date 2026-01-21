@@ -61,6 +61,7 @@ export class PeriodFormPageComponent implements OnInit {
   protected readonly isEditMode = signal<boolean>(false);
   protected readonly periodId = signal<string | null>(null);
   protected readonly supplierId = signal<string | null>(null);
+  private readonly originalPeriodSupplierId = signal<string | null>(null);
   protected readonly articles = signal<Article[]>([]);
   protected readonly filteredArticles = signal<Article[]>([]);
   protected readonly selectedArticle = signal<Article | null>(null);
@@ -105,6 +106,15 @@ export class PeriodFormPageComponent implements OnInit {
     this.form.get('endDate')?.valueChanges.subscribe(() => {
       this.form.get('deliveryDate')?.updateValueAndValidity();
       this.cdr.markForCheck();
+    });
+
+    // Recarregar articles quan canvia el proveïdor
+    this.form.get('supplierId')?.valueChanges.subscribe(async (supplierId) => {
+      if (supplierId) {
+        this.supplierId.set(supplierId);
+        // Recarregar articles amb el nou filtre de proveïdor
+        await this.loadArticles();
+      }
     });
   }
 
@@ -206,6 +216,7 @@ export class PeriodFormPageComponent implements OnInit {
       const deliveryDate = typeof period.deliveryDate === 'string' ? new Date(period.deliveryDate) : period.deliveryDate;
 
       this.supplierId.set(period.supplierId);
+      this.originalPeriodSupplierId.set(period.supplierId);
       this.form.patchValue({
         supplierId: period.supplierId,
         name: period.name,
@@ -298,6 +309,23 @@ export class PeriodFormPageComponent implements OnInit {
 
   private async loadArticles(): Promise<void> {
     try {
+      // Netejar filtres previs
+      this.catalogService.clearFilters();
+
+      const currentSupplierId = this.supplierId() || this.form.get('supplierId')?.value;
+      
+      if (currentSupplierId) {
+        // Si estem editant un període i el proveïdor no ha canviat, filtrar per període i proveïdor
+        if (this.isEditMode() && this.periodId() && currentSupplierId === this.originalPeriodSupplierId()) {
+          // Filtrar per període i proveïdor per mostrar només articles d'aquest període i proveïdor
+          this.catalogService.setPeriodFilter(this.periodId()!);
+          this.catalogService.setSupplierFilter([currentSupplierId]);
+        } else {
+          // Si estem creant un període nou o el proveïdor ha canviat, filtrar només per proveïdor
+          this.catalogService.setSupplierFilter([currentSupplierId]);
+        }
+      }
+
       await this.catalogService.loadArticles();
       const allArticles = this.catalogService.articles();
       this.articles.set(allArticles);

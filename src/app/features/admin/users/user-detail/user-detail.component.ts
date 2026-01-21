@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,6 +18,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { AdminUsersService, UserAdmin, UserActivity } from '../../../../core/services/admin-users.service';
 import { UserRole } from '../../../../core/models/user-role.enum';
+import { LocalStorageService } from '../../../../core/services/local-storage.service';
+import { STORAGE_KEYS } from '../../../../core/constants/storage-keys';
 
 interface UserGroup {
   id: string;
@@ -59,6 +61,7 @@ export class UserDetailComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translate = inject(TranslateService);
+  private readonly localStorage = inject(LocalStorageService);
 
   protected readonly userEmail = signal<string>('');
   protected readonly user = signal<UserAdmin | null>(null);
@@ -80,6 +83,35 @@ export class UserDetailComponent implements OnInit {
     { value: UserRole.PREPARER, label: 'admin.users.roles.preparer' }
   ];
 
+  private isInitialized = false;
+
+  constructor() {
+    // Guardar el tab activo cuando cambie (solo después de la inicialización)
+    effect(() => {
+      if (!this.isInitialized) return;
+      
+      const email = this.userEmail();
+      const tab = this.activeTab();
+      if (email && tab) {
+        this.saveActiveTab(email, tab);
+      }
+    });
+  }
+
+  private getTabStorageKey(email: string): string {
+    return `${STORAGE_KEYS.USER_DETAIL_ACTIVE_TAB}_${email}`;
+  }
+
+  private saveActiveTab(email: string, tab: string): void {
+    const storageKey = this.getTabStorageKey(email);
+    localStorage.setItem(storageKey, tab);
+  }
+
+  private loadActiveTab(email: string): string | null {
+    const storageKey = this.getTabStorageKey(email);
+    return localStorage.getItem(storageKey);
+  }
+
   async ngOnInit(): Promise<void> {
     const email = this.route.snapshot.paramMap.get('email');
     if (!email) {
@@ -88,6 +120,15 @@ export class UserDetailComponent implements OnInit {
     }
 
     this.userEmail.set(email);
+    
+    // Recuperar el tab guardado
+    const savedTab = this.loadActiveTab(email);
+    if (savedTab && ['general', 'groups', 'activity'].includes(savedTab)) {
+      this.activeTab.set(savedTab);
+    }
+    
+    this.isInitialized = true;
+    
     await this.loadUserDetail();
     await this.loadUserGroups();
     await this.loadUserActivity();

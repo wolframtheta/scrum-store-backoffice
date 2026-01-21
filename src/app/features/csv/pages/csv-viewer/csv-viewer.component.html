@@ -320,7 +320,7 @@
                   <span style="color: var(--text-color-secondary)">-</span>
                 }
               </td>
-              <td>{{ article.taxRate !== undefined ? article.taxRate + '%' : '-' }}</td>
+              <td>{{ article.taxRate !== undefined && article.taxRate > 0 ? article.taxRate + '%' : '-' }}</td>
               <td>
                 @for (error of article.errors; track error) {
                   <p-tag [value]="error" severity="danger" styleClass="mr-1" />
@@ -437,7 +437,7 @@
               <td>{{ article.city || '-' }}</td>
               <td>{{ article.producer || '-' }}</td>
               <td>{{ article.isEco !== undefined ? article.isEco : '-' }}</td>
-              <td>{{ article.taxRate !== undefined ? article.taxRate + '%' : '-' }}</td>
+              <td>{{ article.taxRate !== undefined && article.taxRate > 0 ? article.taxRate + '%' : '-' }}</td>
               <td>
                 <p-tag [value]="article.isValid ? 'true' : 'false'" [severity]="article.isValid ? 'success' : 'danger'" />
               </td>

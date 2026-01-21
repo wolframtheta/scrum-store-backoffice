@@ -14,6 +14,9 @@ export const STORAGE_KEYS = {
   // Theme/UI preferences (future)
   THEME: 'theme',
   SIDEBAR_COLLAPSED: 'sidebar_collapsed',
+  
+  // UI state
+  USER_DETAIL_ACTIVE_TAB: 'user_detail_active_tab',
 } as const;
 
 // Type helper for storage keys

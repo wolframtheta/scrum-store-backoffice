@@ -286,7 +286,7 @@
           }
         </td>
         <td class="text-right">
-          @if (article.taxRate) {
+          @if (article.taxRate && article.taxRate > 0) {
             <span>{{ article.taxRate }}%</span>
           } @else {
             <span class="text-secondary">—</span>

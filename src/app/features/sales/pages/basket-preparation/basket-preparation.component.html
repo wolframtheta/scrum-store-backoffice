@@ -1,5 +1,6 @@
 <div class="basket-preparation-container">
   <p-toast />
+  <p-confirmDialog />
 
   <div class="header">
     <div>
@@ -193,6 +194,18 @@
                             <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
                           }
                         </span>
+                        @if (userNode.data.orderId && userNode.data.articleId && !isOrderPrepared(userNode.data.orderId)) {
+                          <p-button
+                            icon="pi pi-trash"
+                            [text]="true"
+                            severity="danger"
+                            size="small"
+                            [rounded]="true"
+                            (onClick)="deleteOrderItem(userNode)"
+                            pTooltip="Eliminar article (no ha arribat)"
+                            styleClass="delete-button"
+                          />
+                        }
                       </div>
                     }
                   </div>

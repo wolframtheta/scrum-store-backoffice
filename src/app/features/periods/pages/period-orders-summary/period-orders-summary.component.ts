@@ -122,12 +122,23 @@ export class PeriodOrdersSummaryComponent implements OnInit {
 
       this.totalOrders.set(periodOrders.length);
 
-      // Agregar articles
+      // Obtenir els IDs dels articles del període per filtrar
+      const periodArticleIds = new Set(
+        period.periodArticles?.map(pa => pa.articleId) || []
+      );
+
+      // Agregar articles només si pertanyen al període
       const articlesMap = new Map<string, ArticleSummary>();
 
       periodOrders.forEach(order => {
         order.items.forEach(item => {
           const articleId = item.articleId;
+          
+          // Només processar si l'article està al període
+          if (!periodArticleIds.has(articleId)) {
+            return;
+          }
+
           let articleName = `Article ${articleId}`;
 
           if (item.article) {
