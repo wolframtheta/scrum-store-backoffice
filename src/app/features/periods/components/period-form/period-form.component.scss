@@ -19,6 +19,13 @@
       color: var(--red-500);
       font-size: 0.875rem;
     }
+
+    .help-text {
+      color: var(--text-color-secondary);
+      font-size: 0.875rem;
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
   }
 
   .form-row {

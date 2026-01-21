@@ -93,6 +93,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/periods/pages/period-orders-summary/period-orders-summary.component').then(m => m.PeriodOrdersSummaryComponent)
       },
       {
+        path: 'periods/:periodId/payments',
+        canActivate: [managerGuard],
+        loadComponent: () => import('./features/periods/pages/period-payments/period-payments.component').then(m => m.PeriodPaymentsComponent)
+      },
+      {
         path: 'periods/new',
         canActivate: [managerGuard],
         loadComponent: () => import('./features/periods/pages/period-form/period-form-page.component').then(m => m.PeriodFormPageComponent)

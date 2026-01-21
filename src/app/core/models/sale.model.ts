@@ -25,6 +25,7 @@ export interface Sale {
   items: SaleItem[];
   totalAmount: number;
   paidAmount: number;
+  transportCost?: number;
   paymentStatus: PaymentStatus;
   isDelivered: boolean;
   createdAt: Date;

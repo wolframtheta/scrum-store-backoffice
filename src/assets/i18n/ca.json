@@ -24,6 +24,8 @@
     "total": "Total",
     "paid": "Pagat",
     "pending": "Pendent",
+    "add": "Afegir",
+    "per": "per",
     "date": "Data",
     "status": "Estat",
     "showing": "Mostrant",
@@ -632,6 +634,9 @@
       "endDate": "Data de fi",
       "deliveryDate": "Data d'entrega",
       "recurrence": "Recurrència",
+      "transportCost": "Cost de transport",
+      "transportCostPlaceholder": "Ex: 25.50",
+      "transportCostHelp": "El cost de transport es repartirà equitativament entre tots els usuaris que hagin fet comandes en aquest període",
       "articles": "Articles",
       "article": "Article",
       "unit": "Unitat",
@@ -655,6 +660,7 @@
       "title": "Resum de Comandes del Període",
       "totalOrders": "Total Comandes",
       "totalArticles": "Total Articles",
+      "perUser": "per usuari",
       "table": {
         "article": "Article",
         "quantity": "Quantitat Total",
@@ -662,6 +668,24 @@
         "orders": "Comandes"
       },
       "noOrders": "No hi ha comandes per a aquest període"
+    },
+    "payments": {
+      "title": "Gestió de Pagaments del Període",
+      "totalSubtotal": "Subtotal Total",
+      "totalTransport": "Transport Total",
+      "grandTotal": "Total General",
+      "markAsPaid": "Marcar com a pagat",
+      "markAsUnpaid": "Marcar com a no pagat",
+      "table": {
+        "user": "Usuari",
+        "orders": "Comandes",
+        "subtotal": "Subtotal",
+        "transport": "Transport",
+        "total": "Total",
+        "paid": "Pagat",
+        "status": "Estat"
+      },
+      "noUsers": "No hi ha usuaris amb comandes en aquest període"
     }
   },
   "admin": {

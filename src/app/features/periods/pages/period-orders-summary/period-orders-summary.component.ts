@@ -1,9 +1,11 @@
 import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -28,9 +30,11 @@ interface ArticleSummary {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    FormsModule,
     TranslateModule,
     TableModule,
     ButtonModule,
+    InputNumberModule,
     TagModule,
     ToastModule,
     ConfirmDialogModule,
@@ -56,6 +60,10 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   );
   protected readonly articlesSummary = signal<ArticleSummary[]>([]);
   protected readonly totalOrders = signal<number>(0);
+  protected readonly uniqueUsers = signal<number>(0);
+  protected readonly transportCost = signal<number | null>(null);
+  protected readonly isEditingTransport = signal<boolean>(false);
+  protected readonly isSavingTransport = signal<boolean>(false);
 
   protected readonly articlesSummaryList = computed(() => {
     return this.articlesSummary().sort((a, b) => 
@@ -84,6 +92,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     try {
       const period = await this.periodsService.getPeriod(periodId);
       this.period.set(period);
+      this.transportCost.set(period.transportCost ?? null);
     } catch (error) {
       this.messageService.add({
         severity: 'error',
@@ -121,6 +130,16 @@ export class PeriodOrdersSummaryComponent implements OnInit {
       });
 
       this.totalOrders.set(periodOrders.length);
+
+      // Comptar usuaris únics
+      const uniqueUserIds = new Set<string>();
+      periodOrders.forEach(order => {
+        const userId = order.userId || order.userEmail;
+        if (userId) {
+          uniqueUserIds.add(userId);
+        }
+      });
+      this.uniqueUsers.set(uniqueUserIds.size);
 
       // Obtenir els IDs dels articles del període per filtrar
       const periodArticleIds = new Set(
@@ -293,5 +312,44 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     });
     
     return lines.join('\n');
+  }
+
+  protected startEditingTransport(): void {
+    this.isEditingTransport.set(true);
+  }
+
+  protected cancelEditingTransport(): void {
+    const period = this.period();
+    this.transportCost.set(period?.transportCost ?? null);
+    this.isEditingTransport.set(false);
+  }
+
+  protected async saveTransportCost(): Promise<void> {
+    const period = this.period();
+    if (!period) return;
+
+    this.isSavingTransport.set(true);
+    try {
+      const updatedPeriod = await this.periodsService.updatePeriod(
+        period.id,
+        period.supplierId,
+        { transportCost: this.transportCost() ?? undefined }
+      );
+      this.period.set(updatedPeriod);
+      this.isEditingTransport.set(false);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Cost de transport actualitzat correctament'
+      });
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No s\'ha pogut actualitzar el cost de transport'
+      });
+    } finally {
+      this.isSavingTransport.set(false);
+    }
   }
 }

@@ -85,6 +85,7 @@ export class PeriodFormComponent implements OnInit {
       endDate: [null, Validators.required],
       deliveryDate: [null, [Validators.required, this.deliveryDateAfterStartValidator.bind(this)]],
       recurrence: [PeriodRecurrence.WEEKLY, Validators.required],
+      transportCost: [null],
       articles: this.fb.array([]),
     });
 
@@ -112,6 +113,7 @@ export class PeriodFormComponent implements OnInit {
           endDate,
           deliveryDate,
           recurrence: period.recurrence,
+          transportCost: period.transportCost ?? null,
         });
         this.dateRange.set([startDate, endDate]);
 
@@ -303,6 +305,7 @@ export class PeriodFormComponent implements OnInit {
         endDate: formatDate(formValue.endDate),
         deliveryDate: formatDate(formValue.deliveryDate),
         recurrence: formValue.recurrence,
+        transportCost: formValue.transportCost ? Number(formValue.transportCost) : null,
         articles: formValue.articles.map((a: any) => ({
           articleId: a.articleId,
           pricePerUnit: a.pricePerUnit,

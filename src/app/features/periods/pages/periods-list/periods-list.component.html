@@ -167,14 +167,12 @@
           <th>{{ 'periods.table.deliveryDate' | translate }}</th>
           <th>{{ 'periods.table.recurrence' | translate }}</th>
           <th>{{ 'periods.table.articles' | translate }}</th>
+          <th class="actions-column">{{ 'common.actions' | translate }}</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-period>
-        <tr 
-          [style.cursor]="'pointer'"
-          (click)="openPeriodOrdersSummary(period)"
-        >
+        <tr>
           <td>
             <strong>{{ period.name }}</strong>
           </td>
@@ -197,12 +195,32 @@
           <td>
             <span>{{ period.periodArticles?.length || 0 }} {{ 'periods.articles' | translate }}</span>
           </td>
+          <td class="actions-column">
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-list"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                (onClick)="openPeriodOrdersSummary(period); $event.stopPropagation()"
+                [pTooltip]="'periods.ordersSummary.title' | translate"
+              />
+              <p-button
+                icon="pi pi-euro"
+                [rounded]="true"
+                [text]="true"
+                severity="success"
+                (onClick)="openPeriodPayments(period); $event.stopPropagation()"
+                [pTooltip]="'periods.payments.title' | translate"
+              />
+            </div>
+          </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center">
+          <td colspan="8" class="text-center">
             {{ 'periods.noPeriods' | translate }}
           </td>
         </tr>

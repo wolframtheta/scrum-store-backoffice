@@ -119,6 +119,21 @@
         />
       </div>
 
+      <!-- Cost de transport -->
+      <div class="form-field">
+        <label for="transportCost">{{ 'periods.form.transportCost' | translate }}</label>
+        <p-inputNumber
+          id="transportCost"
+          formControlName="transportCost"
+          [min]="0"
+          [maxFractionDigits]="2"
+          mode="decimal"
+          [style]="{ width: '100%' }"
+          [placeholder]="'periods.form.transportCostPlaceholder' | translate"
+        />
+        <small class="help-text">{{ 'periods.form.transportCostHelp' | translate }}</small>
+      </div>
+
       <!-- Articles -->
       <div class="form-section">
         <h3>{{ 'periods.form.articles' | translate }}</h3>

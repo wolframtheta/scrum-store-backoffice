@@ -68,6 +68,72 @@
           </div>
         </div>
       }
+
+      <!-- Cost de transport -->
+      @if (period()) {
+        <div class="transport-cost-card">
+          <div class="transport-cost-header">
+            <div>
+              <h3>{{ 'periods.form.transportCost' | translate }}</h3>
+              <p class="transport-cost-description">{{ 'periods.form.transportCostHelp' | translate }}</p>
+            </div>
+            @if (!isEditingTransport()) {
+              <p-button
+                icon="pi pi-pencil"
+                [label]="transportCost() ? ('common.edit' | translate) : ('common.add' | translate)"
+                [outlined]="true"
+                severity="secondary"
+                (onClick)="startEditingTransport()"
+              />
+            }
+          </div>
+          
+          @if (isEditingTransport()) {
+            <div class="transport-cost-form">
+              <div class="transport-cost-input-group">
+                <p-inputNumber
+                  [(ngModel)]="transportCost"
+                  [min]="0"
+                  [maxFractionDigits]="2"
+                  mode="decimal"
+                  [placeholder]="'periods.form.transportCostPlaceholder' | translate"
+                  [style]="{ width: '100%' }"
+                  [disabled]="isSavingTransport()"
+                />
+                <span class="currency-suffix">€</span>
+              </div>
+              <div class="transport-cost-actions">
+                <p-button
+                  [label]="'common.save' | translate"
+                  icon="pi pi-check"
+                  (onClick)="saveTransportCost()"
+                  [disabled]="isSavingTransport()"
+                  [loading]="isSavingTransport()"
+                />
+                <p-button
+                  [label]="'common.cancel' | translate"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="cancelEditingTransport()"
+                  [disabled]="isSavingTransport()"
+                />
+              </div>
+            </div>
+          } @else {
+            <div class="transport-cost-display">
+              <span class="transport-cost-value">
+                {{ transportCost() ? (transportCost()! | number:'1.2-2') + ' €' : ('common.noData' | translate) }}
+              </span>
+              @if (transportCost() && uniqueUsers() > 0) {
+                <span class="transport-cost-per-order">
+                  ({{ ((transportCost()! / uniqueUsers()) | number:'1.2-2') }} € {{ 'periods.ordersSummary.perUser' | translate }})
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
 

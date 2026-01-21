@@ -235,6 +235,10 @@ export class PeriodsListComponent implements OnInit {
     this.router.navigate(['/periods', period.id, 'orders-summary']);
   }
 
+  protected openPeriodPayments(period: Period): void {
+    this.router.navigate(['/periods', period.id, 'payments']);
+  }
+
   private async deletePeriod(period: Period): Promise<void> {
     try {
       const supplierId = period.supplierId;

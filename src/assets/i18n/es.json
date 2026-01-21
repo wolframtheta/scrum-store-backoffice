@@ -24,6 +24,8 @@
     "total": "Total",
     "paid": "Pagado",
     "pending": "Pendiente",
+    "add": "Añadir",
+    "per": "por",
     "date": "Fecha",
     "status": "Estado",
     "showing": "Mostrando",
@@ -601,6 +603,9 @@
       "endDate": "Fecha de fin",
       "deliveryDate": "Fecha de entrega",
       "recurrence": "Recurrencia",
+      "transportCost": "Coste de transporte",
+      "transportCostPlaceholder": "Ej: 25.50",
+      "transportCostHelp": "El coste de transporte se repartirá equitativamente entre todos los usuarios que hayan hecho pedidos en este período",
       "articles": "Artículos",
       "article": "Artículo",
       "unit": "Unidad",
@@ -620,10 +625,29 @@
       "articles": "Artículos"
     },
     "filterBySupplier": "Filtrar por proveedor",
+    "payments": {
+      "title": "Gestión de Pagos del Período",
+      "totalSubtotal": "Subtotal Total",
+      "totalTransport": "Transporte Total",
+      "grandTotal": "Total General",
+      "markAsPaid": "Marcar como pagado",
+      "markAsUnpaid": "Marcar como no pagado",
+      "table": {
+        "user": "Usuario",
+        "orders": "Pedidos",
+        "subtotal": "Subtotal",
+        "transport": "Transporte",
+        "total": "Total",
+        "paid": "Pagado",
+        "status": "Estado"
+      },
+      "noUsers": "No hay usuarios con pedidos en este período"
+    },
     "ordersSummary": {
       "title": "Resumen de Pedidos del Período",
       "totalOrders": "Total Pedidos",
       "totalArticles": "Total Artículos",
+      "perUser": "por usuario",
       "table": {
         "article": "Artículo",
         "quantity": "Cantidad Total",

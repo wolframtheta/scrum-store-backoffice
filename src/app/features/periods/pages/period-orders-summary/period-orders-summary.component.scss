@@ -48,6 +48,7 @@
         span {
           display: flex;
           gap: 0.5rem;
+          align-items: center;
         }
       }
 
@@ -118,4 +119,76 @@
   text-align: center;
   padding: 2rem;
   color: var(--text-color-secondary);
+}
+
+.transport-cost-card {
+  background: var(--surface-card);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--primary-color);
+
+  .transport-cost-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .transport-cost-description {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      font-style: italic;
+    }
+  }
+
+  .transport-cost-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .transport-cost-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .currency-suffix {
+        font-weight: 500;
+        color: var(--text-color-secondary);
+        min-width: 20px;
+      }
+    }
+
+    .transport-cost-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+  }
+
+  .transport-cost-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .transport-cost-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .transport-cost-per-order {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      font-style: italic;
+    }
+  }
 }
