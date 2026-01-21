@@ -120,6 +120,31 @@ export class SalesService {
     }
   }
 
+  async markAsPaid(saleId: string): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const sale = await this.api.patch<Sale>(`orders/${saleId}/mark-as-paid`, {});
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === saleId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = sale;
+        this.sales.set(updatedSales);
+      }
+
+      return sale;
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error marcant comanda com a pagada');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   async deleteOrder(orderId: string): Promise<void> {
     this.isLoading.set(true);
     this.error.set(null);

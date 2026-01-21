@@ -7,6 +7,17 @@
       <h1>{{ 'sales.title' | translate }}</h1>
       <p class="subtitle">{{ 'sales.subtitle' | translate }}</p>
     </div>
+    @if (someSelectableSelected()) {
+      <div class="header-actions">
+        <p-button
+          [label]="'sales.actions.markSelectedAsPaid' | translate"
+          icon="pi pi-check-circle"
+          severity="success"
+          (onClick)="markSelectedAsPaid()"
+          [loading]="salesService.isLoading()"
+        />
+      </div>
+    }
   </div>
 
   <!-- Filtres -->
@@ -111,6 +122,14 @@
   >
     <ng-template pTemplate="header">
       <tr>
+        <th style="width: 3rem" (click)="$event.stopPropagation()">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="allSelectableSelected()"
+            [ngModelOptions]="{standalone: true}"
+            (ngModelChange)="toggleSelectAll()"
+          />
+        </th>
         <th pSortableColumn="createdAt" style="width: 10rem">
           {{ 'sales.table.date' | translate }}
           <p-sortIcon field="createdAt" />
@@ -154,11 +173,27 @@
 
     <ng-template pTemplate="body" let-sale>
       <tr class="clickable-row" (click)="viewDetail(sale)">
+        <td (click)="$event.stopPropagation()">
+          @if (canMarkAsPaid(sale)) {
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="isSaleSelected(sale.id)"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="toggleSaleSelection(sale.id)"
+            />
+          }
+        </td>
         <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ sale.userName || sale.userEmail }}</td>
         <td class="text-right">{{ sale.items.length }}</td>
         <td class="text-right">{{ getSubtotalWithoutTax(sale) | number: '1.2-2' }} €</td>
-        <td class="text-right">{{ getTaxAmount(sale) | number: '1.2-2' }} €</td>
+        <td class="text-right">
+          @if (getTaxAmount(sale) > 0) {
+            {{ getTaxAmount(sale) | number: '1.2-2' }} €
+          } @else {
+            <span class="text-secondary">—</span>
+          }
+        </td>
         <td class="text-right"><strong>{{ getTotalWithTax(sale) | number: '1.2-2' }} €</strong></td>
         <td class="text-right">{{ sale.paidAmount | number: '1.2-2' }} €</td>
         <td class="text-right">{{ getRemainingAmount(sale) | number: '1.2-2' }} €</td>
@@ -185,14 +220,14 @@
               severity="info"
               (onClick)="viewDetail(sale)"
             />
-            @if (sale.paymentStatus !== PaymentStatus.PAID) {
+            @if (canMarkAsPaid(sale)) {
               <p-button
-                icon="pi pi-money-bill"
-                [pTooltip]="'sales.actions.registerPayment' | translate"
+                icon="pi pi-check-circle"
+                [pTooltip]="'sales.actions.markAsPaid' | translate"
                 [rounded]="true"
                 [text]="true"
                 severity="success"
-                (onClick)="openPaymentModal(sale)"
+                (onClick)="markAsPaid(sale)"
               />
             }
             <p-button
@@ -210,17 +245,10 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center">
+        <td colspan="12" class="text-center">
           {{ 'sales.noOrders' | translate }}
         </td>
       </tr>
     </ng-template>
   </p-table>
-
-  <app-payment-modal
-    [visible]="showPaymentModal()"
-    [sale]="selectedSale()"
-    (visibleChange)="showPaymentModal.set($event)"
-    (paymentRegistered)="onPaymentRegistered()"
-  />
 </div>

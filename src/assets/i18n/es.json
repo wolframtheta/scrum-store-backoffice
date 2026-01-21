@@ -224,7 +224,9 @@
       "unpaid": "No Pagado"
     },
     "actions": {
-      "registerPayment": "Registrar Pago"
+      "registerPayment": "Registrar Pago",
+      "markAsPaid": "Marcar como Pagada",
+      "markSelectedAsPaid": "Marcar Seleccionadas como Pagadas"
     },
     "noUnpaidSales": "No hay ventas pendientes de pago",
     "noPartialSales": "No hay ventas con pago parcial",
@@ -281,7 +283,8 @@
       "itemTotal": "Total",
       "itemPaid": "Pagado",
       "itemRemaining": "Pendiente",
-      "noItems": "No hay artículos en este pedido"
+      "noItems": "No hay artículos en este pedido",
+      "markAsPaid": "Marcar como Pagada"
     }
   },
   "basketPreparation": {

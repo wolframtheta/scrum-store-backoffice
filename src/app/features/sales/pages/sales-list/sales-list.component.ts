@@ -21,7 +21,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SalesService } from '../../services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
-import { PaymentModalComponent } from '../../components/payment-modal/payment-modal.component';
 
 @Component({
   selector: 'app-sales-list',
@@ -41,8 +40,7 @@ import { PaymentModalComponent } from '../../components/payment-modal/payment-mo
     SelectModule,
     InputTextModule,
     InputGroupModule,
-    InputGroupAddonModule,
-    PaymentModalComponent
+    InputGroupAddonModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './sales-list.component.html',
@@ -59,9 +57,8 @@ export class SalesListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly userSearchSubject = new Subject<string>();
 
-  protected readonly selectedSale = signal<Sale | null>(null);
-  protected readonly showPaymentModal = signal<boolean>(false);
   protected readonly PaymentStatus = PaymentStatus;
+  protected readonly selectedSales = signal<Set<string>>(new Set());
 
   // Filtres
   protected readonly filterUserId = signal<string | null>(null);
@@ -244,26 +241,8 @@ export class SalesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected openPaymentModal(sale: Sale): void {
-    this.selectedSale.set(sale);
-    this.showPaymentModal.set(true);
-  }
-
   protected viewDetail(sale: Sale): void {
     this.router.navigate(['/sales', sale.id]);
-  }
-
-  protected async onPaymentRegistered(): Promise<void> {
-    this.showPaymentModal.set(false);
-    this.selectedSale.set(null);
-
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Èxit',
-      detail: 'Pagament registrat correctament'
-    });
-
-    await this.loadSales();
   }
 
   protected async toggleDelivered(sale: Sale): Promise<void> {
@@ -355,5 +334,108 @@ export class SalesListComponent implements OnInit, OnDestroy {
         }
       },
     });
+  }
+
+  protected canMarkAsPaid(sale: Sale): boolean {
+    return sale.paymentStatus !== PaymentStatus.PAID;
+  }
+
+  protected async markAsPaid(sale: Sale): Promise<void> {
+    try {
+      await this.salesService.markAsPaid(sale.id);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Comanda marcada com a pagada correctament',
+      });
+      await this.loadSales();
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.error?.message || 'Error marcant comanda com a pagada',
+      });
+    }
+  }
+
+  protected isSaleSelected(saleId: string): boolean {
+    return this.selectedSales().has(saleId);
+  }
+
+  protected toggleSaleSelection(saleId: string): void {
+    const selected = new Set(this.selectedSales());
+    if (selected.has(saleId)) {
+      selected.delete(saleId);
+    } else {
+      selected.add(saleId);
+    }
+    this.selectedSales.set(selected);
+  }
+
+  protected readonly selectableSales = computed(() => {
+    return this.filteredSales().filter(sale => this.canMarkAsPaid(sale));
+  });
+
+  protected readonly allSelectableSelected = computed(() => {
+    const selectable = this.selectableSales();
+    if (selectable.length === 0) return false;
+    return selectable.every(sale => this.selectedSales().has(sale.id));
+  });
+
+  protected readonly someSelectableSelected = computed(() => {
+    const selectable = this.selectableSales();
+    return selectable.some(sale => this.selectedSales().has(sale.id));
+  });
+
+  protected toggleSelectAll(): void {
+    const selectable = this.selectableSales();
+    const selected = new Set(this.selectedSales());
+    
+    if (this.allSelectableSelected()) {
+      // Deseleccionar totes les seleccionables
+      selectable.forEach((sale: Sale) => selected.delete(sale.id));
+    } else {
+      // Seleccionar totes les seleccionables
+      selectable.forEach((sale: Sale) => selected.add(sale.id));
+    }
+    
+    this.selectedSales.set(selected);
+  }
+
+  protected async markSelectedAsPaid(): Promise<void> {
+    const selectedIds = Array.from(this.selectedSales());
+    const selectableIds = this.selectableSales().map((s: Sale) => s.id);
+    const toMark = selectedIds.filter(id => selectableIds.includes(id));
+    
+    if (toMark.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertència',
+        detail: 'No hi ha comandes seleccionades per marcar com a pagades',
+      });
+      return;
+    }
+
+    try {
+      // Marcar totes les seleccionades
+      await Promise.all(toMark.map(id => this.salesService.markAsPaid(id)));
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: `${toMark.length} comanda${toMark.length > 1 ? 's' : ''} marcada${toMark.length > 1 ? 's' : ''} com a pagada${toMark.length > 1 ? 's' : ''} correctament`,
+      });
+      
+      // Netejar selecció
+      this.selectedSales.set(new Set());
+      
+      await this.loadSales();
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.error?.message || 'Error marcant comandes com a pagades',
+      });
+    }
   }
 }

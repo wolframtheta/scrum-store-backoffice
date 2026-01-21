@@ -250,7 +250,9 @@
       "unpaid": "No Pagat"
     },
     "actions": {
-      "registerPayment": "Registrar Pagament"
+      "registerPayment": "Registrar Pagament",
+      "markAsPaid": "Marcar com a Pagada",
+      "markSelectedAsPaid": "Marcar Seleccionades com a Pagades"
     },
     "noUnpaidSales": "No hi ha vendes pendents de pagament",
     "noPartialSales": "No hi ha vendes amb pagament parcial",
@@ -307,7 +309,8 @@
       "itemTotal": "Total",
       "itemPaid": "Pagat",
       "itemRemaining": "Pendent",
-      "noItems": "No hi ha articles en aquesta comanda"
+      "noItems": "No hi ha articles en aquesta comanda",
+      "markAsPaid": "Marcar com a Pagada"
     }
   },
   "basketPreparation": {

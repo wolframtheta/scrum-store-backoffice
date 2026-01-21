@@ -222,6 +222,34 @@ export class SalesDetailComponent implements OnInit {
     // Només permetre eliminar si la comanda no està entregada
     return sale ? !sale.isDelivered : false;
   }
+
+  protected canMarkAsPaid(sale: Sale | null): boolean {
+    // Només mostrar el botó si la comanda no està completament pagada
+    return sale ? sale.paymentStatus !== PaymentStatus.PAID : false;
+  }
+
+  protected async markAsPaid(): Promise<void> {
+    const sale = this.sale();
+    if (!sale) {
+      return;
+    }
+
+    try {
+      const updatedSale = await this.salesService.markAsPaid(sale.id);
+      this.sale.set(updatedSale);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Comanda marcada com a pagada correctament'
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.error?.message || 'Error marcant comanda com a pagada'
+      });
+    }
+  }
 }
 
 

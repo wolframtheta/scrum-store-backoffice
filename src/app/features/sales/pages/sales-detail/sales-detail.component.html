@@ -69,6 +69,19 @@
             <span class="amount remaining">{{ formatPrice(getTotalRemaining()) }} €</span>
           </div>
         </div>
+
+        @if (canMarkAsPaid(sale())) {
+          <p-divider />
+          <div class="actions-section">
+            <p-button
+              icon="pi pi-check-circle"
+              [label]="'sales.detail.markAsPaid' | translate"
+              severity="success"
+              (onClick)="markAsPaid()"
+              [loading]="isLoading()"
+            />
+          </div>
+        }
       </p-card>
 
       <!-- Items Table -->
