@@ -171,19 +171,47 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
       styleClass="p-datatable-sm"
+      dataKey="articleId"
     >
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 3rem"></th>
           <th>{{ 'periods.ordersSummary.table.article' | translate }}</th>
           <th>{{ 'periods.ordersSummary.table.quantity' | translate }}</th>
           <th>{{ 'periods.ordersSummary.table.orders' | translate }}</th>
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-article>
+      <ng-template pTemplate="body" let-article let-rowIndex="rowIndex">
+        <!-- Fila principal -->
         <tr>
+          <td style="width: 3rem; text-align: center;">
+            @if (hasMultipleVariants(article)) {
+              <button
+                type="button"
+                pRipple
+                class="p-row-toggler p-link"
+                [pTooltip]="'periods.ordersSummary.customizations' | translate"
+                (click)="toggleRow(article.articleId)"
+              >
+                <span [class]="isRowExpanded(article.articleId) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></span>
+              </button>
+            }
+          </td>
           <td>
             <strong>{{ article.articleName }}</strong>
+            @if (hasMultipleVariants(article)) {
+              <p-tag
+                [value]="article.variants.length.toString() + ' variants'"
+                severity="secondary"
+                styleClass="ml-2"
+                [pTooltip]="'periods.ordersSummary.hasCustomizations' | translate"
+              />
+            } @else if (getSingleCustomization(article)) {
+              <span class="single-customization-label ml-2">
+                ({{ getSingleCustomization(article)!.customizationLabel }})
+              </span>
+            }
           </td>
           <td>
             <span class="quantity-value">{{ article.totalQuantity }}</span>
@@ -198,11 +226,51 @@
             />
           </td>
         </tr>
+        
+        <!-- Files de variants expandides -->
+        @if (isRowExpanded(article.articleId) && hasMultipleVariants(article)) {
+          <tr class="expansion-row">
+            <td colspan="4" class="p-0">
+              <div class="variants-container">
+                <table class="variants-table">
+                  <thead>
+                    <tr>
+                      <th>{{ 'periods.ordersSummary.table.article' | translate }}</th>
+                      <th>{{ 'periods.ordersSummary.table.quantity' | translate }}</th>
+                      <th>{{ 'periods.ordersSummary.table.orders' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (variant of article.variants; track variant.customizationKey) {
+                      <tr class="variant-row">
+                        <td>
+                          <span class="variant-label">{{ variant.customizationLabel }}</span>
+                        </td>
+                        <td>
+                          <span class="quantity-value">{{ variant.quantity }}</span>
+                          @if (article.unitMeasure) {
+                            <span class="quantity-unit">{{ article.unitMeasure }}</span>
+                          }
+                        </td>
+                        <td>
+                          <p-tag
+                            [value]="variant.ordersCount.toString()"
+                            severity="info"
+                          />
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        }
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="3" class="text-center">
+          <td colspan="4" class="text-center">
             {{ 'periods.ordersSummary.noOrders' | translate }}
           </td>
         </tr>

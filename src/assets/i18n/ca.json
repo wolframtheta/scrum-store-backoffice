@@ -684,6 +684,9 @@
       "totalOrders": "Total Comandes",
       "totalArticles": "Total Articles",
       "perUser": "per usuari",
+      "customizations": "Personalitzacions",
+      "hasCustomizations": "Aquest article té personalitzacions",
+      "noCustomizations": "Aquest article no té personalitzacions",
       "table": {
         "article": "Article",
         "quantity": "Quantitat Total",

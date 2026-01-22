@@ -6,6 +6,14 @@ export enum PaymentStatus {
 
 import { Article } from './article.model';
 
+export interface SelectedOption {
+  optionId: string;
+  title: string;
+  type: 'boolean' | 'numeric' | 'string' | 'select' | 'multiselect';
+  value: boolean | number | string | string[];
+  price?: number;
+}
+
 export interface SaleItem {
   id: string;
   articleId: string;
@@ -14,6 +22,7 @@ export interface SaleItem {
   pricePerUnit: number;
   totalPrice: number;
   paidAmount: number;
+  selectedOptions?: SelectedOption[];
 }
 
 export interface Sale {

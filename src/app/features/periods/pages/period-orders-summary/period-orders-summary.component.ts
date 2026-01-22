@@ -10,12 +10,20 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { RippleModule } from 'primeng/ripple';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PeriodsService } from '../../services/periods.service';
 import { SalesService } from '../../../sales/services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Period } from '../../../../core/models/period.model';
-import { Sale } from '../../../../core/models/sale.model';
+import { Sale, SelectedOption } from '../../../../core/models/sale.model';
+
+interface CustomizationVariant {
+  customizationKey: string;
+  customizationLabel: string;
+  quantity: number;
+  ordersCount: number;
+}
 
 interface ArticleSummary {
   articleId: string;
@@ -23,6 +31,7 @@ interface ArticleSummary {
   totalQuantity: number;
   unitMeasure?: string;
   ordersCount: number;
+  variants: CustomizationVariant[];
 }
 
 @Component({
@@ -39,6 +48,7 @@ interface ArticleSummary {
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    RippleModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './period-orders-summary.component.html',
@@ -64,6 +74,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   protected readonly transportCost = signal<number | null>(null);
   protected readonly isEditingTransport = signal<boolean>(false);
   protected readonly isSavingTransport = signal<boolean>(false);
+  protected readonly expandedRows = signal<Record<string, boolean>>({});
 
   protected readonly articlesSummaryList = computed(() => {
     return this.articlesSummary().sort((a, b) => 
@@ -148,6 +159,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
 
       // Agregar articles només si pertanyen al període
       const articlesMap = new Map<string, ArticleSummary>();
+      const variantsMap = new Map<string, Map<string, { quantity: number; ordersCount: number }>>();
 
       periodOrders.forEach(order => {
         order.items.forEach(item => {
@@ -177,7 +189,9 @@ export class PeriodOrdersSummaryComponent implements OnInit {
               totalQuantity: 0,
               unitMeasure: item.article?.unitMeasure,
               ordersCount: 0,
+              variants: [],
             });
+            variantsMap.set(articleId, new Map());
           }
 
           const summary = articlesMap.get(articleId)!;
@@ -186,7 +200,67 @@ export class PeriodOrdersSummaryComponent implements OnInit {
             : Number(item.quantity);
           summary.totalQuantity += quantity;
           summary.ordersCount += 1;
+
+          // Crear clau única per a la combinació de personalitzacions
+          let customizationKey = '';
+          let customizationLabel = 'Sense personalitzacions';
+          
+          if (item.selectedOptions && Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0) {
+            const customizationParts: string[] = [];
+            const sortedOptions = [...item.selectedOptions].sort((a: any, b: any) => {
+              const aTitle = (a.title || a.optionTitle || '').toString();
+              const bTitle = (b.title || b.optionTitle || '').toString();
+              return aTitle.localeCompare(bTitle);
+            });
+            
+            sortedOptions.forEach((option: any) => {
+              const optionTitle = option.title || option.optionTitle || 'Personalització';
+              const valueStr = this.formatCustomizationValue(option);
+              customizationParts.push(`${optionTitle}: ${valueStr}`);
+            });
+            
+            customizationKey = customizationParts.join(' | ');
+            customizationLabel = customizationParts.join(', ');
+          }
+
+          // Agregar variant
+          const articleVariants = variantsMap.get(articleId)!;
+          if (!articleVariants.has(customizationKey)) {
+            articleVariants.set(customizationKey, { quantity: 0, ordersCount: 0 });
+          }
+          
+          const variant = articleVariants.get(customizationKey)!;
+          variant.quantity += quantity;
+          variant.ordersCount += 1;
         });
+      });
+
+      // Convertir les variants al format final
+      articlesMap.forEach((summary, articleId) => {
+        const articleVariants = variantsMap.get(articleId);
+        if (articleVariants && articleVariants.size > 0) {
+          summary.variants = Array.from(articleVariants.entries())
+            .map(([key, data]) => ({
+              customizationKey: key,
+              customizationLabel: key || 'Sense personalitzacions',
+              quantity: data.quantity,
+              ordersCount: data.ordersCount,
+            }))
+            .sort((a, b) => {
+              // Ordenar: primer sense personalitzacions, després alfabèticament
+              if (a.customizationKey === '' && b.customizationKey !== '') return -1;
+              if (a.customizationKey !== '' && b.customizationKey === '') return 1;
+              return a.customizationLabel.localeCompare(b.customizationLabel);
+            });
+        } else {
+          // Si no hi ha variants, crear una variant per defecte
+          summary.variants = [{
+            customizationKey: '',
+            customizationLabel: 'Sense personalitzacions',
+            quantity: summary.totalQuantity,
+            ordersCount: summary.ordersCount,
+          }];
+        }
       });
 
       this.articlesSummary.set(Array.from(articlesMap.values()));
@@ -203,6 +277,60 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
     return d.toLocaleDateString('ca-ES');
+  }
+
+  protected formatCustomizationValue(option: any): string {
+    if (!option) return '';
+    const type = option.type || 'string';
+    const value = option.value;
+    
+    if (type === 'boolean') {
+      return value ? 'Sí' : 'No';
+    }
+    if (type === 'multiselect' && Array.isArray(value)) {
+      return value.join(', ');
+    }
+    if (value === null || value === undefined) {
+      return '-';
+    }
+    return String(value);
+  }
+
+  protected formatPrice(price: number | undefined): string {
+    if (price === undefined || price === null) return '';
+    return `(+${price.toFixed(2).replace('.', ',')} €)`;
+  }
+
+  protected hasCustomizations(article: ArticleSummary): boolean {
+    const hasVariants = !!(article.variants && article.variants.length > 0);
+    // Debug: descomentar per veure què passa
+    // console.log('Article:', article.articleName, 'Variants:', article.variants?.length, 'Has variants:', hasVariants);
+    return hasVariants;
+  }
+
+  protected hasMultipleVariants(article: ArticleSummary): boolean {
+    return article.variants && article.variants.length > 1;
+  }
+
+  protected getSingleCustomization(article: ArticleSummary): CustomizationVariant | null {
+    if (article.variants && article.variants.length === 1) {
+      const variant = article.variants[0];
+      // Si la variant té personalització (no és "Sense personalitzacions")
+      if (variant.customizationKey && variant.customizationKey !== '') {
+        return variant;
+      }
+    }
+    return null;
+  }
+
+  protected toggleRow(articleId: string): void {
+    const current = { ...this.expandedRows() };
+    current[articleId] = !current[articleId];
+    this.expandedRows.set(current);
+  }
+
+  protected isRowExpanded(articleId: string): boolean {
+    return !!this.expandedRows()[articleId];
   }
 
   protected goBack(): void {

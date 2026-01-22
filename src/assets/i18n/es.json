@@ -686,6 +686,9 @@
       "totalOrders": "Total Pedidos",
       "totalArticles": "Total Artículos",
       "perUser": "por usuario",
+      "customizations": "Personalizaciones",
+      "hasCustomizations": "Este artículo tiene personalizaciones",
+      "noCustomizations": "Este artículo no tiene personalizaciones",
       "table": {
         "article": "Artículo",
         "quantity": "Cantidad Total",

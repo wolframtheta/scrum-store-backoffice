@@ -101,12 +101,39 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .p-row-toggler {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    
+    span {
+      font-size: 0.875rem;
+    }
+  }
+
+  ::ng-deep {
+    .expansion-row {
+      background: var(--surface-ground);
+      
+      td {
+        padding: 0 !important;
+      }
+    }
+  }
 }
 
 .quantity-value {
   font-weight: 600;
   font-size: 1.1rem;
-  color: var(--text-color);
+  color: #000000;
   margin-right: 0.5rem;
 }
 
@@ -115,10 +142,62 @@
   color: var(--text-color-secondary);
 }
 
+.single-customization-label {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+  font-style: italic;
+  padding: 0.25rem 0.75rem;
+  background: var(--surface-ground);
+  border-radius: 12px;
+  display: inline-block;
+}
+
 .text-center {
   text-align: center;
   padding: 2rem;
   color: var(--text-color-secondary);
+}
+
+.variants-container {
+  padding: 1rem;
+  background: white;
+  
+  .variants-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    border: 1px solid var(--surface-border);
+    
+    thead {
+      background: var(--surface-card);
+      
+      th {
+        text-align: left;
+        padding: 1rem 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #000000;
+        border-bottom: 2px solid var(--surface-border);
+      }
+    }
+    
+    tbody {
+      .variant-row {
+        background: white;
+        
+        td {
+          padding: 1rem 0.75rem;
+          border-bottom: 1px solid var(--surface-border);
+          color: #000000;
+        }
+        
+        .variant-label {
+          color: #000000;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
 }
 
 .transport-cost-card {
