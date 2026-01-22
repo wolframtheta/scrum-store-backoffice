@@ -99,7 +99,7 @@
               <th class="text-right">{{ 'sales.detail.itemTotal' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemPaid' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemRemaining' | translate }}</th>
-              @if (canDeleteItem(sale())) {
+              @if (canEditItem(sale())) {
                 <th class="text-center">{{ 'common.actions' | translate }}</th>
               }
             </tr>
@@ -132,7 +132,52 @@
                 <span class="category-badge">{{ item.article?.category || '-' }}</span>
               </td>
               <td class="text-right">
-                {{ formatQuantity(item.quantity) }} {{ item.article?.unitMeasure || 'ud' }}
+                @if (editingItemId() === item.id) {
+                  <div class="quantity-edit">
+                    <p-inputNumber
+                      [(ngModel)]="editingQuantity"
+                      mode="decimal"
+                      [min]="getMinQuantity()"
+                      [step]="getQuantityStep()"
+                      [style]="{ width: '100px' }"
+                      [showButtons]="true"
+                    />
+                    <span [style]="{ 'margin-left': '0.5rem' }">{{ item.article?.unitMeasure || 'ud' }}</span>
+                    <div class="edit-actions" [style]="{ 'margin-top': '0.5rem' }">
+                      <p-button
+                        icon="pi pi-check"
+                        [text]="true"
+                        severity="success"
+                        size="small"
+                        (onClick)="saveQuantity(item)"
+                        pTooltip="Guardar"
+                      />
+                      <p-button
+                        icon="pi pi-times"
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        (onClick)="cancelEditQuantity()"
+                        pTooltip="Cancel·lar"
+                      />
+                    </div>
+                  </div>
+                } @else {
+                  <div class="quantity-display">
+                    <span>{{ formatQuantity(item.quantity) }} {{ item.article?.unitMeasure || 'ud' }}</span>
+                    @if (canEditItem(sale())) {
+                      <p-button
+                        icon="pi pi-pencil"
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        (onClick)="startEditQuantity(item)"
+                        pTooltip="Editar quantitat"
+                        [style]="{ 'margin-left': '0.5rem' }"
+                      />
+                    }
+                  </div>
+                }
               </td>
               <td class="text-right">{{ formatPrice(item.pricePerUnit) }} €</td>
               <td class="text-right">
@@ -155,17 +200,30 @@
               <td class="text-right remaining">
                 {{ formatPrice(getItemRemaining(item)) }} €
               </td>
-              @if (canDeleteItem(sale())) {
+              @if (canEditItem(sale())) {
                 <td class="text-center">
-                  <p-button
-                    icon="pi pi-trash"
-                    [text]="true"
-                    severity="danger"
-                    size="small"
-                    [rounded]="true"
-                    (onClick)="deleteOrderItem(item)"
-                    pTooltip="Eliminar article (no ha arribat)"
-                  />
+                  <div class="action-buttons" [style]="{ 'display': 'flex', 'gap': '0.5rem', 'justify-content': 'center' }">
+                    @if (item.article?.customizationOptions && item.article.customizationOptions.length > 0) {
+                      <p-button
+                        icon="pi pi-pencil"
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        [rounded]="true"
+                        (onClick)="openCustomizationDialog(item)"
+                        pTooltip="Editar quantitat i personalització"
+                      />
+                    }
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      severity="danger"
+                      size="small"
+                      [rounded]="true"
+                      (onClick)="deleteOrderItem(item)"
+                      pTooltip="Eliminar article"
+                    />
+                  </div>
                 </td>
               }
             </tr>
@@ -173,7 +231,7 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td [attr.colspan]="canDeleteItem(sale()) ? 11 : 10" class="text-center">
+              <td [attr.colspan]="canEditItem(sale()) ? 11 : 10" class="text-center">
                 {{ 'sales.detail.noItems' | translate }}
               </td>
             </tr>
@@ -182,6 +240,269 @@
       </p-card>
     </div>
   }
+
+  <!-- Customization Dialog -->
+  <p-dialog
+    [(visible)]="showCustomizationDialog"
+    [header]="'sales.detail.editCustomization' | translate"
+    [modal]="true"
+    [style]="{ width: '600px', maxHeight: '80vh' }"
+    [draggable]="false"
+    [resizable]="false">
+    
+    @if (editingItem()) {
+      <div class="customization-dialog-content">
+        <!-- Total Quantity (outside customization section) -->
+        <div class="form-field" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--surface-200);">
+          <label style="font-weight: 600; font-size: 1.1rem;">{{ 'sales.detail.totalQuantity' | translate }}</label>
+          <p-inputNumber
+            [(ngModel)]="editingQuantity"
+            mode="decimal"
+            [min]="getMinQuantity()"
+            [step]="getQuantityStep()"
+            [style]="{ width: '100%' }"
+            [showButtons]="true"
+            (onInput)="onTotalQuantityChange()"
+          />
+          <small>{{ editingItem()?.article?.unitMeasure || 'ud' }}</small>
+        </div>
+
+        <!-- Customization Options -->
+        @if (articleCustomizationOptions().length > 0) {
+          <div class="customization-options-form" style="margin-bottom: 1.5rem;">
+            <h4>{{ 'sales.detail.customizationOptions' | translate }}</h4>
+            
+            @for (option of articleCustomizationOptions(); track option.id) {
+              <div class="customization-option-field" style="margin-bottom: 1rem;">
+                <!-- Boolean -->
+                @if (option.type === 'boolean') {
+                  <div>
+                    @if (getCustomizationOption(option.id)) {
+                      <div class="toggle-container" [style]="{ 'display': 'flex', 'align-items': 'center', 'justify-content': 'space-between' }">
+                        <div class="toggle-with-label" [style]="{ 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem' }">
+                          <label [for]="'opt-' + option.id">
+                            {{ option.title }}
+                            @if (option.required) {
+                              <span class="required">*</span>
+                            }
+                          </label>
+                          <p-toggleswitch
+                            [ngModel]="getCustomizationValue(option.id)"
+                            (onChange)="setCustomizationValue(option.id, $event.checked)"
+                            [inputId]="'opt-' + option.id"
+                          />
+                        </div>
+                        @if (getCustomizationValue(option.id) && getOptionPrice(option, getCustomizationValue(option.id)) > 0) {
+                          <span class="option-price">(+{{ formatPrice(getOptionPrice(option, getCustomizationValue(option.id))) }} €)</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Numeric -->
+                @if (option.type === 'numeric') {
+                  @if (getCustomizationOption(option.id)) {
+                    <p-inputNumber
+                      [ngModel]="getCustomizationValue(option.id)"
+                      (onInput)="setCustomizationValue(option.id, $event.value)"
+                      [style]="{ width: '100%' }"
+                      mode="decimal"
+                    />
+                  }
+                }
+
+                <!-- String -->
+                @if (option.type === 'string') {
+                  @if (getCustomizationOption(option.id)) {
+                    <input
+                      pInputText
+                      [ngModel]="getCustomizationValue(option.id)"
+                      (ngModelChange)="setCustomizationValue(option.id, $event)"
+                      [style]="{ width: '100%' }"
+                    />
+                  }
+                }
+
+                <!-- Select -->
+                @if (option.type === 'select' && option.values) {
+                  @if (getCustomizationOption(option.id)) {
+                    <p-select
+                      [ngModel]="getCustomizationValue(option.id)"
+                      (onChange)="setCustomizationValue(option.id, $event.value)"
+                      [options]="option.values"
+                      optionLabel="label"
+                      optionValue="id"
+                      [style]="{ width: '100%' }"
+                      [placeholder]="'sales.detail.selectOption' | translate"
+                    />
+                    @if (getCustomizationValue(option.id) && getOptionPrice(option, getCustomizationValue(option.id)) > 0) {
+                      <small class="option-price">+{{ formatPrice(getOptionPrice(option, getCustomizationValue(option.id))) }} €</small>
+                    }
+                  }
+                }
+
+                <!-- Multiselect -->
+                @if (option.type === 'multiselect' && option.values) {
+                  @if (getCustomizationOption(option.id)) {
+                    <p-multiselect
+                      [ngModel]="getCustomizationValue(option.id)"
+                      (onChange)="setCustomizationValue(option.id, $event.value)"
+                      [options]="option.values"
+                      optionLabel="label"
+                      optionValue="id"
+                      [style]="{ width: '100%' }"
+                      [placeholder]="'sales.detail.selectOptions' | translate"
+                    />
+                    @if (getCustomizationValue(option.id) && isArray(getCustomizationValue(option.id)) && getCustomizationValue(option.id).length > 0 && getOptionPrice(option, getCustomizationValue(option.id)) > 0) {
+                      <small class="option-price">+{{ formatPrice(getOptionPrice(option, getCustomizationValue(option.id))) }} €</small>
+                    }
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Variants (when quantity > 1) -->
+        @if (editingQuantity() > 1) {
+          <div class="variants-section" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h5 style="margin: 0;">{{ 'sales.detail.quantityByVariant' | translate }}</h5>
+              <p-button
+                icon="pi pi-plus"
+                [text]="true"
+                size="small"
+                [label]="'sales.detail.addVariant' | translate"
+                (onClick)="addVariant()"
+              />
+            </div>
+            
+            @if (editingVariants().length > 0) {
+              <div class="variants-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                @for (variant of editingVariants(); track $index; let i = $index) {
+                  <div class="variant-item" style="padding: 0.75rem; border: 1px solid var(--surface-200); border-radius: 4px; background: var(--surface-0);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                      <div style="flex: 1;">
+                        <strong>{{ 'sales.detail.variant' | translate }} {{ i + 1 }}</strong>
+                        @if (variant.customizations.length > 0) {
+                          <div style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--text-color-secondary);">
+                            @for (opt of variant.customizations; track opt.optionId) {
+                              <span>{{ opt.title }}: {{ formatCustomizationValue(opt) }}</span>
+                              @if (!$last) {<span>, </span>}
+                            }
+                          </div>
+                        } @else {
+                          <div style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--text-color-secondary);">
+                            {{ 'sales.detail.noCustomization' | translate }}
+                          </div>
+                        }
+                      </div>
+                      @if (editingVariants().length > 1) {
+                        <p-button
+                          icon="pi pi-trash"
+                          [text]="true"
+                          severity="danger"
+                          size="small"
+                          (onClick)="removeVariant(i)"
+                        />
+                      }
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                      <label style="min-width: 80px;">{{ 'sales.detail.quantity' | translate }}:</label>
+                      <p-inputNumber
+                        [(ngModel)]="variant.quantity"
+                        mode="decimal"
+                        [min]="getMinQuantity()"
+                        [max]="getMaxVariantQuantity(i)"
+                        [step]="getQuantityStep()"
+                        [style]="{ width: '120px' }"
+                        [showButtons]="true"
+                        (onInput)="onVariantQuantityChange(i, $event.value)"
+                      />
+                      <span>{{ editingItem()?.article?.unitMeasure || 'ud' }}</span>
+                    </div>
+                    @if (variant.customizations.length > 0) {
+                      <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--surface-200);">
+                        <div style="font-size: 0.875rem; color: var(--text-color-secondary);">
+                          <strong>{{ 'sales.detail.customizationOptions' | translate }}:</strong>
+                          @for (opt of variant.customizations; track opt.optionId) {
+                            <div style="margin-top: 0.25rem;">
+                              {{ opt.title }}: {{ formatCustomizationValue(opt) }}
+                              @if (opt.price && opt.price > 0) {
+                                <span class="option-price">(+{{ formatPrice(opt.price) }} €)</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+              
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: var(--surface-50); border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span><strong>{{ 'sales.detail.totalVariants' | translate }}:</strong></span>
+                  <span><strong>{{ formatQuantity(getTotalVariantsQuantity()) }} {{ editingItem()?.article?.unitMeasure || 'ud' }}</strong></span>
+                </div>
+                @if (getTotalVariantsQuantity() < editingQuantity()) {
+                  <div style="margin-top: 0.25rem; color: var(--blue-500); font-size: 0.875rem;">
+                    {{ 'sales.detail.remainingQuantity' | translate }}: {{ formatQuantity(editingQuantity() - getTotalVariantsQuantity()) }} {{ editingItem()?.article?.unitMeasure || 'ud' }} {{ 'sales.detail.withoutCustomization' | translate }}
+                  </div>
+                } @else if (getTotalVariantsQuantity() > editingQuantity()) {
+                  <div style="margin-top: 0.25rem; color: var(--orange-500); font-size: 0.875rem;">
+                    {{ 'sales.detail.exceedsTotal' | translate }}: {{ formatQuantity(getTotalVariantsQuantity() - editingQuantity()) }} {{ editingItem()?.article?.unitMeasure || 'ud' }}
+                  </div>
+                }
+              </div>
+            } @else {
+              <p style="color: var(--text-color-secondary); font-size: 0.875rem;">
+                {{ 'sales.detail.addVariantToSplit' | translate }}
+              </p>
+            }
+          </div>
+        }
+
+        <!-- Price Breakdown (when quantity > 1 and has customizations) -->
+        @if (editingQuantity() > 1 && (hasAnyCustomization() || editingVariants().length > 0)) {
+          <div class="price-breakdown" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--surface-50); border-radius: 4px;">
+            <h5 style="margin-top: 0; margin-bottom: 0.5rem;">{{ 'sales.detail.priceBreakdown' | translate }}</h5>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span>{{ 'sales.detail.basePrice' | translate }}:</span>
+                <span>{{ formatPrice(getBasePricePerUnit()) }} € × {{ formatQuantity(editingQuantity()) }} = {{ formatPrice(getBasePriceTotal()) }} €</span>
+              </div>
+              @if (getCustomizationPriceTotal() > 0) {
+                <div style="display: flex; justify-content: space-between;">
+                  <span>{{ 'sales.detail.customizationPrice' | translate }}:</span>
+                  <span>{{ formatPrice(getCustomizationPricePerUnit()) }} € × {{ formatQuantity(getCustomizedQuantity()) }} = {{ formatPrice(getCustomizationPriceTotal()) }} €</span>
+                </div>
+              }
+              <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--surface-200);">
+                <span>{{ 'sales.detail.total' | translate }}:</span>
+                <span>{{ formatPrice(getBasePriceTotal() + getCustomizationPriceTotal()) }} €</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <ng-template pTemplate="footer">
+      <p-button
+        [label]="'common.cancel' | translate"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="closeCustomizationDialog()"
+      />
+      <p-button
+        [label]="'common.save' | translate"
+        icon="pi pi-check"
+        (onClick)="saveCustomizations()"
+      />
+    </ng-template>
+  </p-dialog>
 </div>
 
 

@@ -163,6 +163,31 @@ export class SalesService {
     }
   }
 
+  async updateOrderItem(orderId: string, itemId: string, updateDto: { quantity?: number; selectedOptions?: any[] }): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const updatedOrder = await this.api.patch<Sale>(`orders/${orderId}/items/${itemId}`, updateDto);
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === orderId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = updatedOrder;
+        this.sales.set(updatedSales);
+      }
+
+      return updatedOrder;
+    } catch (err: any) {
+      this.error.set(err?.error?.message || 'Error actualitzant article de la comanda');
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
   async deleteOrderItem(orderId: string, itemId: string): Promise<Sale> {
     this.isLoading.set(true);
     this.error.set(null);
