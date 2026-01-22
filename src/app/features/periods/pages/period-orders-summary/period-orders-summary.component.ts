@@ -433,10 +433,79 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   private generateArticlesContent(): string {
     const lines: string[] = [];
     
-    // Solo los artículos, uno por línea
     this.articlesSummaryList().forEach(article => {
       const unit = article.unitMeasure ? ` ${article.unitMeasure}` : '';
-      lines.push(`${article.articleName}: ${article.totalQuantity}${unit}`);
+      
+      // Si no hi ha variants amb personalitzacions, mostrar només el total
+      const variantsWithCustomizations = article.variants.filter(
+        v => v.customizationKey && v.customizationKey !== ''
+      );
+      
+      if (variantsWithCustomizations.length === 0) {
+        lines.push(`${article.articleName}. Total ${article.totalQuantity}${unit}`);
+        return;
+      }
+      
+      // Agrupar variants per opció i valor
+      const optionGroups = new Map<string, Map<string, number>>();
+      
+      variantsWithCustomizations.forEach(variant => {
+        // Parsejar el customizationKey que té format "Option1: Value1 | Option2: Value2"
+        const optionPairs = variant.customizationKey.split(' | ');
+        
+        optionPairs.forEach(pair => {
+          // Trobar el primer ": " per separar títol i valor (el valor pot contenir ":" però no ": ")
+          const colonIndex = pair.indexOf(': ');
+          if (colonIndex === -1) return;
+          
+          const optionTitle = pair.substring(0, colonIndex).trim();
+          const optionValue = pair.substring(colonIndex + 2).trim();
+          
+          if (!optionTitle || !optionValue) return;
+          
+          if (!optionGroups.has(optionTitle)) {
+            optionGroups.set(optionTitle, new Map());
+          }
+          
+          const valueMap = optionGroups.get(optionTitle)!;
+          const currentQty = valueMap.get(optionValue) || 0;
+          valueMap.set(optionValue, currentQty + variant.quantity);
+        });
+      });
+      
+      // Construir la línia amb el format: "ArticleName. Option1? Value1: qty1; Value2: qty2"
+      let line = article.articleName;
+      
+      const customizationParts: string[] = [];
+      // Ordenar opcions alfabèticament per consistència
+      const sortedOptions = Array.from(optionGroups.entries()).sort((a, b) => 
+        a[0].localeCompare(b[0])
+      );
+      
+      sortedOptions.forEach(([optionTitle, valueMap]) => {
+        const valueParts: string[] = [];
+        // Ordenar valors: primer "Sí", després "No", després alfabèticament
+        const sortedValues = Array.from(valueMap.entries()).sort((a, b) => {
+          if (a[0] === 'Sí') return -1;
+          if (b[0] === 'Sí') return 1;
+          if (a[0] === 'No') return -1;
+          if (b[0] === 'No') return 1;
+          return a[0].localeCompare(b[0]);
+        });
+        
+        sortedValues.forEach(([value, qty]) => {
+          valueParts.push(`${value}: ${qty}`);
+        });
+        
+        customizationParts.push(`${optionTitle} ${valueParts.join('; ')}`);
+      });
+      
+      if (customizationParts.length > 0) {
+        line += `. ${customizationParts.join('. ')}`;
+      }
+      
+      line += `. Total ${article.totalQuantity}${unit}`;
+      lines.push(line);
     });
     
     return lines.join('\n');
