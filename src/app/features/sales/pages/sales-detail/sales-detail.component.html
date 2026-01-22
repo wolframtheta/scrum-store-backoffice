@@ -113,6 +113,16 @@
                   @if (item.article?.description) {
                     <small class="variety">{{ item.article.description }}</small>
                   }
+                  @if (item.selectedOptions && item.selectedOptions.length > 0) {
+                    <div class="selected-options">
+                      <div *ngFor="let option of item.selectedOptions" class="option-item">
+                        <strong>{{ option.title }}:</strong>
+                        <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
+                        <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
+                        <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
+                      </div>
+                    </div>
+                  }
                 </div>
               </td>
               <td>

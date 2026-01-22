@@ -1,7 +1,8 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -10,10 +11,14 @@ import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ChartModule } from 'primeng/chart';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
+import { CheckboxModule } from 'primeng/checkbox';
 
 import { CatalogService } from '../../services/catalog.service';
 import { PeriodsService } from '../../../periods/services/periods.service';
-import { Article, PriceHistory } from '../../../../core/models/article.model';
+import { Article, PriceHistory, CustomizationOption } from '../../../../core/models/article.model';
 import { Period, PeriodRecurrence } from '../../../../core/models/period.model';
 
 @Component({
@@ -22,6 +27,7 @@ import { Period, PeriodRecurrence } from '../../../../core/models/period.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     TranslateModule,
     ButtonModule,
     CardModule,
@@ -29,6 +35,10 @@ import { Period, PeriodRecurrence } from '../../../../core/models/period.model';
     DividerModule,
     ToastModule,
     ChartModule,
+    DialogModule,
+    InputTextModule,
+    Select,
+    CheckboxModule,
   ],
   providers: [MessageService],
   templateUrl: './article-detail.component.html',
@@ -40,6 +50,8 @@ export class ArticleDetailComponent implements OnInit {
   private readonly catalogService = inject(CatalogService);
   private readonly periodsService = inject(PeriodsService);
   private readonly messageService = inject(MessageService);
+  private readonly translateService = inject(TranslateService);
+  private readonly fb = inject(FormBuilder);
 
   protected readonly article = signal<Article | null>(null);
   protected readonly priceHistory = signal<PriceHistory[]>([]);
@@ -47,6 +59,22 @@ export class ArticleDetailComponent implements OnInit {
   protected readonly isLoading = signal<boolean>(true);
   protected readonly chartData = signal<any>(null);
   protected readonly chartOptions = signal<any>(null);
+  protected readonly showOptionsDialog = signal<boolean>(false);
+  protected readonly optionsForm!: FormGroup;
+
+  protected readonly optionTypes = [
+    { label: 'Boolean (Sí/No)', value: 'boolean' },
+    { label: 'Numèric', value: 'numeric' },
+    { label: 'Text', value: 'string' },
+    { label: 'Selecció única', value: 'select' },
+    { label: 'Selecció múltiple', value: 'multiselect' },
+  ];
+
+  constructor() {
+    this.optionsForm = this.fb.group({
+      options: this.fb.array([])
+    });
+  }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -264,6 +292,124 @@ export class ArticleDetailComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  // Customization Options Management
+  get optionsArray(): FormArray {
+    return this.optionsForm.get('options') as FormArray;
+  }
+
+  protected openOptionsDialog() {
+    this.initOptionsForm();
+    this.showOptionsDialog.set(true);
+  }
+
+  protected closeOptionsDialog() {
+    this.showOptionsDialog.set(false);
+  }
+
+  private initOptionsForm() {
+    const article = this.article();
+    this.optionsArray.clear();
+    
+    if (article?.customizationOptions) {
+      article.customizationOptions.forEach(opt => {
+        this.optionsArray.push(this.createOptionGroup(opt));
+      });
+    }
+  }
+
+  private createOptionGroup(option?: CustomizationOption): FormGroup {
+    const group = this.fb.group({
+      id: [option?.id || this.generateId()],
+      title: [option?.title || '', Validators.required],
+      type: [option?.type || 'string', Validators.required],
+      required: [option?.required || false],
+      price: [option?.price || 0, [Validators.min(0)]],
+      values: this.fb.array(option?.values?.map(v => this.createValueGroup(v)) || [])
+    });
+    return group;
+  }
+
+  private createValueGroup(value?: { id: string; label: string; price?: number }): FormGroup {
+    return this.fb.group({
+      id: [value?.id || this.generateId()],
+      label: [value?.label || '', Validators.required],
+      price: [value?.price || 0, [Validators.min(0)]]
+    });
+  }
+
+  private generateId(): string {
+    return `opt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  protected addOption() {
+    this.optionsArray.push(this.createOptionGroup());
+  }
+
+  protected removeOption(index: number) {
+    this.optionsArray.removeAt(index);
+  }
+
+  protected getValuesArray(optionIndex: number): FormArray {
+    return this.optionsArray.at(optionIndex).get('values') as FormArray;
+  }
+
+  protected addValue(optionIndex: number) {
+    this.getValuesArray(optionIndex).push(this.createValueGroup());
+  }
+
+  protected removeValue(optionIndex: number, valueIndex: number) {
+    this.getValuesArray(optionIndex).removeAt(valueIndex);
+  }
+
+  protected needsValues(type: string): boolean {
+    return type === 'select' || type === 'multiselect';
+  }
+
+  protected async saveOptions() {
+    if (this.optionsForm.invalid) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translateService.instant('common.warning'),
+        detail: this.translateService.instant('catalog.detail.fillRequiredFields')
+      });
+      return;
+    }
+
+    const article = this.article();
+    if (!article) return;
+
+    try {
+      // Processar i validar les opcions abans d'enviar-les
+      const customizationOptions = this.optionsForm.value.options.map((opt: any) => ({
+        ...opt,
+        price: opt.price ? parseFloat(opt.price) || 0 : 0,
+        values: opt.values?.map((val: any) => ({
+          ...val,
+          price: val.price ? parseFloat(val.price) || 0 : 0
+        })) || []
+      }));
+      
+      const updatedArticle = await this.catalogService.updateArticle(article.id, {
+        customizationOptions
+      });
+
+      this.article.set(updatedArticle);
+      this.showOptionsDialog.set(false);
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('common.success'),
+        detail: this.translateService.instant('catalog.detail.optionsSaved')
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('common.error'),
+        detail: error?.error?.message || this.translateService.instant('catalog.detail.optionsError')
+      });
+    }
   }
 }
 

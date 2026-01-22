@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
-import { Article, UnitMeasure, PriceHistory } from '../../../core/models/article.model';
+import { Article, UnitMeasure, PriceHistory, CustomizationOption } from '../../../core/models/article.model';
 
 export interface CreateArticleDto {
   category: string;
@@ -28,6 +28,7 @@ export interface UpdateArticleDto {
   city?: string;
   producer?: string;
   maxQuantity?: number;
+  customizationOptions?: CustomizationOption[];
 }
 
 @Injectable({

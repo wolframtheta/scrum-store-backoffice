@@ -250,6 +250,13 @@ export class SalesDetailComponent implements OnInit {
       });
     }
   }
+
+  protected formatMultiselectValue(value: any): string {
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    return String(value);
+  }
 }
 
 

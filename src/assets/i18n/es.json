@@ -180,6 +180,10 @@
         "title": "Avisos",
         "description": "Publica avisos para el grupo"
       },
+      "payments": {
+        "title": "Pagos",
+        "description": "Gestiona los pagos por período"
+      },
       "csvImport": {
         "title": "Importar CSV",
         "description": "Importa artículos desde archivo CSV"
@@ -312,7 +316,26 @@
       "title": "Detalle del Artículo",
       "info": "Información del Artículo",
       "priceHistory": "Histórico de Precios",
-      "noPriceHistory": "No hay histórico de precios disponible para este artículo"
+      "noPriceHistory": "No hay histórico de precios disponible para este artículo",
+      "customizationOptions": "Opciones de Personalización",
+      "required": "Obligatorio",
+      "addOptions": "Añadir opciones",
+      "editOptions": "Editar opciones",
+      "noOptions": "No hay opciones de personalización configuradas.",
+      "optionTitle": "Título",
+      "optionType": "Tipo",
+      "optionPrice": "Precio adicional (€)",
+      "optionRequired": "Campo obligatorio",
+      "addNewOption": "Añadir nueva opción",
+      "addValue": "Añadir valor",
+      "valueLabel": "Etiqueta del valor",
+      "valuePrice": "Precio (€)",
+      "noValues": "No hay valores. Añade al menos uno.",
+      "saveOptions": "Guardar",
+      "cancel": "Cancelar",
+      "optionsSaved": "Opciones actualizadas correctamente",
+      "optionsError": "Error actualizando opciones",
+      "fillRequiredFields": "Por favor, completa todos los campos obligatorios"
     },
     "filters": {
       "searchPlaceholder": "Buscar por nombre, descripción o productor...",
@@ -630,18 +653,33 @@
       "totalSubtotal": "Subtotal Total",
       "totalTransport": "Transporte Total",
       "grandTotal": "Total General",
+      "totalPaid": "Total Pagado",
+      "totalPending": "Total Pendiente",
       "markAsPaid": "Marcar como pagado",
       "markAsUnpaid": "Marcar como no pagado",
+      "viewDetails": "Ver detalles",
+      "viewOrders": "Ver pedidos del período",
       "table": {
         "user": "Usuario",
         "orders": "Pedidos",
+        "periods": "Períodos",
         "subtotal": "Subtotal",
         "transport": "Transporte",
         "total": "Total",
         "paid": "Pagado",
+        "pending": "Pendiente",
         "status": "Estado"
       },
-      "noUsers": "No hay usuarios con pedidos en este período"
+      "noUsers": "No hay usuarios con pedidos en este período",
+      "overview": {
+        "title": "Resumen de Pagos",
+        "subtitle": "Pagos pendientes por períodos con fecha de entrega pasada",
+        "usersSummary": "Resumen por Usuario",
+        "suppliersBreakdown": "Desglose por Proveedor",
+        "periodsCount": "Número de períodos",
+        "periods": "Período",
+        "noData": "No hay períodos con pagos pendientes"
+      }
     },
     "ordersSummary": {
       "title": "Resumen de Pedidos del Período",

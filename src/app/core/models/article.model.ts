@@ -29,6 +29,22 @@ export interface Article {
   isSeasonal: boolean;
   createdAt: Date;
   updatedAt: Date;
+  customizationOptions?: CustomizationOption[];
+}
+
+export interface CustomizationOption {
+  id: string;
+  title: string;
+  type: 'boolean' | 'numeric' | 'string' | 'select' | 'multiselect';
+  required?: boolean;
+  price?: number; // Preu addicional quan s'activa/selecciona aquesta opció
+  values?: CustomizationOptionValue[];
+}
+
+export interface CustomizationOptionValue {
+  id: string;
+  label: string;
+  price?: number; // Preu addicional per aquest valor específic (per select/multiselect)
 }
 
 export interface PriceHistory {

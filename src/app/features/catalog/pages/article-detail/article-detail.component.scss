@@ -77,3 +77,164 @@
   }
 }
 
+.card-header-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.customization-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .option-item {
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    background: var(--surface-50);
+
+    .option-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+
+      .option-title {
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--text-color);
+        flex: 1;
+      }
+    }
+
+    .option-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .value-tag {
+        padding: 0.25rem 0.75rem;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+
+        .value-price {
+          margin-left: 0.5rem;
+          opacity: 0.9;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
+
+// Options dialog styles
+.options-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+
+  .option-form-group {
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    background: var(--surface-50);
+
+    .option-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .checkbox-field {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        grid-column: span 2;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .values-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--surface-border);
+
+      .values-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        label {
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+        }
+      }
+
+      .value-row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        input {
+          flex: 1;
+        }
+
+        .price-input {
+          flex: 0 0 120px;
+        }
+      }
+    }
+  }
+}
+
+.dialog-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.text-center {
+  text-align: center;
+}
+

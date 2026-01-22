@@ -195,6 +195,10 @@
         "title": "Avisos",
         "description": "Publica avisos per al grup"
       },
+      "payments": {
+        "title": "Pagaments",
+        "description": "Gestiona els pagaments per període"
+      },
       "csvImport": {
         "title": "Importar CSV",
         "description": "Importa articles des de fitxer CSV"
@@ -338,7 +342,26 @@
       "title": "Detall de l'Article",
       "info": "Informació de l'Article",
       "priceHistory": "Historial de Preus",
-      "noPriceHistory": "No hi ha històric de preus disponible per aquest article"
+      "noPriceHistory": "No hi ha històric de preus disponible per aquest article",
+      "customizationOptions": "Opcions de Personalització",
+      "required": "Obligatori",
+      "addOptions": "Afegir opcions",
+      "editOptions": "Editar opcions",
+      "noOptions": "No hi ha opcions de personalització configurades.",
+      "optionTitle": "Títol",
+      "optionType": "Tipus",
+      "optionPrice": "Preu addicional (€)",
+      "optionRequired": "Camp obligatori",
+      "addNewOption": "Afegir nova opció",
+      "addValue": "Afegir valor",
+      "valueLabel": "Etiqueta del valor",
+      "valuePrice": "Preu (€)",
+      "noValues": "No hi ha valors. Afegeix-ne almenys un.",
+      "saveOptions": "Guardar",
+      "cancel": "Cancel·lar",
+      "optionsSaved": "Opcions actualitzades correctament",
+      "optionsError": "Error actualitzant opcions",
+      "fillRequiredFields": "Si us plau, omple tots els camps obligatoris"
     },
     "filters": {
       "searchPlaceholder": "Cercar per nom, descripció o productor...",
@@ -674,18 +697,33 @@
       "totalSubtotal": "Subtotal Total",
       "totalTransport": "Transport Total",
       "grandTotal": "Total General",
+      "totalPaid": "Total Pagat",
+      "totalPending": "Total Pendent",
       "markAsPaid": "Marcar com a pagat",
       "markAsUnpaid": "Marcar com a no pagat",
+      "viewDetails": "Veure detalls",
+      "viewOrders": "Veure comandes del període",
       "table": {
         "user": "Usuari",
         "orders": "Comandes",
+        "periods": "Períodes",
         "subtotal": "Subtotal",
         "transport": "Transport",
         "total": "Total",
         "paid": "Pagat",
+        "pending": "Pendent",
         "status": "Estat"
       },
-      "noUsers": "No hi ha usuaris amb comandes en aquest període"
+      "noUsers": "No hi ha usuaris amb comandes en aquest període",
+      "overview": {
+        "title": "Resum de Pagaments",
+        "subtitle": "Pagaments pendents per períodes amb data d'entrega passada",
+        "usersSummary": "Resum per Usuari",
+        "suppliersBreakdown": "Desglossament per Proveïdor",
+        "periodsCount": "Nombre de períodes",
+        "periods": "Període",
+        "noData": "No hi ha períodes amb pagaments pendents"
+      }
     }
   },
   "admin": {

@@ -1,0 +1,225 @@
+<div class="payments-overview-container">
+  <p-toast />
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-top">
+        <p-button
+          icon="pi pi-arrow-left"
+          [text]="true"
+          severity="secondary"
+          (onClick)="goBack()"
+          [pTooltip]="'common.back' | translate"
+        />
+        <h1>{{ 'periods.payments.overview.title' | translate }}</h1>
+      </div>
+      <p class="subtitle">{{ 'periods.payments.overview.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  @if (totalSummary()) {
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-label">{{ 'periods.payments.totalSubtotal' | translate }}</div>
+        <div class="summary-value">{{ formatPrice(totalSummary()!.totalSubtotal) }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">{{ 'periods.payments.totalTransport' | translate }}</div>
+        <div class="summary-value">{{ formatPrice(totalSummary()!.totalTransportCost) }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">{{ 'periods.payments.totalPaid' | translate }}</div>
+        <div class="summary-value">{{ formatPrice(totalSummary()!.totalPaidAmount) }}</div>
+      </div>
+      <div class="summary-card highlight">
+        <div class="summary-label">{{ 'periods.payments.totalPending' | translate }}</div>
+        <div class="summary-value">{{ formatPrice(totalSummary()!.totalAmount - totalSummary()!.totalPaidAmount) }}</div>
+      </div>
+    </div>
+  }
+
+  <!-- Aggregated Users Table -->
+  <div class="table-container">
+    <p-card>
+      <h2 class="section-title">{{ 'periods.payments.overview.usersSummary' | translate }}</h2>
+      <p-table
+        [value]="aggregatedUsers()"
+        [loading]="isLoading()"
+        [paginator]="true"
+        [rows]="20"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{{ 'common.showing' | translate }} {first} {{ 'common.to' | translate }} {last} {{ 'common.of' | translate }} {totalRecords} {{ 'common.records' | translate }}"
+        styleClass="p-datatable-sm"
+        [tableStyle]="{ 'min-width': '50rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'periods.payments.table.user' | translate }}</th>
+            <th>{{ 'periods.payments.table.periods' | translate }}</th>
+            <th>{{ 'periods.payments.table.subtotal' | translate }}</th>
+            <th>{{ 'periods.payments.table.transport' | translate }}</th>
+            <th>{{ 'periods.payments.table.total' | translate }}</th>
+            <th>{{ 'periods.payments.table.paid' | translate }}</th>
+            <th>{{ 'periods.payments.table.pending' | translate }}</th>
+            <th>{{ 'periods.payments.table.status' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-user>
+          <tr>
+            <td>
+              <strong>{{ user.userName }}</strong>
+            </td>
+            <td>
+              <p-tag
+                [value]="user.periods.length.toString()"
+                severity="info"
+              />
+            </td>
+            <td>
+              <span class="price-value">{{ formatPrice(user.totalSubtotal) }}</span>
+            </td>
+            <td>
+              <span class="price-value">{{ formatPrice(user.totalTransportCost) }}</span>
+            </td>
+            <td>
+              <strong class="price-value total">{{ formatPrice(user.totalAmount) }}</strong>
+            </td>
+            <td>
+              <span class="price-value">{{ formatPrice(user.totalPaidAmount) }}</span>
+            </td>
+            <td>
+              <span class="price-value pending">{{ formatPrice(user.totalAmount - user.totalPaidAmount) }}</span>
+            </td>
+            <td>
+              <p-tag
+                [value]="getPaymentStatusLabel(user.overallPaymentStatus)"
+                [severity]="getPaymentStatusSeverity(user.overallPaymentStatus)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center">
+              {{ 'periods.payments.overview.noData' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- Suppliers Breakdown -->
+  @if (suppliersData().length > 0) {
+    <div class="suppliers-section">
+      <h2 class="section-title">{{ 'periods.payments.overview.suppliersBreakdown' | translate }}</h2>
+      @for (supplierData of suppliersData(); track supplierData.supplierId) {
+        <p-card class="supplier-card">
+          <div class="supplier-header">
+            <div>
+              <h3>{{ supplierData.supplierName }}</h3>
+              <div class="supplier-details">
+                <span>
+                  <strong>{{ 'periods.payments.overview.periodsCount' | translate }}:</strong>
+                  {{ supplierData.periods.length }}
+                </span>
+                <span class="periods-list">
+                  <strong>{{ 'periods.payments.overview.periods' | translate }}:</strong>
+                  @for (periodData of supplierData.periods; track periodData.period.id) {
+                    <span class="period-item">
+                      <span class="period-name">{{ periodData.period.name }}</span>
+                      <p-button
+                        icon="pi pi-eye"
+                        [text]="true"
+                        severity="secondary"
+                        [rounded]="true"
+                        (onClick)="openPeriodOrders(periodData.period.id)"
+                        [pTooltip]="'periods.payments.viewOrders' | translate"
+                      />
+                      @if (!$last) {
+                        <span class="period-separator">,</span>
+                      }
+                    </span>
+                  }
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <p-table
+            [value]="getSupplierUsersArray(supplierData)"
+            styleClass="p-datatable-sm"
+            [tableStyle]="{ 'min-width': '50rem' }"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'periods.payments.table.user' | translate }}</th>
+                <th>{{ 'periods.payments.table.orders' | translate }}</th>
+                <th>{{ 'periods.payments.table.subtotal' | translate }}</th>
+                <th>{{ 'periods.payments.table.transport' | translate }}</th>
+                <th>{{ 'periods.payments.table.total' | translate }}</th>
+                <th>{{ 'periods.payments.table.paid' | translate }}</th>
+                <th>{{ 'periods.payments.table.status' | translate }}</th>
+                <th class="actions-column">{{ 'common.actions' | translate }}</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-user>
+              <tr>
+                <td>{{ user.userName }}</td>
+                <td>
+                  <p-tag [value]="user.ordersCount.toString()" severity="info" />
+                </td>
+                <td>{{ formatPrice(user.subtotal) }}</td>
+                <td>{{ formatPrice(user.transportCost) }}</td>
+                <td><strong>{{ formatPrice(user.total) }}</strong></td>
+                <td>{{ formatPrice(user.paidAmount) }}</td>
+                <td>
+                  <p-tag
+                    [value]="getPaymentStatusLabel(user.paymentStatus)"
+                    [severity]="getPaymentStatusSeverity(user.paymentStatus)"
+                  />
+                </td>
+                <td class="actions-column">
+                  <div class="action-buttons">
+                    @if (user.paymentStatus !== PaymentStatus.PAID) {
+                      @for (periodData of getUserPeriodsForSupplier(supplierData, user.userId); track periodData.period.id) {
+                        <p-button
+                          icon="pi pi-check"
+                          [text]="true"
+                          severity="success"
+                          [rounded]="true"
+                          (onClick)="markAsPaid(periodData.period.id, user.userId)"
+                          [pTooltip]="getTooltipText(('periods.payments.markAsPaid' | translate), periodData.period.name)"
+                          [disabled]="isLoading()"
+                        />
+                      }
+                    }
+                    @if (user.paymentStatus !== PaymentStatus.UNPAID) {
+                      @for (periodData of getUserPeriodsForSupplier(supplierData, user.userId); track periodData.period.id) {
+                        <p-button
+                          icon="pi pi-times"
+                          [text]="true"
+                          severity="danger"
+                          [rounded]="true"
+                          (onClick)="markAsUnpaid(periodData.period.id, user.userId)"
+                          [pTooltip]="getTooltipText(('periods.payments.markAsUnpaid' | translate), periodData.period.name)"
+                          [disabled]="isLoading()"
+                        />
+                      }
+                    }
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      }
+    </div>
+  }
+</div>

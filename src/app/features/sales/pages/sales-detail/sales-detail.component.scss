@@ -102,6 +102,28 @@
     color: var(--text-color-secondary);
     font-size: 0.875rem;
   }
+
+  .selected-options {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--surface-50);
+    border-radius: 4px;
+    font-size: 0.8rem;
+
+    .option-item {
+      margin-bottom: 0.25rem;
+      color: var(--text-color-secondary);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: var(--text-color);
+        margin-right: 0.25rem;
+      }
+    }
+  }
 }
 
 .category-badge {

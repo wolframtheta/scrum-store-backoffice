@@ -89,6 +89,59 @@
         </div>
       </p-card>
 
+      <!-- Customization Options Card -->
+      @if (article()!.customizationOptions && article()!.customizationOptions!.length > 0) {
+        <p-card [style]="{ 'margin-top': '1.5rem' }">
+          <ng-template pTemplate="header">
+            <div class="card-header-with-button">
+              <h3>{{ 'catalog.detail.customizationOptions' | translate }}</h3>
+              <p-button
+                [label]="'catalog.detail.editOptions' | translate"
+                icon="pi pi-pencil"
+                size="small"
+                (onClick)="openOptionsDialog()"
+              />
+            </div>
+          </ng-template>
+          <div class="customization-options-list">
+            <div *ngFor="let option of article()!.customizationOptions" class="option-item">
+              <div class="option-header">
+                <span class="option-title">{{ option.title }}</span>
+                <p-tag [value]="option.type" severity="info" />
+                @if (option.required) {
+                  <p-tag value="{{ 'catalog.detail.required' | translate }}" severity="danger" />
+                }
+                @if (option.price && option.price > 0) {
+                  <p-tag [value]="'+' + formatPrice(option.price)" severity="success" />
+                }
+              </div>
+              @if (option.values && option.values.length > 0) {
+                <div class="option-values">
+                  <span *ngFor="let val of option.values" class="value-tag">
+                    {{ val.label }}
+                    @if (val.price && val.price > 0) {
+                      <span class="value-price">(+{{ formatPrice(val.price) }})</span>
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </p-card>
+      } @else {
+        <p-card [style]="{ 'margin-top': '1.5rem' }">
+          <ng-template pTemplate="header">
+            <h3>{{ 'catalog.detail.customizationOptions' | translate }}</h3>
+          </ng-template>
+          <p class="text-secondary">{{ 'catalog.detail.noOptions' | translate }}</p>
+          <p-button
+            [label]="'catalog.detail.addOptions' | translate"
+            icon="pi pi-plus"
+            (onClick)="openOptionsDialog()"
+          />
+        </p-card>
+      }
+
       <!-- Price History Chart Card -->
       @if (chartData()) {
         <p-card [header]="'catalog.detail.priceHistory' | translate" [style]="{ 'margin-top': '1.5rem' }">
@@ -103,5 +156,150 @@
       }
     </div>
   }
+
+  <!-- Dialog for managing customization options -->
+  <p-dialog
+    [(visible)]="showOptionsDialog"
+    [header]="'catalog.detail.customizationOptions' | translate"
+    [modal]="true"
+    [style]="{ width: '800px', maxHeight: '80vh' }"
+    [draggable]="false"
+    [resizable]="false">
+    
+    <form [formGroup]="optionsForm">
+      <div formArrayName="options" class="options-form">
+        <div *ngFor="let option of optionsArray.controls; let i = index" [formGroupName]="i" class="option-form-group">
+          <div class="option-form-header">
+            <h4>Opció {{ i + 1 }}</h4>
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              severity="danger"
+              size="small"
+              (onClick)="removeOption(i)"
+              pTooltip="Eliminar opció"
+            />
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="title-{{i}}">{{ 'catalog.detail.optionTitle' | translate }} *</label>
+              <input
+                pInputText
+                id="title-{{i}}"
+                formControlName="title"
+                placeholder="Ex: Talla, Color, Pes..."
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="type-{{i}}">{{ 'catalog.detail.optionType' | translate }} *</label>
+              <p-select
+                id="type-{{i}}"
+                formControlName="type"
+                [options]="optionTypes"
+                optionLabel="label"
+                optionValue="value"
+                [placeholder]="'catalog.detail.optionType' | translate"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="price-{{i}}">{{ 'catalog.detail.optionPrice' | translate }}</label>
+              <input
+                pInputText
+                type="number"
+                id="price-{{i}}"
+                formControlName="price"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+              />
+            </div>
+
+            <div class="form-field checkbox-field">
+              <p-checkbox
+                formControlName="required"
+                [binary]="true"
+                inputId="required-{{i}}"
+              />
+              <label for="required-{{i}}">{{ 'catalog.detail.optionRequired' | translate }}</label>
+            </div>
+          </div>
+
+          <!-- Values for select/multiselect -->
+          @if (needsValues(option.get('type')?.value)) {
+            <div class="values-section" formArrayName="values">
+              <div class="values-header">
+                <label>{{ 'catalog.detail.addValue' | translate }}</label>
+                <p-button
+                  [label]="'catalog.detail.addValue' | translate"
+                  icon="pi pi-plus"
+                  size="small"
+                  [text]="true"
+                  (onClick)="addValue(i)"
+                />
+              </div>
+
+              <div *ngFor="let value of getValuesArray(i).controls; let j = index" [formGroupName]="j" class="value-row">
+                <input
+                  pInputText
+                  formControlName="label"
+                  [placeholder]="'catalog.detail.valueLabel' | translate"
+                />
+                <input
+                  pInputText
+                  type="number"
+                  formControlName="price"
+                  [placeholder]="'catalog.detail.valuePrice' | translate"
+                  step="0.01"
+                  min="0"
+                  class="price-input"
+                />
+                <p-button
+                  icon="pi pi-times"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="removeValue(i, j)"
+                />
+              </div>
+
+              @if (getValuesArray(i).length === 0) {
+                <p class="text-secondary">{{ 'catalog.detail.noValues' | translate }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        @if (optionsArray.length === 0) {
+          <p class="text-secondary text-center">{{ 'catalog.detail.noOptions' | translate }}</p>
+        }
+      </div>
+
+      <div class="dialog-actions">
+        <p-button
+          [label]="'catalog.detail.addNewOption' | translate"
+          icon="pi pi-plus"
+          [outlined]="true"
+          (onClick)="addOption()"
+        />
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        [label]="'catalog.detail.cancel' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeOptionsDialog()"
+      />
+      <p-button
+        [label]="'catalog.detail.saveOptions' | translate"
+        icon="pi pi-check"
+        (onClick)="saveOptions()"
+      />
+    </ng-template>
+  </p-dialog>
 </div>
 

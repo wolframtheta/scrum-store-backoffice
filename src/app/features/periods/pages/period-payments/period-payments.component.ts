@@ -117,7 +117,7 @@ export class PeriodPaymentsComponent implements OnInit {
     });
   }
 
-  protected getPaymentStatusSeverity(status: PaymentStatus): 'success' | 'warn' | 'danger' | 'info' {
+  protected getPaymentStatusSeverity(status: PaymentStatus): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
     switch (status) {
       case PaymentStatus.PAID:
         return 'success';
