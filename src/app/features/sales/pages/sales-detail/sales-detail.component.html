@@ -120,6 +120,9 @@
                         <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
                         <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
                         <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
+                        @if (option.price && option.price > 0) {
+                          <span class="option-price">(+{{ formatPrice(option.price) }} €)</span>
+                        }
                       </div>
                     </div>
                   }

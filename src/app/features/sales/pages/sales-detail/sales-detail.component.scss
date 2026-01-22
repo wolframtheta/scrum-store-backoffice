@@ -122,6 +122,12 @@
         color: var(--text-color);
         margin-right: 0.25rem;
       }
+
+      .option-price {
+        color: var(--green-600);
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
     }
   }
 }
