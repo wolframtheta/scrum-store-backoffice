@@ -33,6 +33,7 @@ export interface Period {
   deliveryDate: Date | string;
   recurrence: PeriodRecurrence;
   transportCost?: number;
+  transportTaxRate?: number;
   periodArticles?: PeriodArticle[];
   createdAt: Date | string;
   updatedAt: Date | string;
@@ -51,6 +52,7 @@ export interface CreatePeriodDto {
   deliveryDate: string;
   recurrence?: PeriodRecurrence;
   transportCost?: number;
+  transportTaxRate?: number;
   articles?: CreatePeriodArticleDto[];
 }
 
