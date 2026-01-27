@@ -25,6 +25,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService, ConfirmationService, TreeNode } from 'primeng/api';
 
 // Services
@@ -101,6 +102,7 @@ interface OrderPeriod {
     ConfirmDialogModule,
     BlockUIModule,
     ProgressSpinnerModule,
+    InputNumberModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './csv-viewer.component.html',
@@ -135,6 +137,31 @@ export class CsvViewerComponent implements OnInit {
   selectedSupplierId: string | null = null;
   selectedPeriodId: string | null = null;
   readonly availablePeriods = signal<OrderPeriod[]>([]);
+  private readonly _transportCost = signal<number | null>(null);
+  private readonly _transportTaxRate = signal<number>(21);
+  
+  // Getter/setter per al transport cost per poder usar ngModel
+  get transportCost(): number | null {
+    return this._transportCost();
+  }
+  set transportCost(value: number | null) {
+    this._transportCost.set(value);
+  }
+
+  // Getter/setter per al transport tax rate per poder usar ngModel
+  get transportTaxRate(): number {
+    return this._transportTaxRate();
+  }
+  set transportTaxRate(value: number) {
+    this._transportTaxRate.set(value);
+  }
+
+  // Opcions d'IVA disponibles
+  readonly taxRateOptions = [
+    { label: '0%', value: 0 },
+    { label: '10%', value: 10 },
+    { label: '21%', value: 21 },
+  ];
   
   // Watch for supplier changes to reload periods and check articles
   private readonly supplierWatcher = computed(() => this.selectedSupplierId);
@@ -463,6 +490,8 @@ export class CsvViewerComponent implements OnInit {
     this.selectedSupplierId = null;
     this.selectedPeriodId = null;
     this.availablePeriods.set([]);
+    this.transportCost = null;
+    this.transportTaxRate = 21; // Reset to default
     this.mappingForm.reset();
   }
 
@@ -777,11 +806,31 @@ export class CsvViewerComponent implements OnInit {
   async onSupplierChange(): Promise<void> {
     // Reset selected period when supplier changes
     this.selectedPeriodId = null;
+    this.transportCost = null;
+    this.transportTaxRate = 21;
     // Load periods for the selected supplier
     await this.loadPeriods();
     // Verificar artículos después de seleccionar proveedor
     if (this.selectedSupplierId && this.parsedArticles().length > 0) {
       await this.checkArticlesStatus();
+    }
+  }
+
+  // Period change handler
+  async onPeriodChange(): Promise<void> {
+    if (this.selectedPeriodId) {
+      try {
+        const period = await this.periodsService.getPeriod(this.selectedPeriodId);
+        this.transportCost = period.transportCost ?? null;
+        this.transportTaxRate = period.transportTaxRate ?? 21;
+      } catch (error) {
+        console.error('Error loading period:', error);
+        this.transportCost = null;
+        this.transportTaxRate = 21;
+      }
+    } else {
+      this.transportCost = null;
+      this.transportTaxRate = 21;
     }
   }
 
@@ -1063,7 +1112,8 @@ export class CsvViewerComponent implements OnInit {
           city: article.city,
           producerId,
           isEco: article.isEco,
-          taxRate: article.taxRate,
+          // Aplicar IVA del 21% si no en tenen un definit
+          taxRate: article.taxRate !== undefined && article.taxRate !== null ? article.taxRate : 21,
           consumerGroupId: groupId, // Ensure this is always a valid UUID string
         };
 
@@ -1115,6 +1165,36 @@ export class CsvViewerComponent implements OnInit {
               summary: 'Advertència',
               detail: `${batchResult.added} articles associats correctament. ${batchResult.failed} articles no s'han pogut associar.`,
             });
+          }
+
+          // Actualitzar el preu de transport del període si s'ha introduït un valor
+          const transportCostValue = this.transportCost;
+          const transportTaxRateValue = this.transportTaxRate;
+          if (transportCostValue !== null && transportCostValue !== undefined) {
+            try {
+              // Obtenir el període per obtenir el supplierId
+              const period = await this.periodsService.getPeriod(this.selectedPeriodId);
+              await this.periodsService.updatePeriod(
+                this.selectedPeriodId,
+                period.supplierId,
+                { 
+                  transportCost: transportCostValue,
+                  transportTaxRate: transportTaxRateValue
+                }
+              );
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Èxit',
+                detail: 'Cost de transport actualitzat correctament',
+              });
+            } catch (error) {
+              console.error('Error updating transport cost:', error);
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Advertència',
+                detail: 'Els articles s\'han associat al període però no s\'ha pogut actualitzar el cost de transport',
+              });
+            }
           }
         } catch (error) {
           console.error('Error adding articles to period:', error);

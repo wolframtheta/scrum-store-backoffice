@@ -224,6 +224,30 @@
         font-size: 0.85rem;
       }
     }
+
+    .transport-cost-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .transport-cost-input,
+      .transport-tax-rate-input {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label {
+          font-weight: 500;
+          color: var(--text-color);
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
   }
 
   .mapping-section {

@@ -128,6 +128,7 @@
           [showClear]="true"
           [disabled]="!selectedSupplierId"
           styleClass="w-full"
+          (onChange)="onPeriodChange()"
         >
           <ng-template #selectedItem let-period>
             <div class="period-item">
@@ -176,6 +177,47 @@
           </small>
         }
       </div>
+
+      <!-- Transport Cost Input (only visible when a period is selected) -->
+      @if (selectedPeriodId) {
+        <div class="supplier-selection">
+          <h3>Cost de transport <span class="optional-label">(Opcional)</span></h3>
+          <p class="selection-description">
+            Introdueix el cost de transport per aquest període <strong>sense IVA</strong>. Aquest cost es repartirà equitativament entre tots els usuaris que facin comandes en aquest període.
+          </p>
+          <div class="transport-cost-fields">
+            <div class="transport-cost-input">
+              <label for="transportCost">Cost de transport (sense IVA)</label>
+              <p-inputNumber
+                id="transportCost"
+                [(ngModel)]="transportCost"
+                mode="decimal"
+                [min]="0"
+                [maxFractionDigits]="2"
+                placeholder="Ex: 25.50"
+                styleClass="w-full"
+                [showClear]="true"
+              />
+            </div>
+            <div class="transport-tax-rate-input">
+              <label for="transportTaxRate">IVA del transport</label>
+              <p-select
+                id="transportTaxRate"
+                [(ngModel)]="transportTaxRate"
+                [options]="taxRateOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona l'IVA"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+          <small class="text-color-secondary mt-2">
+            <i class="pi pi-info-circle"></i>
+            Introdueix el valor sense IVA i selecciona el percentatge d'IVA. Si no introduïxes cap valor, el cost de transport del període no es modificarà.
+          </small>
+        </div>
+      }
     }
   </p-card>
 
