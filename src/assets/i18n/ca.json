@@ -721,6 +721,8 @@
       "totalPending": "Total Pendent",
       "markAsPaid": "Marcar com a pagat",
       "markAsUnpaid": "Marcar com a no pagat",
+      "markAllAsPaid": "Marcar totes les comandes com a pagades",
+      "markAllAsUnpaid": "Marcar totes les comandes com a no pagades",
       "viewDetails": "Veure detalls",
       "viewOrders": "Veure comandes del període",
       "table": {

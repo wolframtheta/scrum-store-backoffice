@@ -1,5 +1,6 @@
 <div class="payments-overview-container">
   <p-toast />
+  <p-confirmDialog />
 
   <!-- Header -->
   <div class="header">
@@ -65,6 +66,7 @@
             <th>{{ 'periods.payments.table.paid' | translate }}</th>
             <th>{{ 'periods.payments.table.pending' | translate }}</th>
             <th>{{ 'periods.payments.table.status' | translate }}</th>
+            <th class="actions-column">{{ 'common.actions' | translate }}</th>
           </tr>
         </ng-template>
 
@@ -100,12 +102,38 @@
                 [severity]="getPaymentStatusSeverity(user.overallPaymentStatus)"
               />
             </td>
+            <td class="actions-column">
+              <div class="action-buttons">
+                @if (user.overallPaymentStatus !== PaymentStatus.PAID) {
+                  <p-button
+                    icon="pi pi-check"
+                    [text]="true"
+                    severity="success"
+                    [rounded]="true"
+                    (onClick)="markAllUserPeriodsAsPaid(user)"
+                    [pTooltip]="'periods.payments.markAllAsPaid' | translate"
+                    [disabled]="isLoading()"
+                  />
+                }
+                @if (user.overallPaymentStatus !== PaymentStatus.UNPAID) {
+                  <p-button
+                    icon="pi pi-times"
+                    [text]="true"
+                    severity="danger"
+                    [rounded]="true"
+                    (onClick)="markAllUserPeriodsAsUnpaid(user)"
+                    [pTooltip]="'periods.payments.markAllAsUnpaid' | translate"
+                    [disabled]="isLoading()"
+                  />
+                }
+              </div>
+            </td>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="8" class="text-center">
+            <td colspan="9" class="text-center">
               {{ 'periods.payments.overview.noData' | translate }}
             </td>
           </tr>

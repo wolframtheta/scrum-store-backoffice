@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -52,7 +53,7 @@ import { SelectModule } from 'primeng/select';
   templateUrl: './catalog-list.component.html',
   styleUrl: './catalog-list.component.scss',
 })
-export class CatalogListComponent implements OnInit {
+export class CatalogListComponent implements OnInit, OnDestroy {
   protected readonly catalogService = inject(CatalogService);
   protected readonly categoriesService = inject(CategoriesService);
   protected readonly producersService = inject(ProducersService);
@@ -66,6 +67,7 @@ export class CatalogListComponent implements OnInit {
 
   // Form
   protected readonly filtersForm: FormGroup;
+  private searchSubscription?: Subscription;
 
   // Local state
   protected readonly categories = signal<string[]>([]);
@@ -96,6 +98,19 @@ export class CatalogListComponent implements OnInit {
     await this.loadProducers();
     await this.loadSuppliers();
     await this.loadPeriods();
+
+    // Debounce search input
+    this.searchSubscription = this.filtersForm.get('search')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(async (value: string) => {
+      this.catalogService.setSearchTerm(value || '');
+      await this.loadArticles();
+    });
+  }
+
+  ngOnDestroy() {
+    this.searchSubscription?.unsubscribe();
   }
 
   private async loadCategories() {

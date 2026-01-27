@@ -657,6 +657,8 @@
       "totalPending": "Total Pendiente",
       "markAsPaid": "Marcar como pagado",
       "markAsUnpaid": "Marcar como no pagado",
+      "markAllAsPaid": "Marcar todas las comandas como pagadas",
+      "markAllAsUnpaid": "Marcar todas las comandas como no pagadas",
       "viewDetails": "Ver detalles",
       "viewOrders": "Ver pedidos del período",
       "table": {

@@ -6,7 +6,7 @@ import { UserRole } from '../models/user-role.enum';
 
 /**
  * Guard per a rutes que requereixen rol de preparador
- * Permet accés a SuperAdmin, Manager i Preparer (a nivell de grup)
+ * Permet accés a SuperAdmin, Admin, Manager i Preparer (a nivell de grup)
  */
 export const preparerGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
@@ -23,18 +23,23 @@ export const preparerGuard: CanActivateFn = async (route, state) => {
     return true;
   }
 
+  // Admin té accés
+  if (authService.isAdmin()) {
+    return true;
+  }
+
   // Carregar grups si no estan carregats
   if (groupService.userGroups().length === 0) {
     await groupService.loadUserGroups();
   }
 
-  // Comprovar si és preparador del grup seleccionat
-  const isPreparer = groupService.isPreparer();
+  // Comprovar si és preparador d'almenys un grup
+  const hasPreparerRole = groupService.userGroups().some(group => group.role?.isPreparer === true);
   
   // Manager també té accés (perquè pot veure tot del grup)
   const isManager = groupService.isManager();
   
-  if (isPreparer || isManager) {
+  if (hasPreparerRole || isManager) {
     return true;
   }
 

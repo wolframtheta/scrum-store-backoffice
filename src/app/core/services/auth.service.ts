@@ -17,13 +17,13 @@ export class AuthService {
   // Signals
   readonly currentUser = signal<User | null>(null);
   readonly isAuthenticated = computed(() => !!this.currentUser());
-  readonly isSuperAdmin = computed(() => this.currentUser()?.roles.includes(UserRole.SUPER_ADMIN) || false);
-  readonly isAdmin = computed(() => this.currentUser()?.roles.includes(UserRole.ADMIN) || false);
+  readonly isSuperAdmin = computed(() => this.currentUser()?.roles?.includes(UserRole.SUPER_ADMIN) || false);
+  readonly isAdmin = computed(() => this.currentUser()?.roles?.includes(UserRole.ADMIN) || false);
   // isPreparer ara es comprova a nivell de grup, no com a rol global
   // readonly isPreparer = computed(() => this.currentUser()?.roles.includes(UserRole.PREPARER) || false);
   readonly isClient = computed(() => {
     const user = this.currentUser();
-    if (!user) return false;
+    if (!user || !user.roles) return false;
     // És client si només té el rol CLIENT (no té altres rols que donin accés al gestor)
     // PREPARER no és un rol global, es gestiona a nivell de grup
     return user.roles.includes(UserRole.CLIENT) && 
@@ -42,6 +42,12 @@ export class AuthService {
     const token = this.localStorage.getToken();
 
     if (user && token) {
+      // Validar que el usuario tenga roles definidos
+      if (!user.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
+        console.warn('Usuario sin roles válidos, cerrando sesión');
+        this.clearSession();
+        return;
+      }
       this.currentUser.set(user);
     }
   }
@@ -103,6 +109,13 @@ export class AuthService {
   }
 
   private setSession(authResponse: AuthResponse): void {
+    // Validar que el usuario tenga roles definidos
+    if (!authResponse.user.roles || !Array.isArray(authResponse.user.roles) || authResponse.user.roles.length === 0) {
+      console.error('Usuario sin roles válidos recibido del servidor');
+      this.clearSession();
+      throw new Error('Usuario sin roles válidos');
+    }
+
     this.localStorage.setToken(authResponse.accessToken);
     this.localStorage.setRefreshToken(authResponse.refreshToken);
     this.localStorage.setUser(authResponse.user);
@@ -129,7 +142,7 @@ export class AuthService {
    */
   hasAnyRole(...roles: UserRole[]): boolean {
     const user = this.currentUser();
-    if (!user) return false;
+    if (!user || !user.roles) return false;
     return roles.some(role => user.roles.includes(role));
   }
 
@@ -138,7 +151,7 @@ export class AuthService {
    */
   hasAllRoles(...roles: UserRole[]): boolean {
     const user = this.currentUser();
-    if (!user) return false;
+    if (!user || !user.roles) return false;
     return roles.every(role => user.roles.includes(role));
   }
 

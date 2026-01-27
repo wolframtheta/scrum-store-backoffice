@@ -8,7 +8,8 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { PeriodPaymentsService } from '../../services/period-payments.service';
 import { PeriodsService } from '../../services/periods.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
@@ -69,8 +70,9 @@ interface AggregatedUserPayment {
     ToastModule,
     CardModule,
     TooltipModule,
+    ConfirmDialogModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './payments-overview.component.html',
   styleUrl: './payments-overview.component.scss',
 })
@@ -79,6 +81,7 @@ export class PaymentsOverviewComponent implements OnInit {
   private readonly periodsService = inject(PeriodsService);
   private readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
   protected readonly router = inject(Router);
 
   protected readonly periodsData = signal<PeriodPaymentData[]>([]);
@@ -385,5 +388,122 @@ export class PaymentsOverviewComponent implements OnInit {
         detail: 'No s\'ha pogut marcar les comandes com a no pagades'
       });
     }
+  }
+
+  protected async markAllUserPeriodsAsPaid(user: AggregatedUserPayment): Promise<void> {
+    console.log('markAllUserPeriodsAsPaid called for user:', user);
+    console.log('User periods:', user.periods);
+    
+    if (!user.periods || user.periods.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertència',
+        detail: `L'usuari ${user.userName} no té períodes amb comandes`
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Vols marcar totes les comandes de ${user.userName} de tots els períodes com a pagades?`,
+      header: 'Confirmar pagament',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: async () => {
+        console.log('Confirmation accepted, starting to mark periods as paid');
+        try {
+          const errors: string[] = [];
+          
+          // Marcar com a pagat per cada període del usuari
+          for (const period of user.periods) {
+            console.log(`Processing period: ${period.periodName} (${period.periodId})`);
+            try {
+              const result = await this.paymentsService.markAsPaid(period.periodId, user.userId);
+              console.log(`Successfully marked period ${period.periodName} as paid:`, result);
+            } catch (error: any) {
+              console.error(`Error marking period ${period.periodName} as paid:`, error);
+              errors.push(period.periodName);
+            }
+          }
+          
+          console.log(`Finished processing ${user.periods.length} periods. Errors: ${errors.length}`);
+          
+          // Recarregar dades després de totes les operacions
+          console.log('Reloading payment data...');
+          await this.loadPaymentsData();
+          console.log('Payment data reloaded');
+          
+          if (errors.length > 0) {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Advertència',
+              detail: `Algunes comandes s'han marcat com a pagades, però hi ha hagut errors en els períodes: ${errors.join(', ')}`
+            });
+          } else {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Èxit',
+              detail: `Totes les comandes de ${user.userName} han estat marcades com a pagades`
+            });
+          }
+        } catch (error: any) {
+          console.error('Error in markAllUserPeriodsAsPaid:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.message || 'No s\'han pogut marcar totes les comandes com a pagades'
+          });
+        }
+      }
+    });
+  }
+
+  protected async markAllUserPeriodsAsUnpaid(user: AggregatedUserPayment): Promise<void> {
+    this.confirmationService.confirm({
+      message: `Vols marcar totes les comandes de ${user.userName} de tots els períodes com a no pagades?`,
+      header: 'Confirmar canvi',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: async () => {
+        try {
+          const errors: string[] = [];
+          
+          // Marcar com a no pagat per cada període del usuari
+          for (const period of user.periods) {
+            try {
+              await this.paymentsService.markAsUnpaid(period.periodId, user.userId);
+            } catch (error: any) {
+              console.error(`Error marking period ${period.periodName} as unpaid:`, error);
+              errors.push(period.periodName);
+            }
+          }
+          
+          // Recarregar dades després de totes les operacions
+          await this.loadPaymentsData();
+          
+          if (errors.length > 0) {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Advertència',
+              detail: `Algunes comandes s'han marcat com a no pagades, però hi ha hagut errors en els períodes: ${errors.join(', ')}`
+            });
+          } else {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Èxit',
+              detail: `Totes les comandes de ${user.userName} han estat marcades com a no pagades`
+            });
+          }
+        } catch (error: any) {
+          console.error('Error in markAllUserPeriodsAsUnpaid:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.message || 'No s\'han pogut marcar totes les comandes com a no pagades'
+          });
+        }
+      }
+    });
   }
 }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -56,6 +56,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
   
   private readonly destroy$ = new Subject<void>();
   private readonly userSearchSubject = new Subject<string>();
+  private userSearchSubscription?: any;
 
   protected readonly PaymentStatus = PaymentStatus;
   protected readonly selectedSales = signal<Set<string>>(new Set());
@@ -97,18 +98,19 @@ export class SalesListComponent implements OnInit, OnDestroy {
     
     // Filtrar per usuari
     const userIdFilter = this.filterUserId();
-    const userTextFilter = this.filterUserText().trim().toLowerCase();
+    const userTextFilter = this.filterUserText().trim();
     
     if (userIdFilter) {
       sales = sales.filter(sale => 
         (sale.userId || sale.userEmail) === userIdFilter
       );
     } else if (userTextFilter) {
-      // Filtrar per text del nom d'usuari o email
+      // Filtrar per text del nom d'usuari o email (sense accents)
+      const normalizedSearch = this.removeAccents(userTextFilter);
       sales = sales.filter(sale => {
-        const userName = (sale.userName || sale.userEmail || '').toLowerCase();
-        const userEmail = (sale.userEmail || '').toLowerCase();
-        return userName.includes(userTextFilter) || userEmail.includes(userTextFilter);
+        const userName = this.removeAccents(sale.userName || sale.userEmail || '');
+        const userEmail = this.removeAccents(sale.userEmail || '');
+        return userName.includes(normalizedSearch) || userEmail.includes(normalizedSearch);
       });
     }
     
@@ -172,6 +174,17 @@ export class SalesListComponent implements OnInit, OnDestroy {
   }
   set filterUserTextValue(value: string) {
     this.filterUserText.set(value);
+    this.userSearchSubject.next(value);
+  }
+
+  /**
+   * Elimina los acentos y diacríticos de un string
+   */
+  private removeAccents(str: string): string {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
 
   protected onUserSearch(): void {
@@ -182,11 +195,13 @@ export class SalesListComponent implements OnInit, OnDestroy {
       return;
     }
     
-    // Buscar l'usuari que coincideixi amb el text
-    const matchingUser = this.uniqueUsers().find(user =>
-      user.userName.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchText.toLowerCase())
-    );
+    // Buscar l'usuari que coincideixi amb el text (sense accents)
+    const normalizedSearch = this.removeAccents(searchText);
+    const matchingUser = this.uniqueUsers().find(user => {
+      const normalizedUserName = this.removeAccents(user.userName);
+      const normalizedUserId = this.removeAccents(user.userId);
+      return normalizedUserName.includes(normalizedSearch) || normalizedUserId.includes(normalizedSearch);
+    });
     
     if (matchingUser) {
       this.filterUserId.set(matchingUser.userId);
@@ -211,9 +226,19 @@ export class SalesListComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.loadSales();
+
+    // Debounce search input
+    this.userSearchSubscription = this.userSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.onUserSearch();
+    });
   }
 
   ngOnDestroy(): void {
+    this.userSearchSubscription?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
   }

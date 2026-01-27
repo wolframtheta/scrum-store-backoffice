@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, computed, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
@@ -68,7 +69,7 @@ interface PeriodBasket {
   templateUrl: './basket-preparation.component.html',
   styleUrl: './basket-preparation.component.scss',
 })
-export class BasketPreparationComponent implements OnInit {
+export class BasketPreparationComponent implements OnInit, OnDestroy {
   protected readonly salesService = inject(SalesService);
   protected readonly periodsService = inject(PeriodsService);
   protected readonly groupService = inject(ConsumerGroupService);
@@ -76,6 +77,11 @@ export class BasketPreparationComponent implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translate = inject(TranslateService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroy$ = new Subject<void>();
+  private readonly userSearchSubject = new Subject<string>();
+  private readonly articleSearchSubject = new Subject<string>();
+  private userSearchSubscription?: any;
+  private articleSearchSubscription?: any;
 
   // Estat dels checkboxes (clau: periodId-articleId o periodId-articleId-userId)
   protected readonly preparedItems = signal<Set<string>>(new Set());
@@ -141,6 +147,7 @@ export class BasketPreparationComponent implements OnInit {
   }
   set filterUserTextValue(value: string) {
     this.filterUserText.set(value);
+    this.userSearchSubject.next(value);
   }
 
   get filterArticleTextValue(): string {
@@ -148,6 +155,17 @@ export class BasketPreparationComponent implements OnInit {
   }
   set filterArticleTextValue(value: string) {
     this.filterArticleText.set(value);
+    this.articleSearchSubject.next(value);
+  }
+
+  /**
+   * Elimina los acentos y diacríticos de un string
+   */
+  private removeAccents(str: string): string {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
 
   protected onUserSearch(): void {
@@ -158,11 +176,13 @@ export class BasketPreparationComponent implements OnInit {
       return;
     }
     
-    // Buscar l'usuari que coincideixi amb el text
-    const matchingUser = this.uniqueUsers().find(user =>
-      user.userName.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchText.toLowerCase())
-    );
+    // Buscar l'usuari que coincideixi amb el text (sense accents)
+    const normalizedSearch = this.removeAccents(searchText);
+    const matchingUser = this.uniqueUsers().find(user => {
+      const normalizedUserName = this.removeAccents(user.userName);
+      const normalizedUserId = this.removeAccents(user.userId);
+      return normalizedUserName.includes(normalizedSearch) || normalizedUserId.includes(normalizedSearch);
+    });
     
     if (matchingUser) {
       this.filterUserId.set(matchingUser.userId);
@@ -205,18 +225,19 @@ export class BasketPreparationComponent implements OnInit {
     
     // Filtrar per usuari
     const userIdFilter = this.filterUserId();
-    const userTextFilter = this.filterUserText().trim().toLowerCase();
+    const userTextFilter = this.filterUserText().trim();
     
     if (userIdFilter) {
       filteredSales = filteredSales.filter(sale => 
         (sale.userId || sale.userEmail) === userIdFilter
       );
     } else if (userTextFilter) {
-      // Filtrar per text del nom d'usuari o email
+      // Filtrar per text del nom d'usuari o email (sense accents)
+      const normalizedSearch = this.removeAccents(userTextFilter);
       filteredSales = filteredSales.filter(sale => {
-        const userName = (sale.userName || sale.userEmail || '').toLowerCase();
-        const userEmail = (sale.userEmail || '').toLowerCase();
-        return userName.includes(userTextFilter) || userEmail.includes(userTextFilter);
+        const userName = this.removeAccents(sale.userName || sale.userEmail || '');
+        const userEmail = this.removeAccents(sale.userEmail || '');
+        return userName.includes(normalizedSearch) || userEmail.includes(normalizedSearch);
       });
     }
     
@@ -364,13 +385,17 @@ export class BasketPreparationComponent implements OnInit {
 
       const articleNodes: TreeNode[] = [];
 
-      // Filtrar articles per text de cerca
-      const articleTextFilter = this.filterArticleText().trim().toLowerCase();
+      // Filtrar articles per text de cerca (sense accents)
+      const articleTextFilter = this.filterArticleText().trim();
       
       periodBasket.articles.forEach((basketItem, articleId) => {
-        // Filtrar per nom d'article si hi ha filtre actiu
-        if (articleTextFilter && !basketItem.articleName.toLowerCase().includes(articleTextFilter)) {
-          return;
+        // Filtrar per nom d'article si hi ha filtre actiu (sense accents)
+        if (articleTextFilter) {
+          const normalizedSearch = this.removeAccents(articleTextFilter);
+          const normalizedArticleName = this.removeAccents(basketItem.articleName);
+          if (!normalizedArticleName.includes(normalizedSearch)) {
+            return;
+          }
         }
         
         const userNodes: TreeNode[] = basketItem.users.map(user => {
@@ -520,6 +545,31 @@ export class BasketPreparationComponent implements OnInit {
       this.loadSales(),
       this.loadPeriods()
     ]);
+
+    // Debounce search inputs
+    this.userSearchSubscription = this.userSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.onUserSearch();
+    });
+
+    // El filtre d'articles ja es fa reactivament amb computed, només cal el debounce visual
+    this.articleSearchSubscription = this.articleSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      // El computed ja es dispararà automàticament
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSearchSubscription?.unsubscribe();
+    this.articleSearchSubscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private async loadSales() {

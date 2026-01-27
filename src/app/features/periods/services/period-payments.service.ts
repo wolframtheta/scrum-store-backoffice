@@ -36,7 +36,10 @@ export class PeriodPaymentsService {
   }
 
   async markAsPaid(periodId: string, userId: string): Promise<PeriodPaymentSummary> {
-    this.isLoading.set(true);
+    const wasLoading = this.isLoading();
+    if (!wasLoading) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     try {
@@ -45,21 +48,30 @@ export class PeriodPaymentsService {
         throw new Error('No group selected');
       }
 
-      return await this.api.patch<PeriodPaymentSummary>(
+      console.log(`Marking as paid: periodId=${periodId}, userId=${userId}, groupId=${groupId}`);
+      const result = await this.api.patch<PeriodPaymentSummary>(
         `orders/by-period/${periodId}/user/${userId}/mark-as-paid`,
         {},
         { groupId }
       );
+      console.log(`Marked as paid successfully:`, result);
+      return result;
     } catch (err: any) {
+      console.error(`Error marking as paid:`, err);
       this.error.set(err?.error?.message || 'Error marcant comandes com a pagades');
       throw err;
     } finally {
-      this.isLoading.set(false);
+      if (!wasLoading) {
+        this.isLoading.set(false);
+      }
     }
   }
 
   async markAsUnpaid(periodId: string, userId: string): Promise<PeriodPaymentSummary> {
-    this.isLoading.set(true);
+    const wasLoading = this.isLoading();
+    if (!wasLoading) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     try {
@@ -68,16 +80,22 @@ export class PeriodPaymentsService {
         throw new Error('No group selected');
       }
 
-      return await this.api.patch<PeriodPaymentSummary>(
+      console.log(`Marking as unpaid: periodId=${periodId}, userId=${userId}, groupId=${groupId}`);
+      const result = await this.api.patch<PeriodPaymentSummary>(
         `orders/by-period/${periodId}/user/${userId}/mark-as-unpaid`,
         {},
         { groupId }
       );
+      console.log(`Marked as unpaid successfully:`, result);
+      return result;
     } catch (err: any) {
+      console.error(`Error marking as unpaid:`, err);
       this.error.set(err?.error?.message || 'Error marcant comandes com a no pagades');
       throw err;
     } finally {
-      this.isLoading.set(false);
+      if (!wasLoading) {
+        this.isLoading.set(false);
+      }
     }
   }
 }
