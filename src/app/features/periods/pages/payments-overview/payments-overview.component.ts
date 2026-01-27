@@ -142,8 +142,6 @@ export class PaymentsOverviewComponent implements OnInit {
       for (const user of supplier.users.values()) {
         if (user.paidAmount >= user.total) {
           user.paymentStatus = PaymentStatus.PAID;
-        } else if (user.paidAmount > 0) {
-          user.paymentStatus = PaymentStatus.PARTIAL;
         } else {
           user.paymentStatus = PaymentStatus.UNPAID;
         }
@@ -198,8 +196,6 @@ export class PaymentsOverviewComponent implements OnInit {
     for (const user of aggregatedArray) {
       if (user.totalPaidAmount >= user.totalAmount) {
         user.overallPaymentStatus = PaymentStatus.PAID;
-      } else if (user.totalPaidAmount > 0) {
-        user.overallPaymentStatus = PaymentStatus.PARTIAL;
       } else {
         user.overallPaymentStatus = PaymentStatus.UNPAID;
       }
@@ -301,8 +297,6 @@ export class PaymentsOverviewComponent implements OnInit {
     switch (status) {
       case PaymentStatus.PAID:
         return 'success';
-      case PaymentStatus.PARTIAL:
-        return 'warn';
       case PaymentStatus.UNPAID:
         return 'danger';
       default:
@@ -314,8 +308,6 @@ export class PaymentsOverviewComponent implements OnInit {
     switch (status) {
       case PaymentStatus.PAID:
         return 'Pagat';
-      case PaymentStatus.PARTIAL:
-        return 'Parcial';
       case PaymentStatus.UNPAID:
         return 'No pagat';
       default:

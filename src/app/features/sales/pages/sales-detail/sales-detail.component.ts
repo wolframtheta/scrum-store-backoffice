@@ -98,7 +98,6 @@ export class SalesDetailComponent implements OnInit {
   protected getStatusLabel(paymentStatus?: PaymentStatus): string {
     switch (paymentStatus) {
       case PaymentStatus.PAID: return 'sales.status.paid';
-      case PaymentStatus.PARTIAL: return 'sales.status.partial';
       case PaymentStatus.UNPAID: return 'sales.status.unpaid';
       default: return 'sales.status.unpaid';
     }
@@ -107,7 +106,6 @@ export class SalesDetailComponent implements OnInit {
   protected getStatusSeverity(paymentStatus?: PaymentStatus): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
     switch (paymentStatus) {
       case PaymentStatus.PAID: return 'success';
-      case PaymentStatus.PARTIAL: return 'warn';
       case PaymentStatus.UNPAID: return 'danger';
       default: return 'secondary';
     }

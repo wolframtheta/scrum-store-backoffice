@@ -121,8 +121,6 @@ export class PeriodPaymentsComponent implements OnInit {
     switch (status) {
       case PaymentStatus.PAID:
         return 'success';
-      case PaymentStatus.PARTIAL:
-        return 'warn';
       case PaymentStatus.UNPAID:
         return 'danger';
       default:
@@ -134,8 +132,6 @@ export class PeriodPaymentsComponent implements OnInit {
     switch (status) {
       case PaymentStatus.PAID:
         return 'Pagat';
-      case PaymentStatus.PARTIAL:
-        return 'Parcial';
       case PaymentStatus.UNPAID:
         return 'No pagat';
       default:
