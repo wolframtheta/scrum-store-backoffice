@@ -34,10 +34,6 @@
         <div class="summary-label">{{ 'periods.payments.totalPaid' | translate }}</div>
         <div class="summary-value">{{ formatPrice(totalSummary()!.totalPaidAmount) }}</div>
       </div>
-      <div class="summary-card highlight">
-        <div class="summary-label">{{ 'periods.payments.totalPending' | translate }}</div>
-        <div class="summary-value">{{ formatPrice(totalSummary()!.totalAmount - totalSummary()!.totalPaidAmount) }}</div>
-      </div>
     </div>
   }
 
@@ -64,7 +60,6 @@
             <th>{{ 'periods.payments.table.transport' | translate }}</th>
             <th>{{ 'periods.payments.table.total' | translate }}</th>
             <th>{{ 'periods.payments.table.paid' | translate }}</th>
-            <th>{{ 'periods.payments.table.pending' | translate }}</th>
             <th>{{ 'periods.payments.table.status' | translate }}</th>
             <th class="actions-column">{{ 'common.actions' | translate }}</th>
           </tr>
@@ -92,9 +87,6 @@
             </td>
             <td>
               <span class="price-value">{{ formatPrice(user.totalPaidAmount) }}</span>
-            </td>
-            <td>
-              <span class="price-value pending">{{ formatPrice(user.totalAmount - user.totalPaidAmount) }}</span>
             </td>
             <td>
               <p-tag

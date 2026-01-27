@@ -154,9 +154,6 @@
           {{ 'sales.table.paid' | translate }}
           <p-sortIcon field="paidAmount" />
         </th>
-        <th class="text-right" style="width: 8rem">
-          {{ 'sales.table.pending' | translate }}
-        </th>
         <th pSortableColumn="paymentStatus" style="width: 10rem">
           {{ 'sales.table.status' | translate }}
           <p-sortIcon field="paymentStatus" />
@@ -195,7 +192,6 @@
         </td>
         <td class="text-right"><strong>{{ getTotalWithTax(sale) | number: '1.2-2' }} €</strong></td>
         <td class="text-right">{{ sale.paidAmount | number: '1.2-2' }} €</td>
-        <td class="text-right">{{ getRemainingAmount(sale) | number: '1.2-2' }} €</td>
         <td>
           <p-tag
             [value]="getStatusLabel(sale.paymentStatus) | translate"

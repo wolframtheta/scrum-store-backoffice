@@ -64,10 +64,6 @@
             <label>{{ 'sales.table.paid' | translate }}:</label>
             <span class="amount paid">{{ formatPrice(getTotalPaid()) }} €</span>
           </div>
-          <div class="total-item">
-            <label>{{ 'sales.table.remaining' | translate }}:</label>
-            <span class="amount remaining">{{ formatPrice(getTotalRemaining()) }} €</span>
-          </div>
         </div>
 
         @if (canMarkAsPaid(sale())) {
@@ -98,7 +94,6 @@
               <th class="text-right">{{ 'sales.detail.itemTax' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemTotal' | translate }}</th>
               <th class="text-right">{{ 'sales.detail.itemPaid' | translate }}</th>
-              <th class="text-right">{{ 'sales.detail.itemRemaining' | translate }}</th>
               @if (canEditItem(sale())) {
                 <th class="text-center">{{ 'common.actions' | translate }}</th>
               }
@@ -197,9 +192,6 @@
               </td>
               <td class="text-right"><strong>{{ formatPrice(getItemTotalWithTax(item)) }} €</strong></td>
               <td class="text-right paid">{{ formatPrice(item.paidAmount || 0) }} €</td>
-              <td class="text-right remaining">
-                {{ formatPrice(getItemRemaining(item)) }} €
-              </td>
               @if (canEditItem(sale())) {
                 <td class="text-center">
                   <div class="action-buttons" [style]="{ 'display': 'flex', 'gap': '0.5rem', 'justify-content': 'center' }">
