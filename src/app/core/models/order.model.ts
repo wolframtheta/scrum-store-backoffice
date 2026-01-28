@@ -11,7 +11,6 @@ export interface OrderItem {
   quantity: number;
   pricePerUnit: number;
   totalPrice: number;
-  paidAmount?: number;
   article?: any;
   periodId?: string;
   period?: {
