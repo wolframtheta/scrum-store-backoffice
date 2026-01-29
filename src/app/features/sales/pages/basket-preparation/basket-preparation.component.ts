@@ -22,6 +22,7 @@ import { Period } from '../../../../core/models/period.model';
 import { TreeNode } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { removeAccents } from '../../../../core/utils/string.utils';
 
 interface BasketItem {
   articleId: string;
@@ -158,16 +159,6 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
     this.articleSearchSubject.next(value);
   }
 
-  /**
-   * Elimina los acentos y diacríticos de un string
-   */
-  private removeAccents(str: string): string {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  }
-
   protected onUserSearch(): void {
     const searchText = this.filterUserText().trim();
     
@@ -177,10 +168,10 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
     }
     
     // Buscar l'usuari que coincideixi amb el text (sense accents)
-    const normalizedSearch = this.removeAccents(searchText);
+    const normalizedSearch = removeAccents(searchText);
     const matchingUser = this.uniqueUsers().find(user => {
-      const normalizedUserName = this.removeAccents(user.userName);
-      const normalizedUserId = this.removeAccents(user.userId);
+      const normalizedUserName = removeAccents(user.userName);
+      const normalizedUserId = removeAccents(user.userId);
       return normalizedUserName.includes(normalizedSearch) || normalizedUserId.includes(normalizedSearch);
     });
     
@@ -233,10 +224,10 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
       );
     } else if (userTextFilter) {
       // Filtrar per text del nom d'usuari o email (sense accents)
-      const normalizedSearch = this.removeAccents(userTextFilter);
+      const normalizedSearch = removeAccents(userTextFilter);
       filteredSales = filteredSales.filter(sale => {
-        const userName = this.removeAccents(sale.userName || sale.userEmail || '');
-        const userEmail = this.removeAccents(sale.userEmail || '');
+        const userName = removeAccents(sale.userName || sale.userEmail || '');
+        const userEmail = removeAccents(sale.userEmail || '');
         return userName.includes(normalizedSearch) || userEmail.includes(normalizedSearch);
       });
     }
@@ -391,8 +382,8 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
       periodBasket.articles.forEach((basketItem, articleId) => {
         // Filtrar per nom d'article si hi ha filtre actiu (sense accents)
         if (articleTextFilter) {
-          const normalizedSearch = this.removeAccents(articleTextFilter);
-          const normalizedArticleName = this.removeAccents(basketItem.articleName);
+          const normalizedSearch = removeAccents(articleTextFilter);
+          const normalizedArticleName = removeAccents(basketItem.articleName);
           if (!normalizedArticleName.includes(normalizedSearch)) {
             return;
           }

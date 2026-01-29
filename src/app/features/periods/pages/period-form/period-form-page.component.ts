@@ -20,6 +20,7 @@ import { CatalogService } from '../../../catalog/services/catalog.service';
 import { SuppliersService } from '../../../suppliers/services/suppliers.service';
 import { PeriodsService } from '../../services/periods.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
+import { removeAccents } from '../../../../core/utils/string.utils';
 
 @Component({
   selector: 'app-period-form-page',
@@ -336,10 +337,10 @@ export class PeriodFormPageComponent implements OnInit {
   }
 
   protected filterArticles(event: any): void {
-    const query = event.query.toLowerCase();
+    const query = removeAccents(event.query);
     const allArticles = this.articles();
     const filtered = allArticles.filter(article => {
-      const searchText = `${article.product} ${article.variety || ''} ${article.category}`.toLowerCase();
+      const searchText = removeAccents(`${article.product} ${article.variety || ''} ${article.category}`);
       return searchText.includes(query);
     });
     this.filteredArticles.set(filtered);

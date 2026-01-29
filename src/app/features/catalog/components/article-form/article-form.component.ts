@@ -17,6 +17,7 @@ import { CategoriesService } from '../../services/categories.service';
 import { ProducersService } from '../../../producers/services/producers.service';
 import { ProducerFormComponent } from '../../../producers/components/producer-form/producer-form.component';
 import { TooltipModule } from 'primeng/tooltip';
+import { removeAccents } from '../../../../core/utils/string.utils';
 
 @Component({
   selector: 'app-article-form',
@@ -293,21 +294,19 @@ export class ArticleFormComponent {
   }
 
   protected filterUnitMeasures(event: any): void {
-    const query = event.query?.toLowerCase() || '';
+    const query = removeAccents(event.query || '');
     this.filteredUnitMeasures.set(
       this.unitMeasureOptions.filter(option =>
-        option.label.toLowerCase().includes(query)
+        removeAccents(option.label).includes(query)
       )
     );
   }
 
   protected filterCategories(event: any): void {
-    console.log('[filterCategories] Event:', event);
-    const query = event.query?.toLowerCase() || '';
+    const query = removeAccents(event.query || '');
     const filtered = this.categories().filter(cat =>
-      cat.toLowerCase().includes(query)
+      removeAccents(cat).includes(query)
     );
-    console.log('[filterCategories] Query:', query, 'Filtered:', filtered);
     this.filteredCategories.set(filtered);
   }
 
@@ -320,12 +319,10 @@ export class ArticleFormComponent {
   }
 
   protected filterProducts(event: any): void {
-    console.log('[filterProducts] Event:', event);
-    const query = event.query?.toLowerCase() || '';
+    const query = removeAccents(event.query || '');
     const filtered = this.products().filter(prod =>
-      prod.toLowerCase().includes(query)
+      removeAccents(prod).includes(query)
     );
-    console.log('[filterProducts] Query:', query, 'Filtered:', filtered);
     this.filteredProducts.set(filtered);
   }
 
@@ -335,12 +332,10 @@ export class ArticleFormComponent {
   }
 
   protected filterVarieties(event: any): void {
-    console.log('[filterVarieties] Event:', event);
-    const query = event.query?.toLowerCase() || '';
+    const query = removeAccents(event.query || '');
     const filtered = this.varieties().filter(variety =>
-      variety.toLowerCase().includes(query)
+      removeAccents(variety).includes(query)
     );
-    console.log('[filterVarieties] Query:', query, 'Filtered:', filtered);
     this.filteredVarieties.set(filtered);
   }
 
@@ -350,10 +345,10 @@ export class ArticleFormComponent {
   }
 
   protected filterProducers(event: any): void {
-    const query = event.query?.toLowerCase() || '';
+    const query = removeAccents(event.query || '');
     this.filteredProducers.set(
       this.producers().filter(producer =>
-        producer.name.toLowerCase().includes(query)
+        removeAccents(producer.name).includes(query)
       )
     );
   }

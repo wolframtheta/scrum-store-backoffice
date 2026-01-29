@@ -21,6 +21,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SalesService } from '../../services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
+import { removeAccents } from '../../../../core/utils/string.utils';
 
 @Component({
   selector: 'app-sales-list',
@@ -106,10 +107,10 @@ export class SalesListComponent implements OnInit, OnDestroy {
       );
     } else if (userTextFilter) {
       // Filtrar per text del nom d'usuari o email (sense accents)
-      const normalizedSearch = this.removeAccents(userTextFilter);
+      const normalizedSearch = removeAccents(userTextFilter);
       sales = sales.filter(sale => {
-        const userName = this.removeAccents(sale.userName || sale.userEmail || '');
-        const userEmail = this.removeAccents(sale.userEmail || '');
+        const userName = removeAccents(sale.userName || sale.userEmail || '');
+        const userEmail = removeAccents(sale.userEmail || '');
         return userName.includes(normalizedSearch) || userEmail.includes(normalizedSearch);
       });
     }
@@ -177,16 +178,6 @@ export class SalesListComponent implements OnInit, OnDestroy {
     this.userSearchSubject.next(value);
   }
 
-  /**
-   * Elimina los acentos y diacríticos de un string
-   */
-  private removeAccents(str: string): string {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  }
-
   protected onUserSearch(): void {
     const searchText = this.filterUserText().trim();
     
@@ -196,10 +187,10 @@ export class SalesListComponent implements OnInit, OnDestroy {
     }
     
     // Buscar l'usuari que coincideixi amb el text (sense accents)
-    const normalizedSearch = this.removeAccents(searchText);
+    const normalizedSearch = removeAccents(searchText);
     const matchingUser = this.uniqueUsers().find(user => {
-      const normalizedUserName = this.removeAccents(user.userName);
-      const normalizedUserId = this.removeAccents(user.userId);
+      const normalizedUserName = removeAccents(user.userName);
+      const normalizedUserId = removeAccents(user.userId);
       return normalizedUserName.includes(normalizedSearch) || normalizedUserId.includes(normalizedSearch);
     });
     

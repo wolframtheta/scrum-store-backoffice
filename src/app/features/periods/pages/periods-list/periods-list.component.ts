@@ -18,6 +18,7 @@ import { PeriodsService } from '../../services/periods.service';
 import { SuppliersService } from '../../../suppliers/services/suppliers.service';
 import { Period } from '../../../../core/models/period.model';
 import { Supplier } from '../../../../core/models/supplier.model';
+import { removeAccents } from '../../../../core/utils/string.utils';
 
 @Component({
   selector: 'app-periods-list',
@@ -66,28 +67,28 @@ export class PeriodsListComponent implements OnInit {
   });
 
   protected readonly filteredSuppliers = computed(() => {
-    const search = this.searchTerm().toLowerCase();
+    const search = removeAccents(this.searchTerm());
     const suppliersList = this.suppliers();
 
     return suppliersList.filter(supplier => {
       const matchesSearch = !search ||
-        supplier.name.toLowerCase().includes(search) ||
-        supplier.cif?.toLowerCase().includes(search) ||
-        supplier.email?.toLowerCase().includes(search);
+        removeAccents(supplier.name).includes(search) ||
+        (supplier.cif && removeAccents(supplier.cif).includes(search)) ||
+        (supplier.email && removeAccents(supplier.email).includes(search));
 
       return matchesSearch && supplier.isActive;
     });
   });
 
   protected readonly filteredPeriods = computed(() => {
-    const search = this.searchTerm().toLowerCase();
+    const search = removeAccents(this.searchTerm());
     const supplierFilter = this.selectedSupplierFilter();
     const periodsList = this.periods();
 
     return periodsList.filter(period => {
       const matchesSearch = !search ||
-        period.name.toLowerCase().includes(search) ||
-        period.supplier?.name.toLowerCase().includes(search);
+        removeAccents(period.name).includes(search) ||
+        (period.supplier?.name && removeAccents(period.supplier.name).includes(search));
 
       const matchesSupplier = !supplierFilter || period.supplierId === supplierFilter;
 
