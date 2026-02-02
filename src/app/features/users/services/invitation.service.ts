@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { ApiService } from '../../../core/services/api.service';
 
 export interface InvitationData {
@@ -46,7 +47,7 @@ export class InvitationService {
     try {
       return await this.api.post<Invitation>(`consumer-groups/${groupId}/invitations`, data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error creant invitació');
+      this.error.set(getErrorMessage(err, 'Error creant invitació'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -59,7 +60,7 @@ export class InvitationService {
     try {
       return await this.api.get<InvitationValidation>(`consumer-groups/invitations/${token}/validate`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error validant invitació');
+      this.error.set(getErrorMessage(err, 'Error validant invitació'));
       throw err;
     } finally {
       this.isLoading.set(false);

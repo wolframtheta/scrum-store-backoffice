@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Period, CreatePeriodDto } from '../../../core/models/period.model';
@@ -27,7 +28,7 @@ export class PeriodsService {
       const response = await this.api.get<Period[]>(url);
       this.periods.set(response);
     } catch (error) {
-      this.error.set('Error al carregar els períodes');
+      this.error.set(getErrorMessage(error, 'Error al carregar els períodes'));
       throw error;
     } finally {
       this.isLoading.set(false);
@@ -44,7 +45,7 @@ export class PeriodsService {
     try {
       return await this.api.get<Period>(`periods/${id}?consumerGroupId=${groupId}`);
     } catch (error) {
-      this.error.set('Error al carregar el període');
+      this.error.set(getErrorMessage(error, 'Error al carregar el període'));
       throw error;
     }
   }
@@ -61,7 +62,7 @@ export class PeriodsService {
       await this.loadPeriods(data.supplierId);
       return period;
     } catch (error) {
-      this.error.set('Error al crear el període');
+      this.error.set(getErrorMessage(error, 'Error al crear el període'));
       throw error;
     }
   }
@@ -78,7 +79,7 @@ export class PeriodsService {
       await this.loadPeriods(supplierId);
       return period;
     } catch (error) {
-      this.error.set('Error al actualitzar el període');
+      this.error.set(getErrorMessage(error, 'Error al actualitzar el període'));
       throw error;
     }
   }
@@ -94,7 +95,7 @@ export class PeriodsService {
       await this.api.delete(`periods/${id}?consumerGroupId=${groupId}`);
       await this.loadPeriods(supplierId);
     } catch (error) {
-      this.error.set('Error al eliminar el període');
+      this.error.set(getErrorMessage(error, 'Error al eliminar el període'));
       throw error;
     }
   }

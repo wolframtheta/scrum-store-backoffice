@@ -3,6 +3,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroup } from '../../../core/models/consumer-group.model';
 import { CategoryTreeItem } from '../models/category-tree.model';
 import { GroupMember, AddMemberDto, UpdateMemberRoleDto } from '../models/group-member.model';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class GroupSettingsService {
     try {
       return await this.api.patch<ConsumerGroup>(`consumer-groups/${groupId}`, data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant la configuració');
+      this.error.set(getErrorMessage(err, 'Error actualitzant la configuració'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -32,7 +33,7 @@ export class GroupSettingsService {
     try {
       return await this.api.get<CategoryTreeItem[]>(`categories/tree?consumerGroupId=${groupId}`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant categories');
+      this.error.set(getErrorMessage(err, 'Error carregant categories'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -45,7 +46,7 @@ export class GroupSettingsService {
     try {
       return await this.api.post<CategoryTreeItem>('categories', data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error creant categoria');
+      this.error.set(getErrorMessage(err, 'Error creant categoria'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -58,7 +59,7 @@ export class GroupSettingsService {
     try {
       return await this.api.post<{ created: number; categories: CategoryTreeItem[] }>('categories/batch', data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error creant categories');
+      this.error.set(getErrorMessage(err, 'Error creant categories'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -78,7 +79,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant categoria');
+      this.error.set(getErrorMessage(err, 'Error actualitzant categoria'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -99,7 +100,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant producte');
+      this.error.set(getErrorMessage(err, 'Error actualitzant producte'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -121,7 +122,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant varietat');
+      this.error.set(getErrorMessage(err, 'Error actualitzant varietat'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -141,7 +142,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant categoria');
+      this.error.set(getErrorMessage(err, 'Error eliminant categoria'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -161,7 +162,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant producte');
+      this.error.set(getErrorMessage(err, 'Error eliminant producte'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -182,7 +183,7 @@ export class GroupSettingsService {
         }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant varietat');
+      this.error.set(getErrorMessage(err, 'Error eliminant varietat'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -197,7 +198,7 @@ export class GroupSettingsService {
     try {
       return await this.api.get<GroupMember[]>(`consumer-groups/${groupId}/members`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant membres');
+      this.error.set(getErrorMessage(err, 'Error carregant membres'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -210,7 +211,7 @@ export class GroupSettingsService {
     try {
       return await this.api.post<{ message: string }>(`consumer-groups/${groupId}/join`, data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error afegint membre');
+      this.error.set(getErrorMessage(err, 'Error afegint membre'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -225,7 +226,7 @@ export class GroupSettingsService {
       const encodedEmail = encodeURIComponent(userEmail);
       return await this.api.patch<{ message: string }>(`consumer-groups/${groupId}/members/${encodedEmail}/role`, data);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant rol');
+      this.error.set(getErrorMessage(err, 'Error actualitzant rol'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -240,7 +241,7 @@ export class GroupSettingsService {
       const encodedEmail = encodeURIComponent(userEmail);
       return await this.api.delete<{ message: string }>(`consumer-groups/${groupId}/members/${encodedEmail}`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant membre');
+      this.error.set(getErrorMessage(err, 'Error eliminant membre'));
       throw err;
     } finally {
       this.isLoading.set(false);

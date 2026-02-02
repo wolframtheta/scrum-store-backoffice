@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ShowcaseService } from '../../services/showcase.service';
 import { Article } from '../../../../core/models/article.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 @Component({
   selector: 'app-showcase-list',
@@ -73,7 +74,7 @@ export class ShowcaseListComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error traient article de l\'aparador',
+            detail: getErrorMessage(error, 'Error traient article de l\'aparador'),
           });
         }
       },

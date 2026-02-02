@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { PeriodPaymentSummary } from '../../../core/models/period-payment-summary.model';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class PeriodPaymentsService {
         { groupId }
       );
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant resum de pagaments');
+      this.error.set(getErrorMessage(err, 'Error carregant resum de pagaments'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -58,7 +59,7 @@ export class PeriodPaymentsService {
       return result;
     } catch (err: any) {
       console.error(`Error marking as paid:`, err);
-      this.error.set(err?.error?.message || 'Error marcant comandes com a pagades');
+      this.error.set(getErrorMessage(err, 'Error marcant comandes com a pagades'));
       throw err;
     } finally {
       if (!wasLoading) {
@@ -90,7 +91,7 @@ export class PeriodPaymentsService {
       return result;
     } catch (err: any) {
       console.error(`Error marking as unpaid:`, err);
-      this.error.set(err?.error?.message || 'Error marcant comandes com a no pagades');
+      this.error.set(getErrorMessage(err, 'Error marcant comandes com a no pagades'));
       throw err;
     } finally {
       if (!wasLoading) {

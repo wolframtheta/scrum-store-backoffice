@@ -22,6 +22,7 @@ import { SalesService } from '../../services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
 import { removeAccents } from '../../../../core/utils/string.utils';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 @Component({
   selector: 'app-sales-list',
@@ -343,7 +344,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant comanda',
+            detail: getErrorMessage(error, 'Error eliminant comanda'),
           });
         }
       },
@@ -367,7 +368,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error marcant comanda com a pagada',
+        detail: getErrorMessage(error, 'Error marcant comanda com a pagada'),
       });
     }
   }
@@ -448,7 +449,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error marcant comandes com a pagades',
+        detail: getErrorMessage(error, 'Error marcant comandes com a pagades'),
       });
     }
   }

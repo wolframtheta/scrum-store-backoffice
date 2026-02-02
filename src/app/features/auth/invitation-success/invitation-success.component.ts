@@ -13,6 +13,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { InvitationService } from '../../users/services/invitation.service';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 @Component({
   selector: 'app-invitation-success',
@@ -90,7 +91,7 @@ export class InvitationSuccessComponent implements OnInit {
       }
     } catch (error: any) {
       this.tokenValid.set(false);
-      this.errorMessage.set(error?.error?.message || 'Error al validar el token d\'invitació.');
+      this.errorMessage.set(getErrorMessage(error, 'Error al validar el token d\'invitació.'));
     } finally {
       this.isValidatingToken.set(false);
     }
@@ -147,8 +148,7 @@ export class InvitationSuccessComponent implements OnInit {
     } catch (error: any) {
       console.error('Error processing invitation:', error);
       this.errorMessage.set(
-        error?.error?.message || 
-        'Error al processar la invitació. Si us plau, intenta-ho de nou.'
+        getErrorMessage(error, 'Error al processar la invitació. Si us plau, intenta-ho de nou.')
       );
       this.isProcessing.set(false);
     }

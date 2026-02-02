@@ -10,6 +10,7 @@ import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { InvitationService } from '../../users/services/invitation.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 
@@ -79,7 +80,7 @@ export class RegisterComponent implements OnInit {
       this.groupName.set(validation.groupName || null);
     } catch (error: any) {
       this.tokenValid.set(false);
-      this.errorMessage.set(error?.error?.message || this.translate.instant('register.errors.invalidToken'));
+      this.errorMessage.set(getErrorMessage(error, this.translate.instant('register.errors.invalidToken')));
     } finally {
       this.isValidatingToken.set(false);
     }
@@ -130,9 +131,7 @@ export class RegisterComponent implements OnInit {
           console.error('Error using invitation token:', error);
           // Mostrar error però no bloquejar el registre
           this.errorMessage.set(
-            error?.error?.message || 
-            this.translate.instant('register.errors.invitationFailed') ||
-            'Error al unir-se al grup. Pots intentar-ho més tard.'
+            getErrorMessage(error, this.translate.instant('register.errors.invitationFailed') || 'Error al unir-se al grup. Pots intentar-ho més tard.')
           );
         }
       }
@@ -143,7 +142,7 @@ export class RegisterComponent implements OnInit {
       });
     } catch (error: any) {
       this.errorMessage.set(
-        error?.error?.message || this.translate.instant('register.errors.generic')
+        getErrorMessage(error, this.translate.instant('register.errors.generic'))
       );
     } finally {
       this.isRegistering.set(false);

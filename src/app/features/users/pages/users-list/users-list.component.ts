@@ -8,6 +8,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { GroupSettingsService } from '../../../settings/services/group-settings.service';
@@ -92,7 +93,7 @@ export class UsersListComponent implements OnInit {
       });
     } catch (error: any) {
       console.error('Error adding member:', error);
-      const errorMessage = error?.error?.message || this.translate.instant('users.errors.addMember');
+      const errorMessage = getErrorMessage(error, this.translate.instant('users.errors.addMember'));
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('common.error'),
@@ -119,7 +120,7 @@ export class UsersListComponent implements OnInit {
       });
     } catch (error: any) {
       console.error('Error updating role:', error);
-      const errorMessage = error?.error?.message || this.translate.instant('users.errors.updateRole');
+      const errorMessage = getErrorMessage(error, this.translate.instant('users.errors.updateRole'));
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('common.error'),
@@ -146,7 +147,7 @@ export class UsersListComponent implements OnInit {
       });
     } catch (error: any) {
       console.error('Error updating role:', error);
-      const errorMessage = error?.error?.message || this.translate.instant('users.errors.updateRole');
+      const errorMessage = getErrorMessage(error, this.translate.instant('users.errors.updateRole'));
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('common.error'),
@@ -173,7 +174,7 @@ export class UsersListComponent implements OnInit {
       });
     } catch (error: any) {
       console.error('Error updating role:', error);
-      const errorMessage = error?.error?.message || this.translate.instant('users.errors.updateRole');
+      const errorMessage = getErrorMessage(error, this.translate.instant('users.errors.updateRole'));
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('common.error'),

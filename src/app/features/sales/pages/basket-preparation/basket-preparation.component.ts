@@ -23,6 +23,7 @@ import { TreeNode } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { removeAccents } from '../../../../core/utils/string.utils';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 interface BasketItem {
   articleId: string;
@@ -276,40 +277,46 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Agrupar comandes per període basant-nos en la data de creació
+    // Agrupar items per període: cada item va al seu període (item.periodId), no tota la comanda
     filteredSales.forEach(sale => {
       const orderDate = new Date(sale.createdAt);
-      
-      // Trobar el període que correspon a aquesta comanda
-      let assignedPeriod: Period | null = null;
+      // Fallback: període per data de comanda si l'item no té periodId
+      let fallbackPeriod: Period | null = null;
       for (const period of periods) {
         const startDate = new Date(period.startDate);
         const endDate = new Date(period.endDate);
         if (orderDate >= startDate && orderDate <= endDate) {
-          assignedPeriod = period;
+          fallbackPeriod = period;
           break;
         }
       }
 
-      // Si no trobem període, assignar a "Sense període"
-      const periodId = assignedPeriod?.id || 'no-period';
-      const periodName = assignedPeriod?.name || 'Sense període';
-      const isFinished = assignedPeriod ? new Date(assignedPeriod.endDate) < now : false;
-
-      if (!periodMap.has(periodId)) {
-        periodMap.set(periodId, {
-          periodId,
-          periodName,
-          period: assignedPeriod || null as any,
-          isFinished,
-          articles: new Map()
-        });
-      }
-
-      const periodBasket = periodMap.get(periodId)!;
-
-      // Agrupar items per article
+      // Agrupar cada item al seu període (cada article pot ser de períodes diferents dins la mateixa comanda)
       sale.items.forEach(item => {
+        // Prioritat: item.periodId > fallback per data de comanda
+        let assignedPeriod: Period | null = null;
+        if (item.periodId) {
+          assignedPeriod = periods.find(p => p.id === item.periodId) || null;
+        }
+        if (!assignedPeriod) {
+          assignedPeriod = fallbackPeriod;
+        }
+
+        const periodId = assignedPeriod?.id || 'no-period';
+        const periodName = assignedPeriod?.name || 'Sense període';
+        const isFinished = assignedPeriod ? new Date(assignedPeriod.endDate) < now : false;
+
+        if (!periodMap.has(periodId)) {
+          periodMap.set(periodId, {
+            periodId,
+            periodName,
+            period: assignedPeriod || null as any,
+            isFinished,
+            articles: new Map()
+          });
+        }
+
+        const periodBasket = periodMap.get(periodId)!;
         const articleId = item.articleId;
         let articleName = `Article ${articleId}`;
         
@@ -988,7 +995,7 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant article de la comanda'
+            detail: getErrorMessage(error, 'Error eliminant article de la comanda')
           });
         }
       }

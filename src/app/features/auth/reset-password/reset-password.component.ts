@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -118,7 +119,8 @@ export class ResetPasswordComponent implements OnInit {
         }
       }, 2000);
     } catch (error: any) {
-      const errorMsg = error?.error?.message || await this.translate.get('resetPassword.error').toPromise();
+      const fallback = await this.translate.get('resetPassword.error').toPromise();
+      const errorMsg = getErrorMessage(error, fallback);
       this.errorMessage.set(errorMsg);
     } finally {
       this.isLoading.set(false);

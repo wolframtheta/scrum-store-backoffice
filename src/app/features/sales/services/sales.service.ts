@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Sale, PaymentStatus, RegisterPaymentDto } from '../../../core/models/sale.model';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class SalesService {
       const sales = await this.api.get<Sale[]>(`orders/by-group/${groupId}${params}`);
       this.sales.set(sales);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant comandes');
+      this.error.set(getErrorMessage(err, 'Error carregant comandes'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -38,7 +39,7 @@ export class SalesService {
     try {
       return await this.api.get<Sale>(`orders/${id}`);
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error carregant comanda');
+      this.error.set(getErrorMessage(err, 'Error carregant comanda'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -63,7 +64,7 @@ export class SalesService {
 
       return order;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant estat de la comanda');
+      this.error.set(getErrorMessage(err, 'Error actualitzant estat de la comanda'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -88,7 +89,7 @@ export class SalesService {
 
       return sale;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error registrant pagament');
+      this.error.set(getErrorMessage(err, 'Error registrant pagament'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -113,7 +114,7 @@ export class SalesService {
 
       return sale;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant estat d\'entrega');
+      this.error.set(getErrorMessage(err, 'Error actualitzant estat d\'entrega'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -138,7 +139,7 @@ export class SalesService {
 
       return sale;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error marcant comanda com a pagada');
+      this.error.set(getErrorMessage(err, 'Error marcant comanda com a pagada'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -156,7 +157,7 @@ export class SalesService {
       const currentSales = this.sales();
       this.sales.set(currentSales.filter(s => s.id !== orderId));
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant comanda');
+      this.error.set(getErrorMessage(err, 'Error eliminant comanda'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -181,7 +182,7 @@ export class SalesService {
 
       return updatedOrder;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error actualitzant article de la comanda');
+      this.error.set(getErrorMessage(err, 'Error actualitzant article de la comanda'));
       throw err;
     } finally {
       this.isLoading.set(false);
@@ -211,7 +212,7 @@ export class SalesService {
 
       return updatedOrder;
     } catch (err: any) {
-      this.error.set(err?.error?.message || 'Error eliminant article de la comanda');
+      this.error.set(getErrorMessage(err, 'Error eliminant article de la comanda'));
       throw err;
     } finally {
       this.isLoading.set(false);

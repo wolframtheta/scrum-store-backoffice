@@ -41,6 +41,7 @@ import { PeriodsService } from '../../../periods/services/periods.service';
 // Models
 import { UnitMeasure } from '../../../../core/models/article.model';
 import { Category } from '../../../../core/models/category.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 interface ColumnMapping {
   articleField: string;
@@ -1231,7 +1232,7 @@ export class CsvViewerComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error durant la importació',
+        detail: getErrorMessage(error, 'Error durant la importació'),
       });
     } finally {
       this.isLoading.set(false);

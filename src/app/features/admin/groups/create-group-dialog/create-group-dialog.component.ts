@@ -8,6 +8,7 @@ import { Button, ButtonModule } from 'primeng/button';
 import { InputText, InputTextModule } from 'primeng/inputtext';
 import { Textarea, TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 import { AdminGroupsService, ConsumerGroupAdmin } from '../../../../core/services/admin-groups.service';
 
@@ -70,7 +71,7 @@ export class CreateGroupDialogComponent {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error.error?.message || 'admin.groups.errors.createFailed',
+        detail: getErrorMessage(error, 'admin.groups.errors.createFailed'),
       });
     } finally {
       this.isSubmitting.set(false);

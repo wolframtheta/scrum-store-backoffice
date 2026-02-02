@@ -19,6 +19,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { CatalogService } from '../../services/catalog.service';
 import { PeriodsService } from '../../../periods/services/periods.service';
 import { Article, PriceHistory, CustomizationOption } from '../../../../core/models/article.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 import { Period, PeriodRecurrence } from '../../../../core/models/period.model';
 
 @Component({
@@ -98,7 +99,7 @@ export class ArticleDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error carregant article',
+        detail: getErrorMessage(error, 'Error carregant article'),
       });
       this.router.navigate(['/catalog']);
     } finally {
@@ -407,7 +408,7 @@ export class ArticleDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: this.translateService.instant('common.error'),
-        detail: error?.error?.message || this.translateService.instant('catalog.detail.optionsError')
+        detail: getErrorMessage(error, this.translateService.instant('catalog.detail.optionsError'))
       });
     }
   }

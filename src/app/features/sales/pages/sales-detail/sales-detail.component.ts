@@ -22,6 +22,7 @@ import { SalesService } from '../../services/sales.service';
 import { Sale, PaymentStatus } from '../../../../core/models/sale.model';
 import { OrderItem, SelectedOption } from '../../../../core/models/order.model';
 import { Article, CustomizationOption } from '../../../../core/models/article.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 @Component({
   selector: 'app-sales-detail',
@@ -232,7 +233,7 @@ export class SalesDetailComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant article de la comanda'
+            detail: getErrorMessage(error, 'Error eliminant article de la comanda')
           });
         }
       }
@@ -267,7 +268,7 @@ export class SalesDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error marcant comanda com a pagada'
+        detail: getErrorMessage(error, 'Error marcant comanda com a pagada')
       });
     }
   }
@@ -324,7 +325,7 @@ export class SalesDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error actualitzant quantitat'
+        detail: getErrorMessage(error, 'Error actualitzant quantitat')
       });
     }
   }
@@ -532,7 +533,7 @@ export class SalesDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error actualitzant personalització'
+        detail: getErrorMessage(error, 'Error actualitzant personalització')
       });
     }
   }

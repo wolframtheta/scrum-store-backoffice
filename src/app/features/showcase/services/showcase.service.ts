@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Article } from '../../../core/models/article.model';
@@ -41,7 +42,7 @@ export class ShowcaseService {
 
       this._articles.set(articles);
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error carregant articles de l\'aparador');
+      this._error.set(getErrorMessage(error, 'Error carregant articles de l\'aparador'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -63,7 +64,7 @@ export class ShowcaseService {
       // Recarregar la llista
       await this.loadShowcaseArticles();
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error afegint article a l\'aparador');
+      this._error.set(getErrorMessage(error, 'Error afegint article a l\'aparador'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -85,7 +86,7 @@ export class ShowcaseService {
       // Eliminar de la llista local
       this._articles.update(articles => articles.filter(a => a.id !== articleId));
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error traient article de l\'aparador');
+      this._error.set(getErrorMessage(error, 'Error traient article de l\'aparador'));
       throw error;
     } finally {
       this._isLoading.set(false);

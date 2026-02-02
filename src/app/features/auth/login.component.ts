@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { getErrorMessage } from '../../core/models/http-error.model';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { InvitationService } from '../users/services/invitation.service';
 import { GroupSelectorModalComponent } from '../../core/components/group-selector-modal/group-selector-modal.component';
@@ -81,7 +82,7 @@ export class LoginComponent implements OnInit {
       this.groupName.set(validation.groupName || null);
     } catch (error: any) {
       this.tokenValid.set(false);
-      this.errorMessage.set(error?.error?.message || 'Token d\'invitació invàlid');
+      this.errorMessage.set(getErrorMessage(error, 'Token d\'invitació invàlid'));
     }
   }
 
@@ -121,8 +122,7 @@ export class LoginComponent implements OnInit {
           console.error('Error using invitation token:', error);
           // No bloquejar el login si falla la invitació, però mostrar missatge
           this.errorMessage.set(
-            error?.error?.message || 
-            'Error al unir-se al grup. Pots intentar-ho més tard.'
+            getErrorMessage(error, 'Error al unir-se al grup. Pots intentar-ho més tard.')
           );
         }
       }

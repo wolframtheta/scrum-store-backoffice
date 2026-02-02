@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Supplier } from '../../../core/models/supplier.model';
@@ -24,7 +25,7 @@ export class SuppliersService {
       const response = await this.api.get<Supplier[]>(`suppliers?consumerGroupId=${groupId}&activeOnly=${activeOnly}`);
       this.suppliers.set(response);
     } catch (error) {
-      this.error.set('Error al carregar els proveïdors');
+      this.error.set(getErrorMessage(error, 'Error al carregar els proveïdors'));
       throw error;
     } finally {
       this.isLoading.set(false);
@@ -38,7 +39,7 @@ export class SuppliersService {
       await this.loadSuppliers(false);
       return supplier;
     } catch (error) {
-      this.error.set('Error al crear el proveïdor');
+      this.error.set(getErrorMessage(error, 'Error al crear el proveïdor'));
       throw error;
     }
   }
@@ -55,7 +56,7 @@ export class SuppliersService {
       await this.loadSuppliers(false);
       return supplier;
     } catch (error) {
-      this.error.set('Error al actualitzar el proveïdor');
+      this.error.set(getErrorMessage(error, 'Error al actualitzar el proveïdor'));
       throw error;
     }
   }
@@ -71,7 +72,7 @@ export class SuppliersService {
       await this.api.delete(`suppliers/${id}?consumerGroupId=${groupId}`);
       await this.loadSuppliers(false);
     } catch (error) {
-      this.error.set('Error al eliminar el proveïdor');
+      this.error.set(getErrorMessage(error, 'Error al eliminar el proveïdor'));
       throw error;
     }
   }
@@ -88,7 +89,7 @@ export class SuppliersService {
       await this.loadSuppliers(false);
       return supplier;
     } catch (error) {
-      this.error.set('Error al canviar l\'estat del proveïdor');
+      this.error.set(getErrorMessage(error, 'Error al canviar l\'estat del proveïdor'));
       throw error;
     }
   }

@@ -26,6 +26,7 @@ import { ProducersService } from '../../../producers/services/producers.service'
 import { SuppliersService } from '../../../suppliers/services/suppliers.service';
 import { PeriodsService } from '../../../periods/services/periods.service';
 import { SelectModule } from 'primeng/select';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 @Component({
   selector: 'app-catalog-list',
@@ -398,7 +399,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || `Error ${action}int article`,
+        detail: getErrorMessage(error, `Error ${action}int article`),
       });
     }
   }
@@ -423,7 +424,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant article',
+            detail: getErrorMessage(error, 'Error eliminant article'),
           });
         }
       },
@@ -480,7 +481,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error desant article',
+        detail: getErrorMessage(error, 'Error desant article'),
       });
     }
   }
@@ -534,7 +535,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant articles',
+            detail: getErrorMessage(error, 'Error eliminant articles'),
           });
         }
       },
@@ -570,7 +571,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || `Error ${action}int articles a l'aparador`,
+        detail: getErrorMessage(error, `Error ${action}int articles a l'aparador`),
       });
     }
   }
@@ -604,7 +605,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || `Error ${action} de temporada`,
+        detail: getErrorMessage(error, `Error ${action} de temporada`),
       });
     }
   }
@@ -638,7 +639,7 @@ export class CatalogListComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || `Error ${action} ecològic`,
+        detail: getErrorMessage(error, `Error ${action} ecològic`),
       });
     }
   }

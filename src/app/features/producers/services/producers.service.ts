@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Producer } from '../../../core/models/producer.model';
@@ -29,7 +30,7 @@ export class ProducersService {
       }));
       this.producers.set(producers);
     } catch (error) {
-      this.error.set('Error al carregar els productors');
+      this.error.set(getErrorMessage(error, 'Error al carregar els productors'));
       throw error;
     } finally {
       this.isLoading.set(false);
@@ -47,7 +48,7 @@ export class ProducersService {
       await this.loadProducers(false); // Recarregar tots després de crear
       return producer;
     } catch (error) {
-      this.error.set('Error al crear el productor');
+      this.error.set(getErrorMessage(error, 'Error al crear el productor'));
       throw error;
     }
   }
@@ -68,7 +69,7 @@ export class ProducersService {
       await this.loadProducers(false); // Recarregar tots després d'actualitzar
       return producer;
     } catch (error) {
-      this.error.set('Error al actualitzar el productor');
+      this.error.set(getErrorMessage(error, 'Error al actualitzar el productor'));
       throw error;
     }
   }
@@ -84,7 +85,7 @@ export class ProducersService {
       await this.api.delete(`producers/${id}?consumerGroupId=${groupId}`);
       await this.loadProducers(false); // Recarregar tots després d'eliminar
     } catch (error) {
-      this.error.set('Error al eliminar el productor');
+      this.error.set(getErrorMessage(error, 'Error al eliminar el productor'));
       throw error;
     }
   }
@@ -105,7 +106,7 @@ export class ProducersService {
       await this.loadProducers(false); // Recarregar tots després de canviar estat
       return producer;
     } catch (error) {
-      this.error.set('Error al canviar l\'estat del productor');
+      this.error.set(getErrorMessage(error, 'Error al canviar l\'estat del productor'));
       throw error;
     }
   }

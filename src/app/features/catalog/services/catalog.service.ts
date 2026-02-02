@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { Article, UnitMeasure, PriceHistory, CustomizationOption } from '../../../core/models/article.model';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 export interface CreateArticleDto {
   category: string;
@@ -123,7 +124,7 @@ export class CatalogService {
       const articles = await this.api.get<Article[]>('articles', params);
       this._articles.set(articles);
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error carregant articles');
+      this._error.set(getErrorMessage(error, 'Error carregant articles'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -145,7 +146,7 @@ export class CatalogService {
 
       return article;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error creant article');
+      this._error.set(getErrorMessage(error, 'Error creant article'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -169,7 +170,7 @@ export class CatalogService {
 
       return result;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error creant articles');
+      this._error.set(getErrorMessage(error, 'Error creant articles'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -195,7 +196,7 @@ export class CatalogService {
 
       return updatedArticle;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error actualitzant article');
+      this._error.set(getErrorMessage(error, 'Error actualitzant article'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -215,7 +216,7 @@ export class CatalogService {
       // Eliminar de la llista local
       this._articles.update(articles => articles.filter(a => a.id !== articleId));
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error eliminant article');
+      this._error.set(getErrorMessage(error, 'Error eliminant article'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -240,7 +241,7 @@ export class CatalogService {
         articles.map(a => a.id === articleId ? updatedArticle : a)
       );
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error canviant estat de l\'aparador');
+      this._error.set(getErrorMessage(error, 'Error canviant estat de l\'aparador'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -270,7 +271,7 @@ export class CatalogService {
 
       return updatedArticle;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error pujant imatge');
+      this._error.set(getErrorMessage(error, 'Error pujant imatge'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -381,7 +382,7 @@ export class CatalogService {
 
       return result;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error eliminant articles');
+      this._error.set(getErrorMessage(error, 'Error eliminant articles'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -408,7 +409,7 @@ export class CatalogService {
 
       return result;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error canviant estat de l\'aparador');
+      this._error.set(getErrorMessage(error, 'Error canviant estat de l\'aparador'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -435,7 +436,7 @@ export class CatalogService {
 
       return result;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error canviant estat de temporada');
+      this._error.set(getErrorMessage(error, 'Error canviant estat de temporada'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -462,7 +463,7 @@ export class CatalogService {
 
       return result;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error canviant estat ecològic');
+      this._error.set(getErrorMessage(error, 'Error canviant estat ecològic'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -482,7 +483,7 @@ export class CatalogService {
       const article = await this.api.get<Article>(`articles/${articleId}`, params);
       return article;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error carregant article');
+      this._error.set(getErrorMessage(error, 'Error carregant article'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -500,7 +501,7 @@ export class CatalogService {
       const history = await this.api.get<PriceHistory[]>(`articles/${articleId}/price-history`);
       return history;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error carregant històric de preus');
+      this._error.set(getErrorMessage(error, 'Error carregant històric de preus'));
       throw error;
     } finally {
       this._isLoading.set(false);

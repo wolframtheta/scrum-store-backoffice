@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
+import { getErrorMessage } from '../../../core/models/http-error.model';
 
 export interface NoticeAuthor {
   email: string;
@@ -81,7 +82,7 @@ export class NoticesService {
       this._currentPage.set(page);
       this._totalPages.set(response.pages);
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error carregant avisos');
+      this._error.set(getErrorMessage(error, 'Error carregant avisos'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -110,7 +111,7 @@ export class NoticesService {
 
       return notice;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error creant avís');
+      this._error.set(getErrorMessage(error, 'Error creant avís'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -138,7 +139,7 @@ export class NoticesService {
 
       return updatedNotice;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error actualitzant avís');
+      this._error.set(getErrorMessage(error, 'Error actualitzant avís'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -159,7 +160,7 @@ export class NoticesService {
       this._notices.update(notices => notices.filter(n => n.id !== noticeId));
       this._totalNotices.update(total => total - 1);
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error eliminant avís');
+      this._error.set(getErrorMessage(error, 'Error eliminant avís'));
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -189,7 +190,7 @@ export class NoticesService {
 
       return updatedNotice;
     } catch (error: any) {
-      this._error.set(error?.error?.message || 'Error pujant imatge');
+      this._error.set(getErrorMessage(error, 'Error pujant imatge'));
       throw error;
     } finally {
       this._isLoading.set(false);

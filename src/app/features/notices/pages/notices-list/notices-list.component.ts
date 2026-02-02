@@ -8,6 +8,7 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 import { AvatarModule } from 'primeng/avatar';
 import { ImageModule } from 'primeng/image';
 
@@ -96,7 +97,7 @@ export class NoticesListComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error creant avís',
+        detail: getErrorMessage(error, 'Error creant avís'),
       });
     }
   }
@@ -134,7 +135,7 @@ export class NoticesListComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: error?.error?.message || 'Error actualitzant avís',
+        detail: getErrorMessage(error, 'Error actualitzant avís'),
       });
     }
   }
@@ -157,7 +158,7 @@ export class NoticesListComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.error?.message || 'Error eliminant avís',
+            detail: getErrorMessage(error, 'Error eliminant avís'),
           });
         }
       },

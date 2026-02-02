@@ -20,6 +20,7 @@ import { ConsumerGroupService } from '../../../../core/services/consumer-group.s
 import { PeriodPaymentSummary, UserPaymentSummary } from '../../../../core/models/period-payment-summary.model';
 import { Period } from '../../../../core/models/period.model';
 import { PaymentStatus } from '../../../../core/models/sale.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 interface PeriodPaymentData {
   period: Period;
@@ -271,7 +272,7 @@ export class PaymentsOverviewComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'No s\'ha pogut carregar els períodes'
+        detail: getErrorMessage(error, 'No s\'ha pogut carregar els períodes')
       });
     }
   }
@@ -314,7 +315,7 @@ export class PaymentsOverviewComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'No s\'ha pogut carregar les dades de pagaments'
+        detail: getErrorMessage(error, 'No s\'ha pogut carregar les dades de pagaments')
       });
     }
   }
@@ -503,7 +504,7 @@ export class PaymentsOverviewComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.message || 'No s\'han pogut marcar totes les comandes com a pagades'
+            detail: getErrorMessage(error, 'No s\'han pogut marcar totes les comandes com a pagades')
           });
         }
       }
@@ -553,7 +554,7 @@ export class PaymentsOverviewComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: error?.message || 'No s\'han pogut marcar totes les comandes com a no pagades'
+            detail: getErrorMessage(error, 'No s\'han pogut marcar totes les comandes com a no pagades')
           });
         }
       }
