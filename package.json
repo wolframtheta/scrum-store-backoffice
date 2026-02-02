@@ -7,7 +7,7 @@
     "start:prod": "ng serve --watch --configuration production",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
-    "deploy": "rsync -avz dist/scrum-store-backoffice/browser/ root@46.62.250.143:/dades/www/scrum-store-backoffice/",
+    "deploy": "rsync -avz dist/scrum-store-backoffice/browser/ root@46.62.250.143:/dades/www/backoffice/",
     "test": "ng test"
   },
   "prettier": {
