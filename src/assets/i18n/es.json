@@ -675,9 +675,14 @@
       "noUsers": "No hay usuarios con pedidos en este período",
       "overview": {
         "title": "Resumen de Pagos",
-        "subtitle": "Pagos pendientes por períodos con fecha de entrega pasada",
+        "subtitle": "Selecciona un día de entrega para ver los pagos",
+        "selectDeliveryDate": "Día de entrega",
+        "selectDeliveryDatePlaceholder": "Selecciona el día",
+        "selectDayHint": "Selecciona un día de entrega en la lista para ver los pagos y filtrar por usuario.",
+        "paymentsForDay": "Pagos del día",
         "usersSummary": "Resumen por Usuario",
         "suppliersBreakdown": "Desglose por Proveedor",
+        "toPay": "a pagar",
         "periodsCount": "Número de períodos",
         "periods": "Período",
         "noData": "No hay períodos con pagos pendientes"

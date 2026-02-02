@@ -739,9 +739,14 @@
       "noUsers": "No hi ha usuaris amb comandes en aquest període",
       "overview": {
         "title": "Resum de Pagaments",
-        "subtitle": "Pagaments pendents per períodes amb data d'entrega passada",
+        "subtitle": "Selecciona un dia d'entrega per veure els pagaments",
+        "selectDeliveryDate": "Dia d'entrega",
+        "selectDeliveryDatePlaceholder": "Selecciona el dia",
+        "selectDayHint": "Selecciona un dia d'entrega a la llista per veure els pagaments i filtrar per usuari.",
+        "paymentsForDay": "Pagaments del dia",
         "usersSummary": "Resum per Usuari",
         "suppliersBreakdown": "Desglossament per Proveïdor",
+        "toPay": "a pagar",
         "periodsCount": "Nombre de períodes",
         "periods": "Període",
         "noData": "No hi ha períodes amb pagaments pendents"

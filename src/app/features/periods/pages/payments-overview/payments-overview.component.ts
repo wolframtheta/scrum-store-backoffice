@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +10,9 @@ import { ToastModule } from 'primeng/toast';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DatePickerModule } from 'primeng/datepicker';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PeriodPaymentsService } from '../../services/period-payments.service';
 import { PeriodsService } from '../../services/periods.service';
@@ -63,6 +67,7 @@ interface AggregatedUserPayment {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    FormsModule,
     TranslateModule,
     TableModule,
     ButtonModule,
@@ -71,6 +76,9 @@ interface AggregatedUserPayment {
     CardModule,
     TooltipModule,
     ConfirmDialogModule,
+    DatePickerModule,
+    InputGroupModule,
+    InputGroupAddonModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './payments-overview.component.html',
@@ -85,11 +93,31 @@ export class PaymentsOverviewComponent implements OnInit {
   protected readonly router = inject(Router);
 
   protected readonly periodsData = signal<PeriodPaymentData[]>([]);
+  protected readonly selectedDeliveryDate = signal<Date | null>(null);
   protected readonly isLoading = computed(() => 
     this.paymentsService.isLoading() || this.periodsService.isLoading()
   );
+  protected readonly selectedDayLabel = computed(() => {
+    const date = this.selectedDeliveryDate();
+    if (!date) return null;
+    return date.toLocaleDateString('ca-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  });
 
   protected readonly PaymentStatus = PaymentStatus;
+
+  /** Retorna YYYY-MM-DD només pel dia (ignora hora, fus horari). */
+  private static toDateStr(d: Date | string): string {
+    const date = typeof d === 'string' ? new Date(d) : d;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
 
   protected readonly suppliersData = computed<SupplierPaymentData[]>(() => {
     const data = this.periodsData();
@@ -216,10 +244,11 @@ export class PaymentsOverviewComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    await this.loadPaymentsData();
+    await this.loadPeriodsAndDeliveryDates();
   }
 
-  private async loadPaymentsData(): Promise<void> {
+  /** Carrega períodes i per defecte selecciona el dia d'avui. */
+  private async loadPeriodsAndDeliveryDates(): Promise<void> {
     try {
       const groupId = this.groupService.selectedGroupId();
       if (!groupId) {
@@ -232,34 +261,50 @@ export class PaymentsOverviewComponent implements OnInit {
         return;
       }
 
-      // Carregar tots els períodes
       await this.periodsService.loadPeriods();
-      const allPeriods = this.periodsService.periods();
 
-      // Filtrar períodes que ja han passat la seva data d'entrega
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
-      const relevantPeriods = allPeriods.filter(period => {
-        const deliveryDate = new Date(period.deliveryDate);
-        deliveryDate.setHours(0, 0, 0, 0);
-        return deliveryDate <= today;
+      this.selectedDeliveryDate.set(today);
+      await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(today));
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No s\'ha pogut carregar els períodes'
       });
+    }
+  }
 
-      // Carregar resums de pagaments per cada període rellevant
+  protected onDeliveryDateSelected(date: Date | null): void {
+    this.selectedDeliveryDate.set(date);
+    if (date) {
+      this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
+    } else {
+      this.periodsData.set([]);
+    }
+  }
+
+  /** Carrega resums de pagaments només pels períodes amb la data d'entrega seleccionada. */
+  private async loadPaymentsDataForDate(dateStr: string): Promise<void> {
+    try {
+      const groupId = this.groupService.selectedGroupId();
+      if (!groupId) return;
+
+      const allPeriods = this.periodsService.periods();
+
+      const periodsForDay = allPeriods.filter(period =>
+        PaymentsOverviewComponent.toDateStr(period.deliveryDate) === dateStr
+      );
+
       const periodsData: PeriodPaymentData[] = [];
-      for (const period of relevantPeriods) {
+      for (const period of periodsForDay) {
         try {
           const summary = await this.paymentsService.getPeriodPaymentSummary(period.id);
-          // Només afegir si hi ha usuaris amb comandes
           if (summary.users.length > 0) {
-            periodsData.push({
-              period,
-              summary,
-            });
+            periodsData.push({ period, summary });
           }
         } catch (error) {
-          // Si hi ha error, continuar amb el següent període
           console.error(`Error loading payment summary for period ${period.id}:`, error);
         }
       }
@@ -342,6 +387,18 @@ export class PaymentsOverviewComponent implements OnInit {
     return Array.from(supplierData.users.values());
   }
 
+  protected getSupplierTotalToPay(supplierData: SupplierPaymentData): number {
+    return Array.from(supplierData.users.values()).reduce((sum, u) => sum + u.total, 0);
+  }
+
+  protected getSupplierSubtotal(supplierData: SupplierPaymentData): number {
+    return Array.from(supplierData.users.values()).reduce((sum, u) => sum + u.subtotal, 0);
+  }
+
+  protected getSupplierTransport(supplierData: SupplierPaymentData): number {
+    return Array.from(supplierData.users.values()).reduce((sum, u) => sum + u.transportCost, 0);
+  }
+
   protected getTooltipText(action: string, periodName: string): string {
     return `${action} - ${periodName}`;
   }
@@ -349,7 +406,8 @@ export class PaymentsOverviewComponent implements OnInit {
   protected async markAsPaid(periodId: string, userId: string): Promise<void> {
     try {
       await this.paymentsService.markAsPaid(periodId, userId);
-      await this.loadPaymentsData();
+      const date = this.selectedDeliveryDate();
+      if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
       this.messageService.add({
         severity: 'success',
         summary: 'Èxit',
@@ -367,7 +425,8 @@ export class PaymentsOverviewComponent implements OnInit {
   protected async markAsUnpaid(periodId: string, userId: string): Promise<void> {
     try {
       await this.paymentsService.markAsUnpaid(periodId, userId);
-      await this.loadPaymentsData();
+      const date = this.selectedDeliveryDate();
+      if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
       this.messageService.add({
         severity: 'success',
         summary: 'Èxit',
@@ -422,7 +481,8 @@ export class PaymentsOverviewComponent implements OnInit {
           
           // Recarregar dades després de totes les operacions
           console.log('Reloading payment data...');
-          await this.loadPaymentsData();
+          const date = this.selectedDeliveryDate();
+          if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
           console.log('Payment data reloaded');
           
           if (errors.length > 0) {
@@ -472,7 +532,8 @@ export class PaymentsOverviewComponent implements OnInit {
           }
           
           // Recarregar dades després de totes les operacions
-          await this.loadPaymentsData();
+          const date = this.selectedDeliveryDate();
+          if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
           
           if (errors.length > 0) {
             this.messageService.add({

@@ -15,12 +15,39 @@
         />
         <h1>{{ 'periods.payments.overview.title' | translate }}</h1>
       </div>
-      <p class="subtitle">{{ 'periods.payments.overview.subtitle' | translate }}</p>
+      <p class="subtitle">
+        @if (selectedDayLabel()) {
+          {{ 'periods.payments.overview.paymentsForDay' | translate }}: {{ selectedDayLabel() }}
+        } @else {
+          {{ 'periods.payments.overview.subtitle' | translate }}
+        }
+      </p>
+      <!-- Selector dia d'entrega -->
+      <div class="delivery-date-selector">
+        <label class="delivery-date-label">{{ 'periods.payments.overview.selectDeliveryDate' | translate }}</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-calendar"></i>
+          </p-inputGroupAddon>
+          <p-datePicker
+            [ngModel]="selectedDeliveryDate()"
+            (ngModelChange)="onDeliveryDateSelected($event)"
+            [showIcon]="false"
+            [showClear]="true"
+            dateFormat="dd/mm/yy"
+            [firstDayOfWeek]="1"
+            [placeholder]="'periods.payments.overview.selectDeliveryDatePlaceholder' | translate"
+            [style]="{ width: '100%', maxWidth: '320px', border: 'none' }"
+          />
+        </p-inputGroup>
+      </div>
     </div>
   </div>
 
+  <!-- Contingut només quan hi ha un dia seleccionat -->
+  @if (selectedDeliveryDate()) {
   <!-- Summary Cards -->
-  @if (totalSummary()) {
+  @if (totalSummary() && totalSummary()!.totalAmount > 0) {
     <div class="summary-cards">
       <div class="summary-card">
         <div class="summary-label">{{ 'periods.payments.totalSubtotal' | translate }}</div>
@@ -142,7 +169,15 @@
         <p-card class="supplier-card">
           <div class="supplier-header">
             <div>
-              <h3>{{ supplierData.supplierName }}</h3>
+              <h3>
+                {{ supplierData.supplierName }}
+                <span class="supplier-total-to-pay">
+                  — {{ formatPrice(getSupplierTotalToPay(supplierData)) }} {{ 'periods.payments.overview.toPay' | translate }}
+                  @if (getSupplierTransport(supplierData) > 0) {
+                    <span class="supplier-breakdown">({{ formatPrice(getSupplierSubtotal(supplierData)) }} {{ 'periods.payments.table.subtotal' | translate }} + {{ formatPrice(getSupplierTransport(supplierData)) }} {{ 'periods.payments.table.transport' | translate }})</span>
+                  }
+                </span>
+              </h3>
               <div class="supplier-details">
                 <span>
                   <strong>{{ 'periods.payments.overview.periodsCount' | translate }}:</strong>
@@ -153,6 +188,7 @@
                   @for (periodData of supplierData.periods; track periodData.period.id) {
                     <span class="period-item">
                       <span class="period-name">{{ periodData.period.name }}</span>
+                      <span class="period-delivery-date">({{ formatDate(periodData.period.deliveryDate) }})</span>
                       <p-button
                         icon="pi pi-eye"
                         [text]="true"
@@ -241,5 +277,8 @@
         </p-card>
       }
     </div>
+  }
+  } @else {
+    <p class="no-date-selected">{{ 'periods.payments.overview.selectDayHint' | translate }}</p>
   }
 </div>
