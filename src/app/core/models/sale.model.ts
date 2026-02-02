@@ -22,6 +22,8 @@ export interface SaleItem {
   totalPrice: number;
   paidAmount: number;
   selectedOptions?: SelectedOption[];
+  periodId?: string;
+  period?: { id: string; name: string; startDate: Date | string; endDate: Date | string; deliveryDate?: Date | string };
 }
 
 export interface Sale {
