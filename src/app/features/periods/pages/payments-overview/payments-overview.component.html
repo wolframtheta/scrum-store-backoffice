@@ -221,7 +221,6 @@
                 <th>{{ 'periods.payments.table.total' | translate }}</th>
                 <th>{{ 'periods.payments.table.paid' | translate }}</th>
                 <th>{{ 'periods.payments.table.status' | translate }}</th>
-                <th class="actions-column">{{ 'common.actions' | translate }}</th>
               </tr>
             </ng-template>
 
@@ -240,36 +239,6 @@
                     [value]="getPaymentStatusLabel(user.paymentStatus)"
                     [severity]="getPaymentStatusSeverity(user.paymentStatus)"
                   />
-                </td>
-                <td class="actions-column">
-                  <div class="action-buttons">
-                    @if (user.paymentStatus !== PaymentStatus.PAID) {
-                      @for (periodData of getUserPeriodsForSupplier(supplierData, user.userId); track periodData.period.id) {
-                        <p-button
-                          icon="pi pi-check"
-                          [text]="true"
-                          severity="success"
-                          [rounded]="true"
-                          (onClick)="markAsPaid(periodData.period.id, user.userId)"
-                          [pTooltip]="getTooltipText(('periods.payments.markAsPaid' | translate), periodData.period.name)"
-                          [disabled]="isLoading()"
-                        />
-                      }
-                    }
-                    @if (user.paymentStatus !== PaymentStatus.UNPAID) {
-                      @for (periodData of getUserPeriodsForSupplier(supplierData, user.userId); track periodData.period.id) {
-                        <p-button
-                          icon="pi pi-times"
-                          [text]="true"
-                          severity="danger"
-                          [rounded]="true"
-                          (onClick)="markAsUnpaid(periodData.period.id, user.userId)"
-                          [pTooltip]="getTooltipText(('periods.payments.markAsUnpaid' | translate), periodData.period.name)"
-                          [disabled]="isLoading()"
-                        />
-                      }
-                    }
-                  </div>
                 </td>
               </tr>
             </ng-template>
