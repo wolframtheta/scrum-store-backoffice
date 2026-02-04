@@ -4,6 +4,7 @@ import {
   inject,
   signal,
   computed,
+  viewChild,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -12,11 +13,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DatePickerModule } from 'primeng/datepicker';
+import { PopoverModule } from 'primeng/popover';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { GroupSettingsService } from '../../../settings/services/group-settings.service';
+import { Popover } from 'primeng/popover';
 import {
   BasketScheduleService,
   BasketScheduleCalendar,
@@ -45,7 +50,9 @@ interface DayCell {
     ButtonModule,
     CardModule,
     DatePickerModule,
+    PopoverModule,
     SelectModule,
+    TooltipModule,
     ToastModule,
   ],
   providers: [MessageService],
@@ -56,17 +63,24 @@ export class BasketCalendarPageComponent implements OnInit {
   protected readonly scheduleService = inject(BasketScheduleService);
   protected readonly groupService = inject(ConsumerGroupService);
   protected readonly authService = inject(AuthService);
+  protected readonly groupSettingsService = inject(GroupSettingsService);
   private readonly messageService = inject(MessageService);
 
   protected readonly currentYear = signal(new Date().getFullYear());
   protected readonly currentMonth = signal(new Date().getMonth() + 1);
   protected readonly calendar = signal<BasketScheduleCalendar | null>(null);
   protected readonly preparers = signal<BasketSchedulePreparer[]>([]);
+  /** Managers + preparers (for "add vote" overlay). */
+  protected readonly eligibleMembers = signal<{ userEmail: string; name?: string }[]>([]);
   protected readonly loading = signal(false);
   protected readonly savingVote = signal<string | null>(null);
   protected readonly savingAssignment = signal<string | null>(null);
   protected readonly savingClearVote = signal<{ date: string; userEmail: string } | null>(null);
+  protected readonly savingVoteForUser = signal<{ dateStr: string; userEmail: string } | null>(null);
   protected readonly config = signal<BasketScheduleConfig | null>(null);
+  protected readonly addVotePopover = viewChild<Popover>('addVotePopover');
+  /** Date for which we're showing "add vote for person" overlay (manager only). */
+  protected readonly addVoteForDate = signal<string | null>(null);
   protected readonly configPreferredWeekday = signal<number | null>(null);
   /** Time as Date (only HH:mm used); for PrimeNG time picker */
   protected readonly configPreferredTimeDate = signal<Date | null>(null);
@@ -152,10 +166,23 @@ export class BasketCalendarPageComponent implements OnInit {
       .map((p) => ({ label: p.name || p.userEmail, value: p.userEmail }));
   });
 
+  /** Options for "add vote yes" overlay: managers + preparers, excluding those who already voted that day. */
+  protected readonly addVotePersonOptions = computed(() => {
+    const eligible = this.eligibleMembers();
+    const dateStr = this.addVoteForDate();
+    const votesByDate = this.votesByDate();
+    const alreadyVoted = dateStr ? (votesByDate.get(dateStr) ?? []).map((v) => v.userEmail.toLowerCase()) : [];
+    return eligible
+      .filter((m) => !alreadyVoted.includes(m.userEmail.toLowerCase()))
+      .filter((m) => (m.name || m.userEmail || '').trim() !== 'Test')
+      .map((m) => ({ label: m.name || m.userEmail, value: m.userEmail }));
+  });
+
   async ngOnInit() {
     await this.load();
     if (this.isManager()) {
       await this.loadPreparers();
+      await this.loadEligibleMembers();
       await this.loadConfig();
     }
   }
@@ -187,6 +214,26 @@ export class BasketCalendarPageComponent implements OnInit {
       this.preparers.set(list);
     } catch {
       this.preparers.set([]);
+    }
+  }
+
+  private async loadEligibleMembers() {
+    const groupId = this.groupService.selectedGroupId();
+    if (!groupId) {
+      this.eligibleMembers.set([]);
+      return;
+    }
+    try {
+      const members = await this.groupSettingsService.getGroupMembers(groupId);
+      const eligible = members
+        .filter((m) => m.isManager || m.isPreparer)
+        .map((m) => ({
+          userEmail: m.userEmail,
+          name: [m.name, m.surname].filter(Boolean).join(' ') || m.userEmail,
+        }));
+      this.eligibleMembers.set(eligible);
+    } catch {
+      this.eligibleMembers.set([]);
     }
   }
 
@@ -283,11 +330,24 @@ export class BasketCalendarPageComponent implements OnInit {
     return mine?.status ?? null;
   }
 
-  protected async setVote(dateStr: string, status: VoteStatus) {
-    this.savingVote.set(dateStr);
+  protected async setVote(dateStr: string, status: VoteStatus, userEmail?: string) {
+    if (userEmail) {
+      this.savingVoteForUser.set({ dateStr, userEmail });
+    } else {
+      this.savingVote.set(dateStr);
+    }
     try {
-      await this.scheduleService.setVote(dateStr, status);
+      await this.scheduleService.setVote(dateStr, status, userEmail);
       await this.load();
+      if (userEmail) {
+        this.addVotePopover()?.hide();
+        this.addVoteForDate.set(null);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Vot afegit',
+          detail: `S'ha posat vot "Sí" per a aquest dia`,
+        });
+      }
     } catch (e) {
       this.messageService.add({
         severity: 'error',
@@ -296,6 +356,7 @@ export class BasketCalendarPageComponent implements OnInit {
       });
     } finally {
       this.savingVote.set(null);
+      this.savingVoteForUser.set(null);
     }
   }
 
@@ -368,6 +429,18 @@ export class BasketCalendarPageComponent implements OnInit {
 
   protected voteLabel(status: VoteStatus): string {
     return status === 'yes' ? 'basketCalendar.yes' : status === 'no' ? 'basketCalendar.no' : 'basketCalendar.ifNeeded';
+  }
+
+  /** Manager: click on day cell (not on a person/badge/button) opens overlay to add vote "yes" for a person. */
+  protected onDayCellClick(event: MouseEvent, dateStr: string) {
+    if (!this.isManager() || !dateStr) return;
+    this.addVoteForDate.set(dateStr);
+    this.addVotePopover()?.toggle(event);
+  }
+
+  protected isSavingVoteForUser(dateStr: string, userEmail: string): boolean {
+    const s = this.savingVoteForUser();
+    return s !== null && s.dateStr === dateStr && s.userEmail === userEmail;
   }
 
   protected readonly preferredWeekdayOptions = [

@@ -357,7 +357,11 @@
     "ifNeeded": "Si cal",
     "assigned": "Prepara",
     "clearAssignment": "Treure assignació",
-    "clearVote": "Treure vot"
+    "clearVote": "Treure vot",
+    "addVoteYesFor": "Afegir vot Sí per a...",
+    "noPreparers": "No hi ha preparadors al grup",
+    "noEligibleOrAllVoted": "No hi ha més persones o totes ja tenen vot aquest dia",
+    "clickToAddVoteYes": "Clica per afegir vot Sí per a una persona"
   },
   "catalog": {
     "title": "Catàleg",

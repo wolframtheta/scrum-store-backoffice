@@ -66,12 +66,15 @@
                 class="day-cell"
                 [class.other-month]="!cell.isCurrentMonth"
                 [class.today]="cell.isToday"
+                [class.day-cell-clickable]="isManager() && cell.dateStr"
+                [pTooltip]="isManager() && cell.dateStr ? ('basketCalendar.clickToAddVoteYes' | translate) : null"
+                (click)="isManager() && cell.dateStr && onDayCellClick($event, cell.dateStr)"
               >
                 @if (cell.dateStr) {
                   <div class="day-number">{{ cell.dayOfMonth }}</div>
                   <div class="day-content">
                     @if (isManager()) {
-                      <div class="assignment-pills">
+                      <div class="assignment-pills" (click)="$event.stopPropagation()">
                         @for (opt of preparerOptions(); track opt.value) {
                           <p-button
                             [label]="opt.label"
@@ -86,7 +89,7 @@
                           />
                         }
                       </div>
-                      <div class="votes-list">
+                      <div class="votes-list" (click)="$event.stopPropagation()">
                         @for (v of getVotes(cell.dateStr); track v.userEmail) {
                           <span class="vote-badge-wrap">
                             <span class="vote-badge" [attr.data-status]="v.status">
@@ -133,4 +136,34 @@
       </div>
     }
   </p-card>
+
+  @if (isManager()) {
+    <p-popover #addVotePopover [dismissable]="true">
+      <ng-template pTemplate="content">
+        <div class="add-vote-overlay">
+          <p class="add-vote-overlay-title">{{ 'basketCalendar.addVoteYesFor' | translate }}</p>
+          <ul class="add-vote-person-list">
+            @for (opt of addVotePersonOptions(); track opt.value) {
+              <li>
+                <button
+                  type="button"
+                  class="p-button p-button-text p-button-sm add-vote-person-btn"
+                  [disabled]="addVoteForDate() && isSavingVoteForUser(addVoteForDate()!, opt.value)"
+                  (click)="addVoteForDate() && setVote(addVoteForDate()!, 'yes', opt.value)"
+                >
+                  @if (addVoteForDate() && isSavingVoteForUser(addVoteForDate()!, opt.value)) {
+                    <span class="p-button-icon pi pi-spin pi-spinner"></span>
+                  }
+                  {{ opt.label }}
+                </button>
+              </li>
+            }
+          </ul>
+          @if (addVotePersonOptions().length === 0) {
+            <p class="add-vote-empty">{{ 'basketCalendar.noEligibleOrAllVoted' | translate }}</p>
+          }
+        </div>
+      </ng-template>
+    </p-popover>
+  }
 </div>

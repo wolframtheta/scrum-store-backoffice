@@ -314,7 +314,11 @@
     "ifNeeded": "Si hace falta",
     "assigned": "Prepara",
     "clearAssignment": "Quitar asignación",
-    "clearVote": "Quitar voto"
+    "clearVote": "Quitar voto",
+    "addVoteYesFor": "Añadir voto Sí para...",
+    "noPreparers": "No hay preparadores en el grupo",
+    "noEligibleOrAllVoted": "No hay más personas o todas ya tienen voto ese día",
+    "clickToAddVoteYes": "Clic para añadir voto Sí para una persona"
   },
   "catalog": {
     "title": "Catálogo",

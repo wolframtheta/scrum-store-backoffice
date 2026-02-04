@@ -59,8 +59,11 @@ export class BasketScheduleService {
     );
   }
 
-  async setVote(date: string, status: VoteStatus): Promise<void> {
-    await this.api.put(`consumer-groups/${this.groupId}/basket-schedule/votes`, { date, status });
+  /** Set vote for a date. If userEmail is provided (manager only), set that user's vote. */
+  async setVote(date: string, status: VoteStatus, userEmail?: string): Promise<void> {
+    const body: { date: string; status: VoteStatus; userEmail?: string } = { date, status };
+    if (userEmail) body.userEmail = userEmail;
+    await this.api.put(`consumer-groups/${this.groupId}/basket-schedule/votes`, body);
   }
 
   /** Clear vote for a date. If userEmail is provided (manager only), clear that user's vote. */
