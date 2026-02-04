@@ -61,6 +61,11 @@ export const routes: Routes = [
         canActivate: [preparerGuard],
         loadComponent: () => import('./features/sales/pages/basket-preparation/basket-preparation.component').then(m => m.BasketPreparationComponent)
       },
+      {
+        path: 'basket-calendar',
+        canActivate: [managerGuard],
+        loadComponent: () => import('./features/basket-calendar/pages/basket-calendar-page/basket-calendar-page.component').then(m => m.BasketCalendarPageComponent)
+      },
       // Rutes només per gestor (manager)
       {
         path: 'showcase',

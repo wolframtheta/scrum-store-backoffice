@@ -332,6 +332,19 @@
   }
 }
 
+::ng-deep .module-card-basket-calendar {
+  color: #0d9488;
+
+  .module-icon {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    box-shadow:
+      0 10px 20px rgba(13, 148, 136, 0.3),
+      0 4px 8px rgba(13, 148, 136, 0.2),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+      inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  }
+}
+
 ::ng-deep .module-card-csv-import {
   color: #14b8a6;
 

@@ -60,9 +60,20 @@ export class ApiService {
   }
 
   // DELETE request
-  async delete<T>(endpoint: string): Promise<T> {
+  async delete<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>
+  ): Promise<T> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          httpParams = httpParams.set(key, params[key].toString());
+        }
+      });
+    }
     return firstValueFrom(
-      this.http.delete<T>(`${this.API_URL}/${endpoint}`)
+      this.http.delete<T>(`${this.API_URL}/${endpoint}`, { params: httpParams })
     );
   }
 

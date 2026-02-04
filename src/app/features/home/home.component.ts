@@ -85,7 +85,7 @@ export class HomeComponent implements OnInit {
       }
     ];
 
-    // Mòduls per preparador (només avisos, comandes, preparació i pagaments)
+    // Mòduls per preparador (avisos, comandes, preparació, pagaments; sense calendari cistella)
     const preparerModules: ModuleCardConfig[] = [
       {
         id: 'notices',
@@ -117,7 +117,7 @@ export class HomeComponent implements OnInit {
         description: this.translate.instant('home.modules.payments.description'),
         icon: 'pi-euro',
         color: '#22c55e',
-        route: '/periods'
+        route: '/payments'
       }
     ];
 
@@ -188,6 +188,14 @@ export class HomeComponent implements OnInit {
         icon: 'pi-shopping-bag',
         color: '#8b5cf6',
         route: '/basket-preparation'
+      },
+      {
+        id: 'basket-calendar',
+        title: this.translate.instant('home.modules.basketCalendar.title'),
+        description: this.translate.instant('home.modules.basketCalendar.description'),
+        icon: 'pi-calendar-plus',
+        color: '#0d9488',
+        route: '/basket-calendar'
       },
       {
         id: 'payments',

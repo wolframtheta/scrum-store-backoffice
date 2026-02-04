@@ -186,6 +186,10 @@
         "title": "Preparació de Cistelles",
         "description": "Veure com preparar les cistelles per article"
       },
+      "basketCalendar": {
+        "title": "Calendari Cistella",
+        "description": "Torns per preparar la cistella: vota dies i assigna qui va cada dia"
+      },
       "users": {
         "title": "Usuaris",
         "description": "Gestiona membres del grup",
@@ -341,6 +345,19 @@
     "subtitle": "Agrupa les comandes per període i article per preparar les cistelles",
     "noItems": "No hi ha articles per preparar",
     "finished": "Finalitzat"
+  },
+  "basketCalendar": {
+    "title": "Calendari Cistella",
+    "subtitle": "Vota quins dies et van bé i veu qui prepara cada dia",
+    "configTitle": "Paràmetres de preparació",
+    "preferredWeekday": "Dia de la setmana preferit",
+    "preferredTime": "Horari per quedar",
+    "yes": "Sí",
+    "no": "No",
+    "ifNeeded": "Si cal",
+    "assigned": "Prepara",
+    "clearAssignment": "Treure assignació",
+    "clearVote": "Treure vot"
   },
   "catalog": {
     "title": "Catàleg",

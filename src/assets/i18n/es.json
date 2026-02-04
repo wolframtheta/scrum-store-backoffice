@@ -171,6 +171,10 @@
         "title": "Preparación de Cestas",
         "description": "Ver cómo preparar las cestas por artículo"
       },
+      "basketCalendar": {
+        "title": "Calendario Cesta",
+        "description": "Turnos para preparar la cesta: vota días y asigna quién va cada día"
+      },
       "users": {
         "title": "Usuarios",
         "description": "Gestiona miembros del grupo",
@@ -298,6 +302,19 @@
     "subtitle": "Agrupa los pedidos por período y artículo para preparar las cestas",
     "noItems": "No hay artículos para preparar",
     "finished": "Finalizado"
+  },
+  "basketCalendar": {
+    "title": "Calendario Cesta",
+    "subtitle": "Vota qué días te van bien y ve quién prepara cada día",
+    "configTitle": "Parámetros de preparación",
+    "preferredWeekday": "Día de la semana preferido",
+    "preferredTime": "Horario para quedar",
+    "yes": "Sí",
+    "no": "No",
+    "ifNeeded": "Si hace falta",
+    "assigned": "Prepara",
+    "clearAssignment": "Quitar asignación",
+    "clearVote": "Quitar voto"
   },
   "catalog": {
     "title": "Catálogo",

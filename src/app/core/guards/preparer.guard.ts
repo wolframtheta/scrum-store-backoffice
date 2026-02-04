@@ -2,7 +2,6 @@ import { inject } from '@angular/core';
 import { Router, type CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ConsumerGroupService } from '../services/consumer-group.service';
-import { UserRole } from '../models/user-role.enum';
 
 /**
  * Guard per a rutes que requereixen rol de preparador
@@ -33,13 +32,13 @@ export const preparerGuard: CanActivateFn = async (route, state) => {
     await groupService.loadUserGroups();
   }
 
-  // Comprovar si és preparador d'almenys un grup
-  const hasPreparerRole = groupService.userGroups().some(group => group.role?.isPreparer === true);
-  
-  // Manager també té accés (perquè pot veure tot del grup)
-  const isManager = groupService.isManager();
-  
-  if (hasPreparerRole || isManager) {
+  const groups = groupService.userGroups();
+  // Comprovar si és preparador d'almenys un grup (acceptar qualsevol valor truthy)
+  const hasPreparerRole = groups.some(group => Boolean(group.role?.isPreparer));
+  // Manager en qualsevol grup (no només el seleccionat) també té accés
+  const hasManagerRole = groups.some(group => Boolean(group.role?.isManager));
+
+  if (hasPreparerRole || hasManagerRole) {
     return true;
   }
 

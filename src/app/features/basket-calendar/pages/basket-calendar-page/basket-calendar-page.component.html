@@ -1,0 +1,136 @@
+<div class="basket-calendar-page">
+  <p-toast></p-toast>
+
+  <div class="page-header">
+    <h1>{{ 'basketCalendar.title' | translate }}</h1>
+    <p class="subtitle">{{ 'basketCalendar.subtitle' | translate }}</p>
+  </div>
+
+  @if (isManager()) {
+    <p-card class="config-card" [header]="'basketCalendar.configTitle' | translate">
+      <div class="config-form">
+        <div class="config-field">
+          <label>{{ 'basketCalendar.preferredWeekday' | translate }}</label>
+          <p-select
+            [options]="preferredWeekdayOptions"
+            [(ngModel)]="configWeekdayValue"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            placeholder="—"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="config-field">
+          <label>{{ 'basketCalendar.preferredTime' | translate }}</label>
+          <p-datePicker
+            [(ngModel)]="configTimeDateValue"
+            [showTime]="true"
+            [timeOnly]="true"
+            hourFormat="24"
+            [showClear]="true"
+            placeholder="10:00"
+            styleClass="w-full"
+          />
+        </div>
+        <p-button
+          [label]="'common.save' | translate"
+          icon="pi pi-check"
+          [loading]="savingConfig()"
+          (onClick)="saveConfig()"
+        />
+      </div>
+    </p-card>
+  }
+
+  <p-card>
+    <div class="calendar-nav">
+      <p-button icon="pi pi-chevron-left" (onClick)="prevMonth()" [disabled]="loading()" />
+      <h2 class="month-label">{{ monthLabel() }}</h2>
+      <p-button icon="pi pi-chevron-right" (onClick)="nextMonth()" [disabled]="loading()" />
+    </div>
+
+    @if (loading()) {
+      <p class="loading-msg">{{ 'common.loading' | translate }}</p>
+    } @else {
+      <div class="calendar-grid">
+        <div class="weekday-header">
+          @for (wd of weekdays; track wd) {
+            <span class="weekday-cell">{{ wd }}</span>
+          }
+        </div>
+        @for (row of grid(); track $index) {
+          <div class="week-row">
+            @for (cell of row; track cell.dateStr ?? $index) {
+              <div
+                class="day-cell"
+                [class.other-month]="!cell.isCurrentMonth"
+                [class.today]="cell.isToday"
+              >
+                @if (cell.dateStr) {
+                  <div class="day-number">{{ cell.dayOfMonth }}</div>
+                  <div class="day-content">
+                    @if (isManager()) {
+                      <div class="assignment-pills">
+                        @for (opt of preparerOptions(); track opt.value) {
+                          <p-button
+                            [label]="opt.label"
+                            [rounded]="true"
+                            [text]="true"
+                            [size]="'small'"
+                            [severity]="(getAssignment(cell.dateStr)?.email ?? null) === opt.value ? 'primary' : 'secondary'"
+                            [outlined]="(getAssignment(cell.dateStr)?.email ?? null) !== opt.value"
+                            [loading]="savingAssignment() === cell.dateStr"
+                            (onClick)="onAssignmentChange(cell.dateStr, opt.value)"
+                            [title]="opt.label"
+                          />
+                        }
+                      </div>
+                      <div class="votes-list">
+                        @for (v of getVotes(cell.dateStr); track v.userEmail) {
+                          <span class="vote-badge-wrap">
+                            <span class="vote-badge" [attr.data-status]="v.status">
+                              {{ v.userName || v.userEmail }}: {{ voteLabel(v.status) | translate }}
+                            </span>
+                            <p-button
+                              icon="pi pi-times"
+                              [rounded]="true"
+                              [text]="true"
+                              severity="danger"
+                              size="small"
+                              [loading]="isClearingVote(cell.dateStr, v.userEmail)"
+                              (onClick)="clearVoteForUser(cell.dateStr, v.userEmail)"
+                              [title]="'basketCalendar.clearVote' | translate"
+                            />
+                          </span>
+                        }
+                      </div>
+                    } @else {
+                      @if (getAssignment(cell.dateStr); as a) {
+                        <div class="assigned">
+                          {{ 'basketCalendar.assigned' | translate }}: {{ a.name || a.email }}
+                        </div>
+                      }
+                      <div class="vote-buttons">
+                        @for (status of ['yes', 'no', 'if_needed']; track status) {
+                          <p-button
+                            [label]="('basketCalendar.' + (status === 'yes' ? 'yes' : status === 'no' ? 'no' : 'ifNeeded')) | translate"
+                            [severity]="getMyVote(cell.dateStr) === status ? 'primary' : 'secondary'"
+                            [outlined]="getMyVote(cell.dateStr) !== status"
+                            size="small"
+                            [loading]="savingVote() === cell.dateStr"
+                            (onClick)="setVote(cell.dateStr, $any(status))"
+                          />
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </p-card>
+</div>
