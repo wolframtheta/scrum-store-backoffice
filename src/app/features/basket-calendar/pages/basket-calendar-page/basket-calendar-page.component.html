@@ -74,21 +74,6 @@
                   <div class="day-number">{{ cell.dayOfMonth }}</div>
                   <div class="day-content">
                     @if (isManager()) {
-                      <div class="assignment-pills" (click)="$event.stopPropagation()">
-                        @for (opt of preparerOptions(); track opt.value) {
-                          <p-button
-                            [label]="opt.label"
-                            [rounded]="true"
-                            [text]="true"
-                            [size]="'small'"
-                            [severity]="(getAssignment(cell.dateStr)?.email ?? null) === opt.value ? 'primary' : 'secondary'"
-                            [outlined]="(getAssignment(cell.dateStr)?.email ?? null) !== opt.value"
-                            [loading]="savingAssignment() === cell.dateStr"
-                            (onClick)="onAssignmentChange(cell.dateStr, opt.value)"
-                            [title]="opt.label"
-                          />
-                        }
-                      </div>
                       <div class="votes-list" (click)="$event.stopPropagation()">
                         @for (v of getVotes(cell.dateStr); track v.userEmail) {
                           <span class="vote-badge-wrap">
@@ -109,11 +94,6 @@
                         }
                       </div>
                     } @else {
-                      @if (getAssignment(cell.dateStr); as a) {
-                        <div class="assigned">
-                          {{ 'basketCalendar.assigned' | translate }}: {{ a.name || a.email }}
-                        </div>
-                      }
                       <div class="vote-buttons">
                         @for (status of ['yes', 'no', 'if_needed']; track status) {
                           <p-button

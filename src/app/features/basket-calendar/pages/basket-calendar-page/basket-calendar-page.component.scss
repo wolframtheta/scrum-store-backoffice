@@ -119,13 +119,6 @@
     font-size: 0.8rem;
   }
 
-  .assignment-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 6px;
-  }
-
   .votes-list {
     display: flex;
     flex-wrap: wrap;
@@ -156,11 +149,6 @@
         color: var(--p-orange-800);
       }
     }
-  }
-
-  .assigned {
-    margin-bottom: 6px;
-    font-weight: 500;
   }
 
   .vote-buttons {
@@ -204,7 +192,6 @@
   }
 }
 
-::ng-deep .assignment-pills p-button .p-button,
 ::ng-deep .vote-buttons p-button .p-button {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
