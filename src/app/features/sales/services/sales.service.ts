@@ -222,4 +222,88 @@ export class SalesService {
   clearError(): void {
     this.error.set(null);
   }
+
+  /**
+   * Actualitza l'estat de preparació d'un item específic
+   */
+  async updateItemPrepared(orderId: string, itemId: string, isPrepared: boolean): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const updatedOrder = await this.api.patch<Sale>(`orders/${orderId}/items/${itemId}/prepared`, { isPrepared });
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === orderId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = updatedOrder;
+        this.sales.set(updatedSales);
+      }
+
+      return updatedOrder;
+    } catch (err: any) {
+      this.error.set(getErrorMessage(err, 'Error actualitzant estat de preparació de l\'article'));
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Actualitza l'estat de preparació de tots els items d'un període
+   */
+  async updatePeriodItemsPrepared(periodId: string, groupId: string, isPrepared: boolean): Promise<{ affectedItems: number }> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const result = await this.api.patch<{ affectedItems: number }>(
+        `orders/by-period/${periodId}/items/prepared?groupId=${groupId}`,
+        { isPrepared }
+      );
+
+      // Reload sales to get updated state
+      await this.loadSalesByGroup(groupId);
+
+      return result;
+    } catch (err: any) {
+      this.error.set(getErrorMessage(err, 'Error actualitzant items del període'));
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Actualitza l'estat de preparació de tots els items d'una comanda en un període
+   */
+  async updateOrderPeriodItemsPrepared(orderId: string, periodId: string, isPrepared: boolean): Promise<Sale> {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    try {
+      const updatedOrder = await this.api.patch<Sale>(
+        `orders/${orderId}/by-period/${periodId}/prepared`,
+        { isPrepared }
+      );
+
+      // Update the sales list
+      const currentSales = this.sales();
+      const index = currentSales.findIndex(s => s.id === orderId);
+      if (index !== -1) {
+        const updatedSales = [...currentSales];
+        updatedSales[index] = updatedOrder;
+        this.sales.set(updatedSales);
+      }
+
+      return updatedOrder;
+    } catch (err: any) {
+      this.error.set(getErrorMessage(err, 'Error actualitzant items de la comanda del període'));
+      throw err;
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
 }

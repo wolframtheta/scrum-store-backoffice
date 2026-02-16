@@ -85,11 +85,8 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
   private userSearchSubscription?: any;
   private articleSearchSubscription?: any;
 
-  // Estat dels checkboxes (clau: periodId-articleId o periodId-articleId-userId)
-  protected readonly preparedItems = signal<Set<string>>(new Set());
-  
-  // Estat de les comandes preparades (orderId)
-  protected readonly preparedOrders = signal<Set<string>>(new Set());
+  // Estat local temporal dels checkboxes (només visual)
+  protected readonly checkedItems = signal<Set<string>>(new Set());
 
   // Filtres
   protected readonly filterUserId = signal<string | null>(null);
@@ -206,15 +203,6 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
     // Aplicar filtres
     let filteredSales = sales;
     
-    // Filtrar per estat d'entrega
-    const deliveredFilter = this.filterDelivered();
-    if (deliveredFilter === 'delivered') {
-      filteredSales = filteredSales.filter(sale => sale.isDelivered);
-    } else if (deliveredFilter === 'undelivered') {
-      filteredSales = filteredSales.filter(sale => !sale.isDelivered);
-    }
-    // 'all' no filtra res
-    
     // Filtrar per usuari
     const userIdFilter = this.filterUserId();
     const userTextFilter = this.filterUserText().trim();
@@ -293,6 +281,14 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
 
       // Agrupar cada item al seu període (cada article pot ser de períodes diferents dins la mateixa comanda)
       sale.items.forEach(item => {
+        // Filtrar per estat de preparació a nivell d'item
+        const deliveredFilter = this.filterDelivered();
+        if (deliveredFilter === 'delivered' && !item.isPrepared) {
+          return; // Saltar items no preparats si el filtre és "preparats"
+        } else if (deliveredFilter === 'undelivered' && item.isPrepared) {
+          return; // Saltar items preparats si el filtre és "no preparats"
+        }
+
         // Prioritat: item.periodId > fallback per data de comanda
         let assignedPeriod: Period | null = null;
         if (item.periodId) {
@@ -336,7 +332,7 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
             articleName,
             totalQuantity: 0,
             unitMeasure: item.article?.unitMeasure,
-            isPrepared: this.isArticlePreparedByKey(`${periodId}-${articleId}`),
+            isPrepared: false, // S'actualitzarà després
             users: []
           });
         }
@@ -354,23 +350,15 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
           return;
         }
 
-        const existingUser = basketItem.users.find(u => u.userId === userIdentifier);
-        if (existingUser) {
-          // Si l'usuari ja existeix (mateix userId), sumar la quantitat
-          existingUser.quantity += quantity;
-          // Actualitzar l'orderId a l'última comanda
-          existingUser.orderId = sale.id;
-          // Mantenir el primer itemId (no actualitzar-lo)
-        } else {
-          // Si l'usuari no existeix (nou client), afegir-lo a l'array
-          basketItem.users.push({
-            userId: userIdentifier,
-            userName: sale.userName || userIdentifier,
-            quantity: quantity,
-            orderId: sale.id,
-            itemId: item.id
-          });
-        }
+        // NO agrupar per userId - crear una entrada per cada item individual
+        // Això permet marcar items de diferents comandes separadament
+        basketItem.users.push({
+          userId: userIdentifier,
+          userName: sale.userName || userIdentifier,
+          quantity: quantity,
+          orderId: sale.id,
+          itemId: item.id
+        });
       });
     });
 
@@ -397,7 +385,7 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
         }
         
         const userNodes: TreeNode[] = basketItem.users.map(user => {
-          const userKey = `${periodId}-${articleId}-${user.userId}`;
+          const userKey = `${periodId}-${articleId}-${user.itemId}`;
           return {
             key: userKey,
             label: user.userName,
@@ -434,8 +422,12 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
         });
       });
 
-      // Ordenar articles per nom
-      articleNodes.sort((a, b) => a.label!.localeCompare(b.label!));
+      // Ordenar articles alfabèticament per nom (categoria - producte - varietat)
+      articleNodes.sort((a, b) => {
+        const nameA = a.label || '';
+        const nameB = b.label || '';
+        return nameA.localeCompare(nameB, 'ca', { sensitivity: 'base' });
+      });
 
       // Formatear la data d'entrega
       let deliveryDateStr = '';
@@ -470,9 +462,17 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Ordenar períodes per nom
-    activePeriods.sort((a, b) => a.label!.localeCompare(b.label!));
-    finishedPeriods.sort((a, b) => a.label!.localeCompare(b.label!));
+    // Ordenar períodes alfabèticament per nom
+    activePeriods.sort((a, b) => {
+      const nameA = a.data?.periodName || '';
+      const nameB = b.data?.periodName || '';
+      return nameA.localeCompare(nameB, 'ca', { sensitivity: 'base' });
+    });
+    finishedPeriods.sort((a, b) => {
+      const nameA = a.data?.periodName || '';
+      const nameB = b.data?.periodName || '';
+      return nameA.localeCompare(nameB, 'ca', { sensitivity: 'base' });
+    });
 
     // Retornar períodes actius primer, després els finalitzats
     return [...activePeriods, ...finishedPeriods];
@@ -607,360 +607,116 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected onArticlePreparedChange(node: TreeNode, checked: boolean): void {
-    // Si la comanda està preparada, no permetre canvis
-    if (this.isOrderPreparedForNode(node)) {
-      return;
-    }
-
+  protected async onArticlePreparedChange(node: TreeNode, checked: boolean): Promise<void> {
     const articleData = node.data;
     if (articleData?.type === 'article' && articleData.periodId && articleData.articleId) {
-      const articleKey = `${articleData.periodId}-${articleData.articleId}`;
-      const prepared = new Set(this.preparedItems());
-      
-      if (checked) {
-        // Seleccionar l'article i tots els seus usuaris
-        prepared.add(articleKey);
-        // Seleccionar tots els usuaris d'aquest article (els tenim als children del node)
-        if (node.children) {
-          node.children.forEach(userNode => {
-            const userData = userNode.data;
-            if (userData?.type === 'user' && userData.userId) {
-              const userKey = `${articleData.periodId}-${articleData.articleId}-${userData.userId}`;
-              prepared.add(userKey);
-            }
-          });
-        }
-      } else {
-        // Deseleccionar l'article i tots els seus usuaris
-        prepared.delete(articleKey);
-        // Eliminar tots els usuaris d'aquest article
-        if (node.children) {
-          node.children.forEach(userNode => {
-            const userData = userNode.data;
-            if (userData?.type === 'user' && userData.userId) {
-              const userKey = `${articleData.periodId}-${articleData.articleId}-${userData.userId}`;
-              prepared.delete(userKey);
-            }
-          });
-        }
-      }
-      
-      // Actualitzar l'estat (sense marcar comandes com a entregades)
-      this.preparedItems.set(prepared);
-    }
-  }
+      // Marcar tots els usuaris d'aquest article
+      if (!node.children || node.children.length === 0) return;
 
-  protected onUserPreparedChange(node: TreeNode, checked: boolean): void {
-    const userData = node.data;
-    // Si la comanda està preparada, no permetre canvis
-    if (userData?.orderId && this.preparedOrders().has(userData.orderId)) {
-      return;
-    }
-
-    if (userData?.type === 'user' && userData.periodId && userData.articleId && userData.userId) {
-      const userKey = `${userData.periodId}-${userData.articleId}-${userData.userId}`;
-      const articleKey = `${userData.periodId}-${userData.articleId}`;
-      const prepared = new Set(this.preparedItems());
-      
-      if (checked) {
-        prepared.add(userKey);
-      } else {
-        prepared.delete(userKey);
-        // Si es deselecciona un usuari, deseleccionar també l'article
-        prepared.delete(articleKey);
-      }
-      
-      // Verificar si tots els usuaris estan seleccionats per seleccionar l'article
-      // Buscar l'article pare al tree actual
-      const articleNode = this.findArticleNode(userData.periodId, userData.articleId);
-      if (articleNode && articleNode.children) {
-        const allUsersPrepared = this.areAllUsersPreparedFromChildren(articleNode.children, prepared);
-        if (allUsersPrepared) {
-          prepared.add(articleKey);
-        }
-      }
-      
-      this.preparedItems.set(prepared);
-    }
-  }
-
-  private findArticleNode(periodId: string, articleId: string): TreeNode | null {
-    const basketTree = this.basketTree();
-    
-    for (const periodNode of basketTree) {
-      if (periodNode.data?.periodId === periodId && periodNode.children) {
-        for (const articleNode of periodNode.children) {
-          if (articleNode.data?.articleId === articleId) {
-            return articleNode;
+      try {
+        // Actualitzar cada item d'aquest article
+        const updatePromises = node.children.map(userNode => {
+          const userData = userNode.data;
+          if (userData?.type === 'user' && userData.orderId && userData.itemId) {
+            return this.salesService.updateItemPrepared(userData.orderId, userData.itemId, checked);
           }
-        }
+          return Promise.resolve(null);
+        });
+
+        await Promise.all(updatePromises);
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Èxit',
+          detail: `Article ${checked ? 'marcat' : 'desmarcat'} com a preparat`
+        });
+      } catch (error) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: `Error al ${checked ? 'marcar' : 'desmarcar'} l'article`
+        });
       }
     }
-    
-    return null;
   }
 
-  private areAllUsersPreparedFromChildren(children: TreeNode[], prepared: Set<string>): boolean {
-    if (children.length === 0) return false;
-    
-    for (const child of children) {
-      const childData = child.data;
-      if (childData?.type === 'user' && childData.periodId && childData.articleId && childData.userId) {
-        const userKey = `${childData.periodId}-${childData.articleId}-${childData.userId}`;
-        if (!prepared.has(userKey)) {
-          return false;
-        }
+  protected async onUserPreparedChange(node: TreeNode, checked: boolean): Promise<void> {
+    const userData = node.data;
+    if (userData?.type === 'user' && userData.orderId && userData.itemId) {
+      try {
+        await this.salesService.updateItemPrepared(userData.orderId, userData.itemId, checked);
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Èxit',
+          detail: `Item ${checked ? 'marcat' : 'desmarcat'} com a preparat`
+        });
+      } catch (error) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: `Error al ${checked ? 'marcar' : 'desmarcar'} l'item`
+        });
       }
     }
-    
-    return true;
   }
 
   protected isArticlePrepared(node: TreeNode): boolean {
     const articleData = node.data;
-    if (articleData?.type === 'article' && articleData.periodId && articleData.articleId) {
-      // Verificar si tots els usuaris de l'article estan preparats
-      return this.areAllUsersPrepared(articleData.periodId, articleData.articleId);
+    if (articleData?.type === 'article' && node.children) {
+      // Verificar si tots els usuaris de l'article tenen els seus items preparats
+      return node.children.length > 0 && node.children.every(userNode => this.isUserPrepared(userNode));
     }
     return false;
   }
 
   protected isUserPrepared(node: TreeNode): boolean {
     const userData = node.data;
-    if (userData?.type === 'user' && userData.periodId && userData.articleId && userData.userId) {
-      const userKey = `${userData.periodId}-${userData.articleId}-${userData.userId}`;
-      return this.preparedItems().has(userKey);
-    }
-    return false;
-  }
-
-  private isArticlePreparedByKey(key: string): boolean {
-    return this.preparedItems().has(key);
-  }
-
-  private areAllUsersPrepared(periodId: string, articleId: string): boolean {
-    const prepared = this.preparedItems();
-    const basketTree = this.basketTree();
-    
-    // Trobar l'article al tree
-    for (const periodNode of basketTree) {
-      if (periodNode.data?.periodId === periodId && periodNode.children) {
-        for (const articleNode of periodNode.children) {
-          if (articleNode.data?.articleId === articleId && articleNode.children) {
-            // Verificar si tots els usuaris estan preparats
-            if (articleNode.children.length === 0) return false;
-            
-            for (const userNode of articleNode.children) {
-              const userData = userNode.data;
-              if (userData?.type === 'user' && userData.userId) {
-                const userKey = `${periodId}-${articleId}-${userData.userId}`;
-                if (!prepared.has(userKey)) {
-                  return false;
-                }
-              }
-            }
-            return true;
-          }
-        }
-      }
-    }
-    
-    return false;
-  }
-
-  protected isOrderPrepared(orderId: string): boolean {
-    return this.preparedOrders().has(orderId);
-  }
-
-  protected async markOrderAsPrepared(orderId: string): Promise<void> {
-    // Trobar tots els items d'aquesta comanda
-    const basketTree = this.basketTree();
-    const prepared = new Set(this.preparedItems());
-    const orderItems: Array<{ periodId: string; articleId: string; userId: string }> = [];
-
-    for (const periodNode of basketTree) {
-      if (periodNode.children) {
-        for (const articleNode of periodNode.children) {
-          if (articleNode.children) {
-            for (const userNode of articleNode.children) {
-              const userData = userNode.data;
-              if (userData?.type === 'user' && userData.orderId === orderId) {
-                orderItems.push({
-                  periodId: userData.periodId,
-                  articleId: userData.articleId,
-                  userId: userData.userId
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Marcar tots els items d'aquesta comanda com a preparats
-    orderItems.forEach(item => {
-      const userKey = `${item.periodId}-${item.articleId}-${item.userId}`;
-      const articleKey = `${item.periodId}-${item.articleId}`;
-      prepared.add(userKey);
-      prepared.add(articleKey);
-    });
-
-    // Actualitzar l'estat
-    this.preparedItems.set(prepared);
-    const preparedOrders = new Set(this.preparedOrders());
-    preparedOrders.add(orderId);
-    this.preparedOrders.set(preparedOrders);
-
-    // Marcar la comanda com a preparada al backend (usant isDelivered com a "preparada")
-    try {
-      await this.salesService.updateDeliveryStatus(orderId, true);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Èxit',
-        detail: 'Comanda marcada com a preparada'
-      });
-    } catch (error) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error al marcar la comanda com a preparada'
-      });
-    }
-  }
-
-  protected isOrderPreparedForNode(node: TreeNode): boolean {
-    const userData = node.data;
-    if (userData?.orderId) {
-      return this.preparedOrders().has(userData.orderId);
-    }
-    // Si és un article, verificar si algun dels seus usuaris pertany a una comanda preparada
-    if (node.children) {
-      for (const child of node.children) {
-        const childData = child.data;
-        if (childData?.orderId && this.preparedOrders().has(childData.orderId)) {
-          return true;
-        }
+    if (userData?.type === 'user' && userData.orderId) {
+      // Buscar l'item a la sale per obtenir el seu estat isPrepared
+      const sales = this.salesService.sales();
+      const sale = sales.find(s => s.id === userData.orderId);
+      if (sale) {
+        const item = sale.items.find(i => i.id === userData.itemId);
+        return item?.isPrepared || false;
       }
     }
     return false;
-  }
-
-  protected hasUnpreparedOrders(periodId: string): boolean {
-    const orders = this.ordersByPeriod().get(periodId);
-    if (!orders) return false;
-    return orders.some(order => !this.preparedOrders().has(order.orderId));
-  }
-
-  protected areAllOrdersPrepared(periodId: string): boolean {
-    const orders = this.ordersByPeriod().get(periodId);
-    if (!orders || orders.length === 0) return false;
-    return orders.every(order => this.preparedOrders().has(order.orderId));
   }
 
   protected async onPeriodOrdersPreparedChange(periodId: string, checked: boolean): Promise<void> {
-    if (checked) {
-      await this.markAllOrdersAsPrepared(periodId);
-    } else {
-      // Desmarcar totes les comandes del període
-      const orders = this.ordersByPeriod().get(periodId);
-      if (!orders) return;
+    const groupId = this.groupService.selectedGroupId();
+    if (!groupId) return;
 
-      const preparedOrders = new Set(this.preparedOrders());
-      const orderIdsToUpdate: string[] = [];
-
-      for (const order of orders) {
-        if (this.preparedOrders().has(order.orderId)) {
-          orderIdsToUpdate.push(order.orderId);
-          preparedOrders.delete(order.orderId);
-        }
-      }
-
-      this.preparedOrders.set(preparedOrders);
-
-      // Actualitzar el backend
-      try {
-        await Promise.all(
-          orderIdsToUpdate.map(orderId => 
-            this.salesService.updateDeliveryStatus(orderId, false)
-          )
-        );
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Èxit',
-          detail: `${orderIdsToUpdate.length} comanda${orderIdsToUpdate.length > 1 ? 's' : ''} desmarcada${orderIdsToUpdate.length > 1 ? 's' : ''}`
-        });
-      } catch (error) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al desmarcar les comandes'
-        });
-      }
-    }
-  }
-
-  protected async markAllOrdersAsPrepared(periodId: string): Promise<void> {
-    const orders = this.ordersByPeriod().get(periodId);
-    if (!orders) return;
-
-    const basketTree = this.basketTree();
-    const prepared = new Set(this.preparedItems());
-    const preparedOrders = new Set(this.preparedOrders());
-    const orderIdsToUpdate: string[] = [];
-
-    // Trobar tots els items de totes les comandes d'aquest període
-    for (const order of orders) {
-      if (this.preparedOrders().has(order.orderId)) continue; // Ja està preparada
-
-      orderIdsToUpdate.push(order.orderId);
-      preparedOrders.add(order.orderId);
-
-      // Trobar tots els items d'aquesta comanda al tree
-      for (const periodNode of basketTree) {
-        if (periodNode.data?.periodId !== periodId) continue;
-
-        if (periodNode.children) {
-          for (const articleNode of periodNode.children) {
-            if (articleNode.children) {
-              for (const userNode of articleNode.children) {
-                const userData = userNode.data;
-                if (userData?.type === 'user' && userData.orderId === order.orderId) {
-                  const userKey = `${userData.periodId}-${userData.articleId}-${userData.userId}`;
-                  const articleKey = `${userData.periodId}-${userData.articleId}`;
-                  prepared.add(userKey);
-                  prepared.add(articleKey);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Actualitzar l'estat
-    this.preparedItems.set(prepared);
-    this.preparedOrders.set(preparedOrders);
-
-    // Marcar totes les comandes com a preparades al backend
     try {
-      await Promise.all(
-        orderIdsToUpdate.map(orderId => 
-          this.salesService.updateDeliveryStatus(orderId, true)
-        )
-      );
+      await this.salesService.updatePeriodItemsPrepared(periodId, groupId, checked);
+      
       this.messageService.add({
         severity: 'success',
         summary: 'Èxit',
-        detail: `${orderIdsToUpdate.length} comanda${orderIdsToUpdate.length > 1 ? 's' : ''} marcada${orderIdsToUpdate.length > 1 ? 's' : ''} com a preparada${orderIdsToUpdate.length > 1 ? 's' : ''}`
+        detail: `Tots els items del període ${checked ? 'marcats' : 'desmarcats'} com a preparats`
       });
     } catch (error) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error al marcar les comandes com a preparades'
+        detail: `Error al ${checked ? 'marcar' : 'desmarcar'} els items del període`
       });
     }
+  }
+
+  protected areAllOrdersPrepared(periodId: string): boolean {
+    const sales = this.salesService.sales();
+    const periodSales = sales.filter(sale => 
+      sale.items.some(item => item.periodId === periodId)
+    );
+
+    if (periodSales.length === 0) return false;
+
+    return periodSales.every(sale => {
+      const periodItems = sale.items.filter(item => item.periodId === periodId);
+      return periodItems.every(item => item.isPrepared);
+    });
   }
 
   protected async deleteOrderItem(node: TreeNode): Promise<void> {

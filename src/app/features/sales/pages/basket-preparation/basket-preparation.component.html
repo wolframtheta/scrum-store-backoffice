@@ -149,14 +149,13 @@
             @for (articleNode of periodNode.children; track articleNode.key) {
               <div class="article-section">
                 <!-- Article Node -->
-                <div class="article-node" [class.order-prepared]="isOrderPreparedForNode(articleNode)">
+                <div class="article-node">
                   <p-checkbox
                     [binary]="true"
                     [ngModel]="isArticlePrepared(articleNode)"
                     (ngModelChange)="onArticlePreparedChange(articleNode, $event)"
                     [inputId]="'prepared-' + articleNode.key"
                     styleClass="article-checkbox"
-                    [disabled]="isOrderPreparedForNode(articleNode)"
                   />
                   <i class="pi pi-box article-icon"></i>
                   <span class="article-name">{{ articleNode.label }}</span>
@@ -176,14 +175,13 @@
                 @if (articleNode.children) {
                   <div class="users-container">
                     @for (userNode of articleNode.children; track userNode.key) {
-                      <div class="user-node" [class.order-prepared]="userNode.data.orderId && isOrderPrepared(userNode.data.orderId)">
+                      <div class="user-node">
                         <p-checkbox
                           [binary]="true"
                           [ngModel]="isUserPrepared(userNode)"
                           (ngModelChange)="onUserPreparedChange(userNode, $event)"
                           [inputId]="'prepared-user-' + userNode.key"
                           styleClass="user-checkbox"
-                          [disabled]="userNode.data.orderId && isOrderPrepared(userNode.data.orderId)"
                         />
                         <i class="pi pi-user user-icon"></i>
                         <span class="user-name">{{ userNode.label }}</span>
@@ -193,7 +191,7 @@
                             <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
                           }
                         </span>
-                        @if (userNode.data.orderId && userNode.data.articleId && !isOrderPrepared(userNode.data.orderId)) {
+                        @if (userNode.data.orderId && userNode.data.articleId) {
                           <p-button
                             icon="pi pi-trash"
                             [text]="true"
