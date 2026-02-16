@@ -161,19 +161,25 @@ export class PaymentsOverviewComponent implements OnInit {
         supplierUser.transportCost += user.transportCost;
         supplierUser.total += user.total;
         supplierUser.ordersCount += user.ordersCount;
-        supplierUser.paidAmount += user.paidAmount;
+        // Només sumar al paid amount si el període està pagat
+        if (user.paymentStatus === PaymentStatus.PAID) {
+          supplierUser.paidAmount += user.total;
+        }
       }
     }
 
     // Calcular estat de pagament per usuari i proveïdor
     const suppliersArray = Array.from(supplierMap.values());
     for (const supplier of suppliersArray) {
+      // Per cada usuari del proveïdor, mirem si tots els seus períodes estan pagats
       for (const user of supplier.users.values()) {
-        if (user.paidAmount >= user.total) {
-          user.paymentStatus = PaymentStatus.PAID;
-        } else {
-          user.paymentStatus = PaymentStatus.UNPAID;
-        }
+        // Obtenir tots els períodes d'aquest usuari en aquest proveïdor
+        const userPeriodsInSupplier = supplier.periods
+          .map(p => p.summary.users.find(u => u.userId === user.userId))
+          .filter(u => u !== undefined);
+        
+        const allPaid = userPeriodsInSupplier.every(u => u.paymentStatus === PaymentStatus.PAID);
+        user.paymentStatus = allPaid ? PaymentStatus.PAID : PaymentStatus.UNPAID;
       }
     }
 
@@ -209,25 +215,26 @@ export class PaymentsOverviewComponent implements OnInit {
           transportCost: user.transportCost,
           total: user.total,
           ordersCount: user.ordersCount,
-          paidAmount: user.paidAmount,
+          paidAmount: user.paymentStatus === PaymentStatus.PAID ? user.total : 0,
           paymentStatus: user.paymentStatus,
         });
 
         aggregatedUser.totalSubtotal += user.subtotal;
         aggregatedUser.totalTransportCost += user.transportCost;
         aggregatedUser.totalAmount += user.total;
-        aggregatedUser.totalPaidAmount += user.paidAmount;
+        // Només sumar al total paid si el període està pagat
+        if (user.paymentStatus === PaymentStatus.PAID) {
+          aggregatedUser.totalPaidAmount += user.total;
+        }
       }
     }
 
     // Calcular estat de pagament general per usuari
     const aggregatedArray = Array.from(userMap.values());
     for (const user of aggregatedArray) {
-      if (user.totalPaidAmount >= user.totalAmount) {
-        user.overallPaymentStatus = PaymentStatus.PAID;
-      } else {
-        user.overallPaymentStatus = PaymentStatus.UNPAID;
-      }
+      // Si TOTS els períodes estan pagats, l'usuari està totalment pagat
+      const allPeriodsPaid = user.periods.every(p => p.paymentStatus === PaymentStatus.PAID);
+      user.overallPaymentStatus = allPeriodsPaid ? PaymentStatus.PAID : PaymentStatus.UNPAID;
     }
 
     // Ordenar per nom
@@ -443,9 +450,6 @@ export class PaymentsOverviewComponent implements OnInit {
   }
 
   protected async markAllUserPeriodsAsPaid(user: AggregatedUserPayment): Promise<void> {
-    console.log('markAllUserPeriodsAsPaid called for user:', user);
-    console.log('User periods:', user.periods);
-    
     if (!user.periods || user.periods.length === 0) {
       this.messageService.add({
         severity: 'warn',
@@ -462,29 +466,21 @@ export class PaymentsOverviewComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: async () => {
-        console.log('Confirmation accepted, starting to mark periods as paid');
         try {
           const errors: string[] = [];
           
           // Marcar com a pagat per cada període del usuari
           for (const period of user.periods) {
-            console.log(`Processing period: ${period.periodName} (${period.periodId})`);
             try {
-              const result = await this.paymentsService.markAsPaid(period.periodId, user.userId);
-              console.log(`Successfully marked period ${period.periodName} as paid:`, result);
+              await this.paymentsService.markAsPaid(period.periodId, user.userId);
             } catch (error: any) {
-              console.error(`Error marking period ${period.periodName} as paid:`, error);
               errors.push(period.periodName);
             }
           }
           
-          console.log(`Finished processing ${user.periods.length} periods. Errors: ${errors.length}`);
-          
           // Recarregar dades després de totes les operacions
-          console.log('Reloading payment data...');
           const date = this.selectedDeliveryDate();
           if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
-          console.log('Payment data reloaded');
           
           if (errors.length > 0) {
             this.messageService.add({
@@ -500,7 +496,6 @@ export class PaymentsOverviewComponent implements OnInit {
             });
           }
         } catch (error: any) {
-          console.error('Error in markAllUserPeriodsAsPaid:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -550,11 +545,142 @@ export class PaymentsOverviewComponent implements OnInit {
             });
           }
         } catch (error: any) {
-          console.error('Error in markAllUserPeriodsAsUnpaid:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: getErrorMessage(error, 'No s\'han pogut marcar totes les comandes com a no pagades')
+          });
+        }
+      }
+    });
+  }
+
+  protected async markSupplierUserPeriodsAsPaid(supplierData: SupplierPaymentData, userId: string): Promise<void> {
+    // Obtenir informació de l'usuari
+    const user = supplierData.users.get(userId);
+    if (!user) return;
+
+    // Obtenir només els períodes d'aquest proveïdor
+    const userPeriodsInSupplier = supplierData.periods
+      .map(p => p.summary.users.find(u => u.userId === userId))
+      .filter(u => u !== undefined);
+
+    if (userPeriodsInSupplier.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertència',
+        detail: `L'usuari ${user.userName} no té períodes amb comandes d'aquest proveïdor`
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Vols marcar totes les comandes de ${user.userName} del proveïdor ${supplierData.supplierName} com a pagades?`,
+      header: 'Confirmar pagament',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: async () => {
+        try {
+          const errors: string[] = [];
+          
+          // Marcar com a pagat per cada període del proveïdor
+          for (const periodData of supplierData.periods) {
+            try {
+              await this.paymentsService.markAsPaid(periodData.period.id, userId);
+            } catch (error: any) {
+              errors.push(periodData.period.name);
+            }
+          }
+          
+          // Recarregar dades
+          const date = this.selectedDeliveryDate();
+          if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
+          
+          if (errors.length > 0) {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Advertència',
+              detail: `Algunes comandes s'han marcat com a pagades, però hi ha hagut errors en els períodes: ${errors.join(', ')}`
+            });
+          } else {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Èxit',
+              detail: `Comandes de ${user.userName} marcades com a pagades`
+            });
+          }
+        } catch (error: any) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: getErrorMessage(error, 'No s\'han pogut marcar les comandes com a pagades')
+          });
+        }
+      }
+    });
+  }
+
+  protected async markSupplierUserPeriodsAsUnpaid(supplierData: SupplierPaymentData, userId: string): Promise<void> {
+    // Obtenir informació de l'usuari
+    const user = supplierData.users.get(userId);
+    if (!user) return;
+
+    // Obtenir només els períodes d'aquest proveïdor
+    const userPeriodsInSupplier = supplierData.periods
+      .map(p => p.summary.users.find(u => u.userId === userId))
+      .filter(u => u !== undefined);
+
+    if (userPeriodsInSupplier.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertència',
+        detail: `L'usuari ${user.userName} no té períodes amb comandes d'aquest proveïdor`
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Vols marcar totes les comandes de ${user.userName} del proveïdor ${supplierData.supplierName} com a no pagades?`,
+      header: 'Confirmar canvi',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: async () => {
+        try {
+          const errors: string[] = [];
+          
+          // Marcar com a no pagat per cada període del proveïdor
+          for (const periodData of supplierData.periods) {
+            try {
+              await this.paymentsService.markAsUnpaid(periodData.period.id, userId);
+            } catch (error: any) {
+              errors.push(periodData.period.name);
+            }
+          }
+          
+          // Recarregar dades
+          const date = this.selectedDeliveryDate();
+          if (date) await this.loadPaymentsDataForDate(PaymentsOverviewComponent.toDateStr(date));
+          
+          if (errors.length > 0) {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Advertència',
+              detail: `Algunes comandes s'han marcat com a no pagades, però hi ha hagut errors en els períodes: ${errors.join(', ')}`
+            });
+          } else {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Èxit',
+              detail: `Comandes de ${user.userName} marcades com a no pagades`
+            });
+          }
+        } catch (error: any) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: getErrorMessage(error, 'No s\'han pogut marcar les comandes com a no pagades')
           });
         }
       }

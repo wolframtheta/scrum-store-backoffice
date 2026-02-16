@@ -7,7 +7,6 @@ export interface UserPaymentSummary {
   transportCost: number;
   total: number;
   ordersCount: number;
-  paidAmount: number;
   paymentStatus: PaymentStatus;
   orderIds: string[];
 }

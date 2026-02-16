@@ -215,12 +215,13 @@
             <ng-template pTemplate="header">
               <tr>
                 <th>{{ 'periods.payments.table.user' | translate }}</th>
-                <th>{{ 'periods.payments.table.orders' | translate }}</th>
+                <th>{{ 'periods.payments.table.periods' | translate }}</th>
                 <th>{{ 'periods.payments.table.subtotal' | translate }}</th>
                 <th>{{ 'periods.payments.table.transport' | translate }}</th>
                 <th>{{ 'periods.payments.table.total' | translate }}</th>
                 <th>{{ 'periods.payments.table.paid' | translate }}</th>
                 <th>{{ 'periods.payments.table.status' | translate }}</th>
+                <th class="actions-column">{{ 'common.actions' | translate }}</th>
               </tr>
             </ng-template>
 
@@ -228,7 +229,7 @@
               <tr>
                 <td>{{ user.userName }}</td>
                 <td>
-                  <p-tag [value]="user.ordersCount.toString()" severity="info" />
+                  <p-tag [value]="supplierData.periods.length.toString()" severity="info" />
                 </td>
                 <td>{{ formatPrice(user.subtotal) }}</td>
                 <td>{{ formatPrice(user.transportCost) }}</td>
@@ -239,6 +240,32 @@
                     [value]="getPaymentStatusLabel(user.paymentStatus)"
                     [severity]="getPaymentStatusSeverity(user.paymentStatus)"
                   />
+                </td>
+                <td class="actions-column">
+                  <div class="action-buttons">
+                    @if (user.paymentStatus !== PaymentStatus.PAID) {
+                      <p-button
+                        icon="pi pi-check"
+                        [text]="true"
+                        severity="success"
+                        [rounded]="true"
+                        (onClick)="markSupplierUserPeriodsAsPaid(supplierData, user.userId)"
+                        [pTooltip]="'periods.payments.markAllAsPaid' | translate"
+                        [disabled]="isLoading()"
+                      />
+                    }
+                    @if (user.paymentStatus !== PaymentStatus.UNPAID) {
+                      <p-button
+                        icon="pi pi-times"
+                        [text]="true"
+                        severity="danger"
+                        [rounded]="true"
+                        (onClick)="markSupplierUserPeriodsAsUnpaid(supplierData, user.userId)"
+                        [pTooltip]="'periods.payments.markAllAsUnpaid' | translate"
+                        [disabled]="isLoading()"
+                      />
+                    }
+                  </div>
                 </td>
               </tr>
             </ng-template>
