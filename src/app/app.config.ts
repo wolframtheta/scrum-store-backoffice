@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER, LOCALE_ID } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER, LOCALE_ID, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -9,6 +9,7 @@ import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translat
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { provideServiceWorker } from '@angular/service-worker';
 import {
   faUser, faHouse, faBox, faUsers, faChartSimple, faCog, faRightFromBracket,
   faPlus, faPencil, faTrash, faEye, faSearch, faFilter, faFileExport, faFileImport,
@@ -100,6 +101,10 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeApp,
       deps: [ConsumerGroupService, AuthService],
       multi: true
-    }
+    },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 };
