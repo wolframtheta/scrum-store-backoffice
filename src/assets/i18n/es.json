@@ -930,5 +930,13 @@
       "deleteSuccess": "Elemento eliminado correctamente",
       "deleteError": "Error al eliminar el elemento"
     }
+  },
+  "pwa": {
+    "install_title": "Instala la aplicación",
+    "install_description": "Accede más rápido desde la pantalla de inicio",
+    "install_button": "Instalar",
+    "ios_step1": "Pulsa el icono de Compartir",
+    "ios_step2": "Selecciona \"Añadir a pantalla de inicio\"",
+    "dismiss": "Ahora no"
   }
 }
