@@ -1,0 +1,161 @@
+@import '../../../styles/variables';
+
+:host {
+  display: block;
+}
+
+.pwa-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: $white;
+  border-bottom: 1px solid $light-gray;
+  box-shadow: $shadow-md;
+  animation: slideDown 0.3s ease-out;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.banner-icon {
+  flex-shrink: 0;
+  
+  img {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-lg;
+  }
+}
+
+.banner-text {
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 $spacing-xs 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-dark;
+  }
+  
+  p {
+    margin: 0 0 $spacing-sm 0;
+    font-size: 13px;
+    color: $gray;
+  }
+}
+
+.ios-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+  font-size: 12px;
+  
+  .ios-step {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $primary-color;
+    
+    i {
+      font-size: 16px;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+    
+    span {
+      flex: 1;
+    }
+  }
+}
+
+.banner-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.btn-install {
+  background: $primary-color;
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-lg;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition-fast;
+  
+  &:hover {
+    background: darken($primary-color, 8%);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.btn-dismiss {
+  background: transparent;
+  color: $gray;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+  font-size: 18px;
+  cursor: pointer;
+  transition: $transition-fast;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  
+  &:hover {
+    background: $light-bg;
+    color: $text-dark;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: $breakpoint-mobile) {
+  .banner-content {
+    flex-wrap: wrap;
+    padding: $spacing-sm;
+  }
+  
+  .banner-text {
+    flex-basis: 100%;
+    order: 2;
+  }
+  
+  .banner-actions {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+}

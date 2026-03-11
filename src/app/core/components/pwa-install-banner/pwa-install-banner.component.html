@@ -1,0 +1,39 @@
+@if (showBanner()) {
+  <div class="pwa-banner">
+    <div class="banner-content">
+      <div class="banner-icon">
+        <img src="assets/images/icon/icon-192x192.png" alt="App icon" />
+      </div>
+      
+      <div class="banner-text">
+        <h3>{{ 'pwa.install_title' | translate }}</h3>
+        <p>{{ 'pwa.install_description' | translate }}</p>
+        
+        @if (isIOS()) {
+          <div class="ios-instructions">
+            <div class="ios-step">
+              <i class="fa fa-share"></i>
+              <span>{{ 'pwa.ios_step1' | translate }}</span>
+            </div>
+            <div class="ios-step">
+              <i class="fa fa-plus-circle"></i>
+              <span>{{ 'pwa.ios_step2' | translate }}</span>
+            </div>
+          </div>
+        }
+      </div>
+      
+      <div class="banner-actions">
+        @if (isAndroid() || (!isIOS() && hasDeferredPrompt())) {
+          <button class="btn-install" (click)="installPWA()">
+            {{ 'pwa.install_button' | translate }}
+          </button>
+        }
+        
+        <button class="btn-dismiss" (click)="dismiss()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+}
