@@ -1,10 +1,11 @@
 import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { PwaInstallBannerComponent } from './core/components/pwa-install-banner/pwa-install-banner.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, PwaInstallBannerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
