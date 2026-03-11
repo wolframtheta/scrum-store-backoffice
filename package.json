@@ -1,6 +1,6 @@
 {
   "name": "scrum-store-backoffice",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --watch --configuration development --port 4300",
@@ -24,6 +24,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^20.3.17",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
