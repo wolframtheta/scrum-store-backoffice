@@ -11,6 +11,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -62,6 +63,7 @@ interface PeriodBasket {
     DatePickerModule,
     SelectModule,
     InputTextModule,
+    InputNumberModule,
     InputGroupModule,
     InputGroupAddonModule,
     ConfirmDialogModule,
@@ -87,6 +89,10 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
 
   // Estat local temporal dels checkboxes (només visual)
   protected readonly checkedItems = signal<Set<string>>(new Set());
+
+  // Estat per a l'edició de quantitats
+  protected readonly editingItemKey = signal<string | null>(null);
+  protected readonly editingQuantity = signal<number>(0);
 
   // Filtres
   protected readonly filterUserId = signal<string | null>(null);
@@ -772,5 +778,76 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
     }
     
     return `Article ${articleId}`;
+  }
+
+  protected startEditQuantity(node: TreeNode): void {
+    const userData = node.data;
+    if (userData?.type === 'user' && node.key) {
+      this.editingItemKey.set(node.key);
+      this.editingQuantity.set(userData.quantity);
+    }
+  }
+
+  protected isEditingQuantity(key: string | undefined): boolean {
+    return key !== undefined && this.editingItemKey() === key;
+  }
+
+  get editingQuantityValue(): number {
+    return this.editingQuantity();
+  }
+
+  set editingQuantityValue(value: number) {
+    this.editingQuantity.set(value);
+  }
+
+  protected async saveQuantity(node: TreeNode): Promise<void> {
+    const userData = node.data;
+    if (!userData?.orderId || !userData?.itemId) {
+      return;
+    }
+
+    const newQuantity = this.editingQuantity();
+    
+    // Validar que la quantitat sigui vàlida
+    if (newQuantity <= 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La quantitat ha de ser superior a 0'
+      });
+      return;
+    }
+
+    try {
+      await this.salesService.updateOrderItem(userData.orderId, userData.itemId, {
+        quantity: newQuantity
+      });
+      
+      // Recarregar les comandes per actualitzar la vista
+      await this.loadSales();
+      
+      // Cancel·lar l'edició
+      this.editingItemKey.set(null);
+      
+      // Forçar detecció de canvis amb OnPush
+      this.cdr.markForCheck();
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Èxit',
+        detail: 'Quantitat actualitzada correctament'
+      });
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: getErrorMessage(error, 'Error actualitzant la quantitat')
+      });
+    }
+  }
+
+  protected cancelEditQuantity(): void {
+    this.editingItemKey.set(null);
+    this.editingQuantity.set(0);
   }
 }

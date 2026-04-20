@@ -185,13 +185,59 @@
                         />
                         <i class="pi pi-user user-icon"></i>
                         <span class="user-name">{{ userNode.label }}</span>
-                        <span class="user-quantity">
-                          <span class="quantity-value">{{ userNode.data.quantity }}</span>
-                          @if (userNode.data.unitMeasure) {
-                            <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
-                          }
-                        </span>
-                        @if (userNode.data.orderId && userNode.data.articleId) {
+                        
+                        @if (isEditingQuantity(userNode.key)) {
+                          <!-- Mode edició -->
+                          <span class="user-quantity-edit">
+                            <p-inputNumber
+                              [(ngModel)]="editingQuantityValue"
+                              [min]="0.001"
+                              [max]="9999"
+                              [maxFractionDigits]="3"
+                              [showButtons]="true"
+                              [step]="0.5"
+                              mode="decimal"
+                              locale="ca-ES"
+                              [inputStyle]="{ width: '120px' }"
+                              (onKeyDown.enter)="saveQuantity(userNode)"
+                              (onKeyDown.escape)="cancelEditQuantity()"
+                            />
+                            @if (userNode.data.unitMeasure) {
+                              <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
+                            }
+                            <p-button
+                              icon="pi pi-check"
+                              [text]="true"
+                              severity="success"
+                              size="small"
+                              [rounded]="true"
+                              (onClick)="saveQuantity(userNode)"
+                              pTooltip="Guardar"
+                              styleClass="save-button"
+                            />
+                            <p-button
+                              icon="pi pi-times"
+                              [text]="true"
+                              severity="secondary"
+                              size="small"
+                              [rounded]="true"
+                              (onClick)="cancelEditQuantity()"
+                              pTooltip="Cancel·lar"
+                              styleClass="cancel-button"
+                            />
+                          </span>
+                        } @else {
+                          <!-- Mode visualització -->
+                          <span class="user-quantity" (click)="startEditQuantity(userNode)" pTooltip="Clic per editar">
+                            <span class="quantity-value">{{ userNode.data.quantity }}</span>
+                            @if (userNode.data.unitMeasure) {
+                              <span class="quantity-unit">{{ userNode.data.unitMeasure }}</span>
+                            }
+                            <i class="pi pi-pencil edit-icon"></i>
+                          </span>
+                        }
+                        
+                        @if (userNode.data.orderId && userNode.data.articleId && !isEditingQuantity(userNode.key)) {
                           <p-button
                             icon="pi pi-trash"
                             [text]="true"
