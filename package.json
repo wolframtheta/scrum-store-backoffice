@@ -7,9 +7,6 @@
     "start": "ng serve --watch --configuration development --port 4300",
     "start:prod": "ng serve --watch --configuration production",
     "build": "npm run set-env && ng build --configuration=production",
-    "build:local": "API_URL=http://localhost:3100/api/v1 PRODUCTION=false npm run build",
-    "build:pre": "API_URL=https://pre-store-api.scrum-app.com/api/v1 PRODUCTION=true npm run build",
-    "build:pro": "API_URL=https://store.scrum-app.com/api/v1 PRODUCTION=true npm run build",
     "watch": "ng build --watch --configuration development",
     "deploy": "rsync -avz dist/scrum-store-backoffice/browser/ root@46.62.250.143:/dades/www/backoffice/",
     "test": "ng test"
