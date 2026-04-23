@@ -53,12 +53,22 @@
                 }
               ],
               "outputHashing": "all",
-              "fileReplacements": [
+              "serviceWorker": "ngsw-config.json"
+            },
+            "pre": {
+              "budgets": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "12kB",
+                  "maximumError": "20kB"
                 }
               ],
+              "outputHashing": "all",
               "serviceWorker": "ngsw-config.json"
             },
             "development": {
@@ -74,6 +84,9 @@
           "configurations": {
             "production": {
               "buildTarget": "scrum-store-backoffice:build:production"
+            },
+            "pre": {
+              "buildTarget": "scrum-store-backoffice:build:pre"
             },
             "development": {
               "buildTarget": "scrum-store-backoffice:build:development"
