@@ -39,7 +39,7 @@ import { CategoriesService } from '../../../catalog/services/categories.service'
 import { PeriodsService } from '../../../periods/services/periods.service';
 
 // Models
-import { UnitMeasure } from '../../../../core/models/article.model';
+import { UnitMeasure, CustomizationOption } from '../../../../core/models/article.model';
 import { Category } from '../../../../core/models/category.model';
 import { getErrorMessage } from '../../../../core/models/http-error.model';
 
@@ -60,6 +60,7 @@ interface ParsedArticle {
   producer?: string;
   isEco?: boolean;
   taxRate?: number;
+  customizationOptions?: CustomizationOption[];
   isValid: boolean;
   errors: string[];
   selected: boolean;
@@ -192,6 +193,7 @@ export class CsvViewerComponent implements OnInit {
     { articleField: 'producer', label: 'Productor', required: false },
     { articleField: 'isEco', label: 'Ecològic', required: false },
     { articleField: 'taxRate', label: 'IVA (%)', required: false },
+    { articleField: 'customizationOptions', label: 'Opcions de personalització (JSON)', required: false },
   ];
 
   mappingForm: FormGroup = this.fb.group({});
@@ -534,6 +536,7 @@ export class CsvViewerComponent implements OnInit {
       producer: ['productor', 'producer', 'proveïdor', 'proveedor'],
       isEco: ['eco', 'ecològic', 'ecologico', 'ecological', 'bio', 'biològic'],
       taxRate: ['iva', 'tax', 'impost', 'tax rate'],
+      customizationOptions: ['personalitzacio', 'personalitzacions', 'personalizacion', 'personalizaciones', 'customization', 'customizations', 'opcions'],
     };
 
     return names[field] || [field];
@@ -626,6 +629,17 @@ export class CsvViewerComponent implements OnInit {
               article.taxRate = tax;
             }
             break;
+          case 'customizationOptions':
+            if (rawValue) {
+              const result = this.parseCustomizationOptions(rawValue);
+              if (result.error) {
+                article.isValid = false;
+                article.errors.push(result.error);
+              } else {
+                article.customizationOptions = result.options;
+              }
+            }
+            break;
         }
       });
 
@@ -686,6 +700,7 @@ export class CsvViewerComponent implements OnInit {
           isEco: article.isEco,
           taxRate: article.taxRate,
           consumerGroupId: groupId,
+          customizationOptions: article.customizationOptions,
         };
 
         const dtoIndex = dtos.length;
@@ -778,6 +793,80 @@ export class CsvViewerComponent implements OnInit {
     if (!value) return undefined;
     const normalized = value.toLowerCase().trim();
     return normalized === 'true' || normalized === '1' || normalized === 'sí' || normalized === 'si' || normalized === 'yes';
+  }
+
+  private parseCustomizationOptions(value: string): { options?: CustomizationOption[]; error?: string } {
+    if (!value || value.trim() === '') {
+      return { options: undefined };
+    }
+
+    try {
+      const parsed = JSON.parse(value);
+      
+      // Validar que sigui un array
+      if (!Array.isArray(parsed)) {
+        return { error: 'El JSON de personalització ha de ser un array' };
+      }
+
+      // Validar cada opció
+      const validOptions: CustomizationOption[] = [];
+      for (let i = 0; i < parsed.length; i++) {
+        const option = parsed[i];
+        
+        // Validar camps obligatoris
+        if (!option.id || typeof option.id !== 'string') {
+          return { error: `Opció ${i + 1}: falta l'ID o no és un string` };
+        }
+        
+        if (!option.title || typeof option.title !== 'string') {
+          return { error: `Opció ${i + 1}: falta el títol o no és un string` };
+        }
+        
+        if (!option.type || !['boolean', 'numeric', 'string', 'select', 'multiselect'].includes(option.type)) {
+          return { error: `Opció ${i + 1}: tipus invàlid (ha de ser: boolean, numeric, string, select o multiselect)` };
+        }
+
+        // Validar price si existeix
+        if (option.price !== undefined && option.price !== null) {
+          if (typeof option.price !== 'number' || option.price < 0) {
+            return { error: `Opció ${i + 1}: el preu ha de ser un número >= 0` };
+          }
+        }
+
+        // Validar required si existeix
+        if (option.required !== undefined && typeof option.required !== 'boolean') {
+          return { error: `Opció ${i + 1}: required ha de ser booleà` };
+        }
+
+        // Validar values per select/multiselect
+        if (option.type === 'select' || option.type === 'multiselect') {
+          if (!option.values || !Array.isArray(option.values) || option.values.length === 0) {
+            return { error: `Opció ${i + 1}: tipus ${option.type} requereix un array de values` };
+          }
+
+          for (let j = 0; j < option.values.length; j++) {
+            const val = option.values[j];
+            if (!val.id || typeof val.id !== 'string') {
+              return { error: `Opció ${i + 1}, valor ${j + 1}: falta l'ID o no és un string` };
+            }
+            if (!val.label || typeof val.label !== 'string') {
+              return { error: `Opció ${i + 1}, valor ${j + 1}: falta el label o no és un string` };
+            }
+            if (val.price !== undefined && val.price !== null) {
+              if (typeof val.price !== 'number' || val.price < 0) {
+                return { error: `Opció ${i + 1}, valor ${j + 1}: el preu ha de ser un número >= 0` };
+              }
+            }
+          }
+        }
+
+        validOptions.push(option as CustomizationOption);
+      }
+
+      return { options: validOptions };
+    } catch (error: any) {
+      return { error: `JSON invàlid: ${error.message}` };
+    }
   }
 
   // Selection
@@ -1116,6 +1205,7 @@ export class CsvViewerComponent implements OnInit {
           // Aplicar IVA del 21% si no en tenen un definit
           taxRate: article.taxRate !== undefined && article.taxRate !== null ? article.taxRate : 21,
           consumerGroupId: groupId, // Ensure this is always a valid UUID string
+          customizationOptions: article.customizationOptions,
         };
 
         // Validate DTO before adding

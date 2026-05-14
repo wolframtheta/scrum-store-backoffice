@@ -1,18 +1,18 @@
-categoria,producte,varietat,descripció,unitat,preu,ciutat,productor
-Verdures,Tomàquet,Raf,Tomàquet de proximitat,kg,3.50,Barcelona,Can Tomàs
-Verdures,Enciam,Batavia,Enciam de temporada,unitat,1.20,Girona,Hort del Pep
-Conserves,Mel,Flors,Mel natural de flors de primavera,kg,8.90,Lleida,Mel del Pirineu
-Conserves,Oli,Arbequina,Oli d'oliva verge extra,l,12.50,Tarragona,Molí del Solà
-Panaderia,Pa,Sègol,Pa artesà integral,unitat,2.80,Barcelona,Forn del Poble
-Lactis,Formatge,Cabra,Formatge artesà semicurat,kg,18.50,Osona,Formatgeria La Cabreta
-Fruita,Poma,Golden,Pomes de temporada,kg,2.30,Lleida,Fruites del Camp
-Lactis,Iogurt,Natural,Iogurt artesà sense sucres,unitat,1.50,Girona,La Vaqueria
-Verdures,Espinacs,,Espinacs de temporada,kg,3.20,Barcelona,Can Tomàs
-Llegums,Mongetes,Ganxet,Mongetes del ganxet,kg,6.50,Barcelona,Cal Pagès
-Begudes,Suc,Taronja,Suc natural sense additius,l,4.50,València,Taronges del Sud
-Lactis,Ous,,Ous de gallines en llibertat,unitat,0.45,Girona,La Granja del Llac
-Begudes,Vi,Negre,Vi negre jove,l,8.50,Priorat,Celler del Montsant
-Verdures,Patata,Monalisa,Patates de temporada,kg,1.80,Lleida,Can Patata
+categoria,producte,varietat,descripció,unitat,preu,ciutat,productor,personalitzacions
+Verdures,Tomàquet,Raf,Tomàquet de proximitat,kg,3.50,Barcelona,Can Tomàs,"[{""id"":""eco"",""title"":""Ecològic"",""type"":""boolean"",""price"":0.50}]"
+Verdures,Enciam,Batavia,Enciam de temporada,unitat,1.20,Girona,Hort del Pep,"[{""id"":""size"",""title"":""Mida"",""type"":""select"",""values"":[{""id"":""s"",""label"":""Petit"",""price"":0},{""id"":""m"",""label"":""Mitjà"",""price"":0.20},{""id"":""l"",""label"":""Gran"",""price"":0.40}]}]"
+Conserves,Mel,Flors,Mel natural de flors de primavera,kg,8.90,Lleida,Mel del Pirineu,
+Conserves,Oli,Arbequina,Oli d'oliva verge extra,l,12.50,Tarragona,Molí del Solà,
+Panaderia,Pa,Sègol,Pa artesà integral,unitat,2.80,Barcelona,Forn del Poble,"[{""id"":""sliced"",""title"":""Tallat"",""type"":""boolean"",""required"":false,""price"":0}]"
+Lactis,Formatge,Cabra,Formatge artesà semicurat,kg,18.50,Osona,Formatgeria La Cabreta,"[{""id"":""portion"",""title"":""Porció"",""type"":""select"",""values"":[{""id"":""whole"",""label"":""Peça sencera"",""price"":0},{""id"":""half"",""label"":""Mitja peça"",""price"":0},{""id"":""quarter"",""label"":""Quart de peça"",""price"":0}]}]"
+Fruita,Poma,Golden,Pomes de temporada,kg,2.30,Lleida,Fruites del Camp,
+Lactis,Iogurt,Natural,Iogurt artesà sense sucres,unitat,1.50,Girona,La Vaqueria,
+Verdures,Espinacs,,Espinacs de temporada,kg,3.20,Barcelona,Can Tomàs,
+Llegums,Mongetes,Ganxet,Mongetes del ganxet,kg,6.50,Barcelona,Cal Pagès,
+Begudes,Suc,Taronja,Suc natural sense additius,l,4.50,València,Taronges del Sud,
+Lactis,Ous,,Ous de gallines en llibertat,unitat,0.45,Girona,La Granja del Llac,"[{""id"":""quantity"",""title"":""Quantitat extra"",""type"":""numeric"",""price"":0.45}]"
+Begudes,Vi,Negre,Vi negre jove,l,8.50,Priorat,Celler del Montsant,
+Verdures,Patata,Monalisa,Patates de temporada,kg,1.80,Lleida,Can Patata,
 
 
 

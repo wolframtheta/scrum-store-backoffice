@@ -139,6 +139,12 @@
             <span class="period-name" [class.finished]="periodNode.data.isFinished">
               {{ periodNode.label }}
             </span>
+            @if (periodNode.data.supplierName) {
+              <span class="supplier-name">
+                <i class="pi pi-truck supplier-icon"></i>
+                {{ periodNode.data.supplierName }}
+              </span>
+            }
             @if (periodNode.data.isFinished) {
               <p-tag [value]="'basketPreparation.finished' | translate" severity="secondary" styleClass="finished-tag" />
             }

@@ -3,6 +3,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { ConsumerGroupService } from '../../../core/services/consumer-group.service';
 import { PeriodPaymentSummary } from '../../../core/models/period-payment-summary.model';
 import { getErrorMessage } from '../../../core/models/http-error.model';
+import { SalesService } from '../../sales/services/sales.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import { getErrorMessage } from '../../../core/models/http-error.model';
 export class PeriodPaymentsService {
   private readonly api = inject(ApiService);
   private readonly groupService = inject(ConsumerGroupService);
+  private readonly salesService = inject(SalesService);
 
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
@@ -56,6 +58,10 @@ export class PeriodPaymentsService {
         { groupId }
       );
       console.log(`Marked as paid successfully:`, result);
+      
+      // Recarregar les comandes per actualitzar l'estat al cache
+      await this.salesService.loadSalesByGroup(groupId);
+      
       return result;
     } catch (err: any) {
       console.error(`Error marking as paid:`, err);
@@ -88,6 +94,10 @@ export class PeriodPaymentsService {
         { groupId }
       );
       console.log(`Marked as unpaid successfully:`, result);
+      
+      // Recarregar les comandes per actualitzar l'estat al cache
+      await this.salesService.loadSalesByGroup(groupId);
+      
       return result;
     } catch (err: any) {
       console.error(`Error marking as unpaid:`, err);

@@ -17,6 +17,9 @@ export interface CreateArticleDto {
   taxRate?: number;
   consumerGroupId: string;
   maxQuantity?: number;
+  inShowcase?: boolean;
+  isSeasonal?: boolean;
+  customizationOptions?: CustomizationOption[];
 }
 
 export interface UpdateArticleDto {

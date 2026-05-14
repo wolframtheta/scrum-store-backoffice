@@ -445,6 +445,9 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
         });
       }
 
+      // Obtenir el nom del proveïdor
+      const supplierName = periodBasket.period?.supplier?.name || '';
+
       const periodNode: TreeNode = {
         key: periodId,
         label: deliveryDateStr 
@@ -455,7 +458,8 @@ export class BasketPreparationComponent implements OnInit, OnDestroy {
           periodId: periodId,
           periodName: periodBasket.periodName,
           isFinished: periodBasket.isFinished,
-          deliveryDate: periodBasket.period?.deliveryDate
+          deliveryDate: periodBasket.period?.deliveryDate,
+          supplierName: supplierName
         },
         children: articleNodes,
         expanded: true

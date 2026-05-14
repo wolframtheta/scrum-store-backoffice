@@ -26,6 +26,7 @@ Puedes ajustar manualmente el mapeo si es necesario.
 - Varietat
 - Ciutat
 - Productor
+- Opcions de personalització (JSON)
 
 #### Unidades de medida aceptadas:
 El sistema normaliza automáticamente las siguientes unidades:
@@ -63,6 +64,73 @@ El sistema realiza las siguientes validaciones:
 2. **Precio**: Obligatorio, debe ser un número válido > 0
 3. **Unidad de medida**: Obligatoria, debe ser una unidad válida
 4. **Formato de precio**: Acepta tanto punto como coma decimal (3.50 o 3,50)
+5. **Opciones de personalización**: Si se proporciona, debe ser un JSON válido con la estructura correcta
+
+## Opciones de Personalización
+
+Puedes añadir opciones de personalización a los artículos mediante una columna con formato JSON.
+
+### Estructura del JSON
+
+```json
+[
+  {
+    "id": "opt-1",
+    "title": "Opció de exemple",
+    "type": "boolean|numeric|string|select|multiselect",
+    "required": false,
+    "price": 0.50,
+    "values": [
+      {
+        "id": "val-1",
+        "label": "Valor 1",
+        "price": 1.50
+      }
+    ]
+  }
+]
+```
+
+### Tipos de opciones
+
+1. **boolean**: Opción sí/no (checkbox)
+   - Ejemplo: ¿Ecológico?
+   - No requiere `values`
+
+2. **numeric**: Campo numérico
+   - Ejemplo: Cantidad adicional
+   - No requiere `values`
+
+3. **string**: Campo de texto libre
+   - Ejemplo: Instrucciones especiales
+   - No requiere `values`
+
+4. **select**: Selección única (dropdown)
+   - Ejemplo: Tamaño (S, M, L, XL)
+   - Requiere `values`
+
+5. **multiselect**: Selección múltiple
+   - Ejemplo: Ingredientes extras
+   - Requiere `values`
+
+### Campos de cada opción
+
+- **id** (obligatorio): Identificador único de la opción
+- **title** (obligatorio): Título que se muestra al usuario
+- **type** (obligatorio): Tipo de opción (ver tipos arriba)
+- **required** (opcional): Si la opción es obligatoria (true/false)
+- **price** (opcional): Precio adicional cuando se activa/selecciona
+- **values** (obligatorio para select/multiselect): Array de valores posibles
+
+### Ejemplo de CSV con personalización
+
+```csv
+nom,preu,unitat,personalitzacions
+"Tomàquet Cherry",3.50,kg,"[{""id"":""eco"",""title"":""Ecològic"",""type"":""boolean"",""price"":0.50}]"
+"Enciam",1.20,unitat,"[{""id"":""size"",""title"":""Mida"",""type"":""select"",""values"":[{""id"":""s"",""label"":""Petit"",""price"":0},{""id"":""l"",""label"":""Gran"",""price"":0.30}]}]"
+```
+
+**Nota importante**: En CSV, las comillas dobles dentro del JSON deben escaparse duplicándolas (`""`).
 
 ## Consejos
 
