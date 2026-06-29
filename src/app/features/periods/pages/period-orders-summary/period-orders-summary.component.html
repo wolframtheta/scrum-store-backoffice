@@ -150,10 +150,19 @@
       </div>
       <div class="summary-actions">
         <p-button
-          icon="pi pi-download"
-          label="Exportar i enviar per correu"
+          icon="pi pi-envelope"
+          [label]="'periods.ordersSummary.sendEmail' | translate"
           severity="primary"
-          (onClick)="exportToVcfAndEmail()"
+          (onClick)="sendSummaryByEmail()"
+          [disabled]="articlesSummary().length === 0 || isSendingEmail()"
+          [loading]="isSendingEmail()"
+        />
+        <p-button
+          icon="pi pi-download"
+          [label]="'periods.ordersSummary.download' | translate"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="downloadSummary()"
           [disabled]="articlesSummary().length === 0"
         />
       </div>

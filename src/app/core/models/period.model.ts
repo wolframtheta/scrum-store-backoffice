@@ -27,6 +27,7 @@ export interface Period {
   supplier?: {
     id: string;
     name: string;
+    email?: string;
   };
   startDate: Date | string;
   endDate: Date | string;

@@ -713,6 +713,8 @@
       "title": "Resumen de Pedidos del Período",
       "totalOrders": "Total Pedidos",
       "totalArticles": "Total Artículos",
+      "sendEmail": "Enviar al proveedor",
+      "download": "Descargar TXT",
       "perUser": "por usuario",
       "customizations": "Personalizaciones",
       "hasCustomizations": "Este artículo tiene personalizaciones",

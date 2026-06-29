@@ -17,6 +17,7 @@ import { SalesService } from '../../../sales/services/sales.service';
 import { ConsumerGroupService } from '../../../../core/services/consumer-group.service';
 import { Period } from '../../../../core/models/period.model';
 import { Sale, SelectedOption } from '../../../../core/models/sale.model';
+import { getErrorMessage } from '../../../../core/models/http-error.model';
 
 interface CustomizationVariant {
   customizationKey: string;
@@ -74,6 +75,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   protected readonly transportCost = signal<number | null>(null);
   protected readonly isEditingTransport = signal<boolean>(false);
   protected readonly isSavingTransport = signal<boolean>(false);
+  protected readonly isSendingEmail = signal<boolean>(false);
   protected readonly expandedRows = signal<Record<string, boolean>>({});
 
   protected readonly articlesSummaryList = computed(() => {
@@ -403,7 +405,48 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     }
   }
 
-  protected exportToVcfAndEmail(): void {
+  protected async sendSummaryByEmail(): Promise<void> {
+    const period = this.period();
+    const periodId = this.periodId();
+
+    if (!period || !periodId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No hi ha dades del període',
+      });
+      return;
+    }
+
+    if (!period.supplier?.email) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Correu no disponible',
+        detail: 'El proveïdor no té correu registrat. Afegeix-lo a la fitxa del proveïdor.',
+      });
+      return;
+    }
+
+    this.isSendingEmail.set(true);
+    try {
+      const result = await this.periodsService.sendOrdersSummary(periodId);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Correu enviat',
+        detail: `Resum enviat a ${result.sentTo}`,
+      });
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: getErrorMessage(error, 'No s\'ha pogut enviar el correu'),
+      });
+    } finally {
+      this.isSendingEmail.set(false);
+    }
+  }
+
+  protected downloadSummary(): void {
     const period = this.period();
     if (!period) {
       this.messageService.add({

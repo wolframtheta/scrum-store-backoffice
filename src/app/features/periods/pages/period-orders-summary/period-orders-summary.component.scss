@@ -92,6 +92,9 @@
 
     .summary-actions {
       margin-left: auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
   }
 }

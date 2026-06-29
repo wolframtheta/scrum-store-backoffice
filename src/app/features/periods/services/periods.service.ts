@@ -103,5 +103,23 @@ export class PeriodsService {
   clearError(): void {
     this.error.set(null);
   }
+
+  async sendOrdersSummary(periodId: string): Promise<{ sentTo: string; subject: string; sentAt: string }> {
+    const groupId = this.groupService.selectedGroupId();
+    if (!groupId) {
+      throw new Error('No group selected');
+    }
+
+    this.error.set(null);
+    try {
+      return await this.api.post<{ sentTo: string; subject: string; sentAt: string }>(
+        `periods/${periodId}/send-summary?consumerGroupId=${groupId}`,
+        {},
+      );
+    } catch (error) {
+      this.error.set(getErrorMessage(error, 'Error en enviar el resum per correu'));
+      throw error;
+    }
+  }
 }
 
