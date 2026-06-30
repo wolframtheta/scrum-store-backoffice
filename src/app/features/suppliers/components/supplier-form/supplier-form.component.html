@@ -52,9 +52,10 @@
           <label for="email">{{ 'suppliers.form.email' | translate }}</label>
           <input
             id="email"
-            type="email"
+            type="text"
             pInputText
             formControlName="email"
+            autocomplete="email"
             [class.ng-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
           />
           @if (form.get('email')?.invalid && form.get('email')?.touched) {

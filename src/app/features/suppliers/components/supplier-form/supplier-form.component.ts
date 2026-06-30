@@ -119,6 +119,14 @@ export class SupplierFormComponent {
       const formData = {
         ...this.form.value,
         consumerGroupId: groupId,
+        email: this.sanitizeOptionalString(this.form.value.email),
+        phone: this.sanitizeOptionalString(this.form.value.phone),
+        cif: this.sanitizeOptionalString(this.form.value.cif),
+        city: this.sanitizeOptionalString(this.form.value.city),
+        address: this.sanitizeOptionalString(this.form.value.address),
+        postalCode: this.sanitizeOptionalString(this.form.value.postalCode),
+        bankAccount: this.sanitizeOptionalString(this.form.value.bankAccount),
+        notes: this.sanitizeOptionalString(this.form.value.notes),
       };
 
       console.log('Emitting save with data:', formData);
@@ -130,6 +138,11 @@ export class SupplierFormComponent {
         this.form.get(key)?.markAsTouched();
       });
     }
+  }
+
+  private sanitizeOptionalString(value: string | null | undefined): string | undefined {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : undefined;
   }
 }
 

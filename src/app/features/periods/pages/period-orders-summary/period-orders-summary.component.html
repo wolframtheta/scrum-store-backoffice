@@ -149,14 +149,26 @@
         <span class="summary-value">{{ articlesSummary().length }}</span>
       </div>
       <div class="summary-actions">
-        <p-button
-          icon="pi pi-envelope"
-          [label]="'periods.ordersSummary.sendEmail' | translate"
-          severity="primary"
-          (onClick)="sendSummaryByEmail()"
-          [disabled]="articlesSummary().length === 0 || isSendingEmail()"
-          [loading]="isSendingEmail()"
-        />
+        @if (hasSupplierEmail()) {
+          <p-button
+            icon="pi pi-envelope"
+            [label]="'periods.ordersSummary.sendEmail' | translate"
+            severity="primary"
+            (onClick)="sendSummaryByEmail()"
+            [disabled]="articlesSummary().length === 0 || isSendingEmail()"
+            [loading]="isSendingEmail()"
+          />
+        }
+        @if (hasSupplierPhone()) {
+          <p-button
+            icon="pi pi-whatsapp"
+            [label]="'periods.ordersSummary.sendWhatsApp' | translate"
+            severity="success"
+            [outlined]="true"
+            (onClick)="shareViaWhatsApp()"
+            [disabled]="articlesSummary().length === 0"
+          />
+        }
         <p-button
           icon="pi pi-download"
           [label]="'periods.ordersSummary.download' | translate"

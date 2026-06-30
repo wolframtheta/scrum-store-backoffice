@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -61,6 +61,7 @@ export class PeriodOrdersSummaryComponent implements OnInit {
   private readonly groupService = inject(ConsumerGroupService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
+  private readonly translateService = inject(TranslateService);
   private readonly route = inject(ActivatedRoute);
   protected readonly router = inject(Router);
 
@@ -83,6 +84,14 @@ export class PeriodOrdersSummaryComponent implements OnInit {
       a.articleName.localeCompare(b.articleName)
     );
   });
+
+  protected readonly hasSupplierEmail = computed(
+    () => !!this.period()?.supplier?.email?.trim(),
+  );
+
+  protected readonly hasSupplierPhone = computed(
+    () => this.normalizePhoneForWhatsApp(this.period()?.supplier?.phone) !== null,
+  );
 
   async ngOnInit(): Promise<void> {
     const periodId = this.route.snapshot.paramMap.get('periodId');
@@ -444,6 +453,47 @@ export class PeriodOrdersSummaryComponent implements OnInit {
     } finally {
       this.isSendingEmail.set(false);
     }
+  }
+
+  protected shareViaWhatsApp(): void {
+    const period = this.period();
+    if (!period) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No hi ha dades del període',
+      });
+      return;
+    }
+
+    const phone = this.normalizePhoneForWhatsApp(period.supplier?.phone);
+    if (!phone) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Telèfon no disponible',
+        detail: this.translateService.instant('periods.ordersSummary.whatsappNoPhone'),
+      });
+      return;
+    }
+
+    const greeting = this.translateService.instant('periods.ordersSummary.whatsappGreeting');
+    const message = `${greeting}\n${this.generateArticlesContent()}`;
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  private normalizePhoneForWhatsApp(phone?: string): string | null {
+    if (!phone?.trim()) return null;
+
+    let digits = phone.replace(/\D/g, '');
+    if (digits.startsWith('00')) {
+      digits = digits.slice(2);
+    }
+    if (digits.length === 9) {
+      digits = `34${digits}`;
+    }
+
+    return digits.length >= 11 ? digits : null;
   }
 
   protected downloadSummary(): void {

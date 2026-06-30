@@ -28,6 +28,7 @@ export interface Period {
     id: string;
     name: string;
     email?: string;
+    phone?: string;
   };
   startDate: Date | string;
   endDate: Date | string;
